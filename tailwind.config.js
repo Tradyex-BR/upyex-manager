@@ -2,10 +2,19 @@
 export default {
   content: [
     "./index.html",
-    "./src/**/*.{js,ts,jsx,tsx}",
+    "./src/**/*.{vue,js,ts,jsx,tsx}",
   ],
   theme: {
-    extend: {},
+    extend: {
+      colors: {
+        primary: 'var(--primary-color)',
+        secondary: 'var(--secondary-color)',
+        success: 'var(--success-color)',
+        danger: 'var(--danger-color)',
+        warning: 'var(--warning-color)',
+        info: 'var(--info-color)',
+      },
+    },
   },
   plugins: [],
 } 
