@@ -55,41 +55,23 @@
         </button>
       </div>
     </div>
-    <div class="flex items-center gap-2 w-full max-sm:flex-col max-sm:items-start">
-      <div
-        :class="['w-6 h-6 rounded border bg-white border-solid border-[rgba(184,184,184,1)] flex items-center justify-center cursor-pointer', { 'bg-[#CF631C]': rememberMe }]"
-        @click="rememberMe = !rememberMe"
-      >
-        <svg
-          v-if="rememberMe"
-          width="14"
-          height="14"
-          viewBox="0 0 14 14"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path
-            d="M11.6666 3.5L5.24992 9.91667L2.33325 7"
-            stroke="white"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          />
-        </svg>
+    <div class="flex items-center justify-between mb-6">
+      <div class="flex items-center">
+        <input
+          id="remember-me"
+          v-model="rememberMe"
+          type="checkbox"
+          class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+        />
+        <label for="remember-me" class="ml-2 block text-sm text-gray-900">
+          Lembrar-me
+        </label>
       </div>
-      <label
-        for="remember-me"
-        class="flex-1 text-sm font-normal text-[rgba(34,42,63,1)] cursor-pointer"
-        @click="rememberMe = !rememberMe"
-      >
-        Manter conectado
-      </label>
-      <button
-        type="button"
-        class="text-sm font-normal text-[rgba(207,99,28,1)]"
-      >
-        Esqueci a senha
-      </button>
+      <div class="text-sm">
+        <router-link to="/forgot-password" class="font-medium text-blue-600 hover:text-blue-500">
+          Esqueceu sua senha?
+        </router-link>
+      </div>
     </div>
     <div class="flex flex-col gap-6 w-full max-sm:items-center mt-4">
       <div>
