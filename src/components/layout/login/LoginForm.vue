@@ -107,9 +107,9 @@
         </div>
       <div class="text-center text-sm font-normal text-[rgba(4,13,37,1)]">
         <span>Não possui conta? </span>
-        <button type="button" class="text-[rgba(207,99,28,1)]">
+        <router-link to="/cadastro" class="text-[rgba(207,99,28,1)] hover:underline">
           Cadastre-se
-        </button>
+        </router-link>
       </div>
     </div>
 

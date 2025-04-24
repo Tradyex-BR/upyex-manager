@@ -13,6 +13,12 @@ const routes = [
     meta: { requiresAuth: false }
   },
   {
+    path: '/cadastro',
+    name: 'Cadastro',
+    component: () => import('../views/Cadastro.vue'),
+    meta: { requiresAuth: false }
+  },
+  {
     path: '/forgot-password',
     name: 'ForgotPassword',
     component: () => import('../views/ForgotPassword.vue'),
