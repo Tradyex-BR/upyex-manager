@@ -24,7 +24,10 @@
                   <tr v-for="oferta in ofertas" :key="oferta.id" class="border-b border-[#1A1F3C]">
                     <td class="p-4">{{ oferta.data }}</td>
                     <td class="p-4">{{ oferta.cliente }}</td>
-                    <td class="p-4">{{ oferta.token }}</td>
+                    <td class="p-4 flex items-center gap-2">
+                      <img :src="`https://ui-avatars.com/api/?name=${oferta.token}&background=random`" :alt="oferta.token" class="w-10 h-10 rounded-full" />
+                      <p class="text-white text-sm font-semibold">{{ oferta.token }}</p>
+                    </td>
                     <td class="p-4">
                       <span :class="getStatusClass(oferta.status)">{{ oferta.status }}</span>
                     </td>
