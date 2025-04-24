@@ -1,63 +1,67 @@
 import { defineStore } from 'pinia'
-import { ref } from 'vue'
-import api from '@/services/api'
+import { authService, LoginCredentials } from '../services/auth'
+import { LoginResponse } from '../mocks/data/auth'
 
-export const useAuthStore = defineStore('auth', () => {
-  const user = ref<{ id: number; name: string; email: string } | null>(null)
-  const token = ref<string | null>(null)
-  const isAuthenticated = ref(false)
+interface AuthState {
+  user: LoginResponse['user'] | null
+  token: string | null
+  loading: boolean
+  error: string | null
+}
 
-  const login = async (email: string, password: string) => {
-    try {
-      const response = await api.post('/auth/login', { email, password })
-      const { user: userData, token: accessToken } = response.data
-      
-      user.value = userData
-      token.value = accessToken
-      isAuthenticated.value = true
-      
-      localStorage.setItem('token', accessToken)
-      api.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`
-      
-      return true
-    } catch (error) {
-      console.error('Erro no login:', error)
-      return false
-    }
-  }
+export const useAuthStore = defineStore('auth', {
+  state: (): AuthState => ({
+    user: null,
+    token: localStorage.getItem('token'),
+    loading: false,
+    error: null
+  }),
 
-  const logout = () => {
-    user.value = null
-    token.value = null
-    isAuthenticated.value = false
-    localStorage.removeItem('token')
-    delete api.defaults.headers.common['Authorization']
-  }
+  getters: {
+    isAuthenticated: (state) => !!state.token,
+    currentUser: (state) => state.user
+  },
 
-  const checkAuth = async () => {
-    const storedToken = localStorage.getItem('token')
-    if (storedToken) {
+  actions: {
+    async login(credentials: LoginCredentials) {
+      this.loading = true
+      this.error = null
+
       try {
-        api.defaults.headers.common['Authorization'] = `Bearer ${storedToken}`
-        const response = await api.get('/auth/me')
-        user.value = response.data
-        token.value = storedToken
-        isAuthenticated.value = true
-        return true
-      } catch (error) {
-        logout()
+        const response = await authService.login(credentials)
+        this.token = response.token
+        this.user = response.user
+        localStorage.setItem('token', response.token)
+      } catch (error: any) {
+        this.error = error.response?.data?.message || 'Erro ao fazer login'
+        throw error
+      } finally {
+        this.loading = false
+      }
+    },
+
+    logout() {
+      this.user = null
+      this.token = null
+      this.error = null
+      authService.logout()
+    },
+    
+    async checkAuth() {
+      // Verifica se existe um token no localStorage
+      const token = localStorage.getItem('token')
+      
+      if (!token) {
         return false
       }
+      
+      // Se existir um token, verifica se ele está armazenado no estado
+      if (this.token !== token) {
+        this.token = token
+      }
+      
+      // Retorna true se o token existir
+      return !!this.token
     }
-    return false
-  }
-
-  return {
-    user,
-    token,
-    isAuthenticated,
-    login,
-    logout,
-    checkAuth
   }
 }) 
