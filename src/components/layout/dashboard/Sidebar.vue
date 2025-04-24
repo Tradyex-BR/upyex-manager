@@ -24,7 +24,9 @@
                   'cursor-pointer': true
                 }">
                   <div class="self-stretch flex items-center gap-2.5 my-auto">
-                    <div class="self-stretch flex w-6 shrink-0 h-6 my-auto" />
+                    <div class="self-stretch flex w-6 shrink-0 h-6 my-auto">
+                      <menu-icons :name="item.icon" />
+                    </div>
                     <div class="text-sm font-medium leading-5 self-stretch my-auto">
                       {{ item.text }}
                     </div>
@@ -43,14 +45,19 @@
 <script lang="ts">
 import { defineComponent } from 'vue'
 import { useRoute } from 'vue-router'
+import MenuIcons from '@/components/icons/MenuIcons.vue'
 
 interface MenuItem {
   text: string
   route: string
+  icon: string
 }
 
 export default defineComponent({
   name: 'Sidebar',
+  components: {
+    MenuIcons
+  },
   setup() {
     const route = useRoute()
 
@@ -65,10 +72,26 @@ export default defineComponent({
   data() {
     return {
       menuItems: [
-        { text: 'Dashboard', route: '/dashboard' },
-        { text: 'Vendas', route: '/vendas' },
-        { text: 'Ofertas', route: '/ofertas' },
-        { text: 'Saques', route: '/saques' }
+        { 
+          text: 'Dashboard', 
+          route: '/dashboard',
+          icon: 'svg-dashboard'
+        },
+        { 
+          text: 'Vendas', 
+          route: '/vendas',
+          icon: 'svg-vendas'
+        },
+        { 
+          text: 'Ofertas', 
+          route: '/ofertas',
+          icon: 'svg-ofertas'
+        },
+        { 
+          text: 'Saques', 
+          route: '/saques',
+          icon: 'svg-saques'
+        }
       ] as MenuItem[]
     }
   }
