@@ -1,90 +1,84 @@
-  <template>
-    <div class="bg-[#040D25] overflow-hidden">
-      <div class="gap-5 flex max-md:flex-col max-md:items-stretch">
-        <Sidebar />
-        <main class="w-[81%] ml-5 max-md:w-full max-md:ml-0">
-          <div class="w-full max-md:max-w-full">
-            <TopBar />
-            <section
-              class="bg-[#040D25] min-h-[944px] w-full overflow-hidden pt-8 pb-20 px-8 max-md:max-w-full max-md:px-5">
-              <p class="text-white text-2xl font-semibold mb-6">Afiliados</p>
-              <div class="overflow-x-auto">
-                <table class="w-full text-white border-collapse">
-                  <thead>
-                    <tr class="bg-[#1A1F3C]">
-                      <th class="p-4 text-left">Nome</th>
-                      <th class="p-4 text-left">ID de Afiliado</th>
-                      <th class="p-4 text-left">Data de Cadastro</th>
-                      <th class="p-4 text-left">Status</th>
-                      <th class="p-4 text-left">Ações</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr v-for="afiliado in afiliados" :key="afiliado.id" class="border-b border-[#1A1F3C]">
-                      <td class="p-4 flex items-center gap-2">
-                        <img :src="`https://ui-avatars.com/api/?name=${afiliado.nome}&background=random`" :alt="afiliado.nome" class="w-10 h-10 rounded-full" />
-                        <p class="text-white text-sm font-semibold">{{ afiliado.nome }}</p>
-                      </td>
-                      <td class="p-4">{{ afiliado.ref }}</td>
-                      <td class="p-4">{{ afiliado.data }}</td>
-                      <td class="p-4">
-                        <span :class="getStatusClass(afiliado.status)">{{ afiliado.status }}</span>
-                      </td>
-                      <td class="p-4">
-                        <div class="relative">
+<template>
+  <div class="bg-[#040D25] overflow-hidden">
+    <div class="gap-5 flex max-md:flex-col max-md:items-stretch">
+      <Sidebar />
+      <main class="w-[81%] ml-5 max-md:w-full max-md:ml-0">
+        <div class="w-full max-md:max-w-full">
+          <TopBar />
+          <section
+            class="bg-[#040D25] min-h-[944px] w-full overflow-hidden pt-8 pb-20 px-8 max-md:max-w-full max-md:px-5">
+            <p class="text-white text-2xl font-semibold mb-6">Afiliados</p>
+            <div class="overflow-x-auto">
+              <table class="w-full text-white border-collapse">
+                <thead>
+                  <tr class="bg-[#1A1F3C]">
+                    <th class="p-4 text-left">Nome</th>
+                    <th class="p-4 text-left">ID de Afiliado</th>
+                    <th class="p-4 text-left">Data de Cadastro</th>
+                    <th class="p-4 text-left">Status</th>
+                    <th class="p-4 text-left">Ações</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="afiliado in afiliados" :key="afiliado.id" class="border-b border-[#1A1F3C]">
+                    <td class="p-4 flex items-center gap-2">
+                      <img :src="`https://ui-avatars.com/api/?name=${afiliado.nome}&background=random`" :alt="afiliado.nome" class="w-10 h-10 rounded-full" />
+                      <p class="text-white text-sm font-semibold">{{ afiliado.nome }}</p>
+                    </td>
+                    <td class="p-4">{{ afiliado.ref }}</td>
+                    <td class="p-4">{{ afiliado.data }}</td>
+                    <td class="p-4">
+                      <span :class="getStatusClass(afiliado.status)">{{ afiliado.status }}</span>
+                    </td>
+                    <td class="p-4">
+                      <div class="relative">
+                        <button 
+                          @click="toggleDropdown(afiliado.id)"
+                          class="px-3 py-1 bg-[#1A1F3C] rounded-lg hover:bg-[#2A2F4C] transition-colors"
+                        >
+                          Ações
+                        </button>
+                        <div 
+                          v-if="dropdownOpen === afiliado.id"
+                          class="absolute right-0 mt-2 w-48 bg-[#1A1F3C] rounded-lg shadow-lg z-10"
+                        >
                           <button 
-                            @click="toggleDropdown(afiliado.id)"
-                            class="px-3 py-1 bg-[#1A1F3C] rounded-lg hover:bg-[#2A2F4C] transition-colors"
+                            @click="handleAction(afiliado.id, 'aprovar')"
+                            class="w-full text-left px-4 py-2 hover:bg-[#2A2F4C] text-green-500"
                           >
-                            Ações
+                            Aprovar
                           </button>
-                          <div 
-                            v-if="dropdownOpen === afiliado.id"
-                            class="absolute right-0 mt-2 w-48 bg-[#1A1F3C] rounded-lg shadow-lg z-10"
+                          <button 
+                            @click="handleAction(afiliado.id, 'bloquear')"
+                            class="w-full text-left px-4 py-2 hover:bg-[#2A2F4C] text-yellow-500"
                           >
-                            <button 
-                              @click="handleAction(afiliado.id, 'aprovar')"
-                              class="w-full text-left px-4 py-2 hover:bg-[#2A2F4C] text-green-500"
-                            >
-                              Aprovar
-                            </button>
-                            <button 
-                              @click="handleAction(afiliado.id, 'bloquear')"
-                              class="w-full text-left px-4 py-2 hover:bg-[#2A2F4C] text-yellow-500"
-                            >
-                              Bloquear
-                            </button>
-                            <button 
-                              @click="handleAction(afiliado.id, 'excluir')"
-                              class="w-full text-left px-4 py-2 hover:bg-[#2A2F4C] text-red-500"
-                            >
-                              Excluir
-                            </button>
-                          </div>
+                            Bloquear
+                          </button>
+                          <button 
+                            @click="handleAction(afiliado.id, 'excluir')"
+                            class="w-full text-left px-4 py-2 hover:bg-[#2A2F4C] text-red-500"
+                          >
+                            Excluir
+                          </button>
                         </div>
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            </section>
-          </div>
-        </main>
-      </div>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
+        </div>
+      </main>
     </div>
-  </template>
+  </div>
+</template>
+
 <script lang="ts">
 import { defineComponent } from 'vue'
+import { useDashboardStore } from '@/stores/dashboard'
 import Sidebar from '@/components/layout/dashboard/Sidebar.vue'
 import TopBar from '@/components/layout/dashboard/TopBar.vue'
-
-interface Afiliado {
-  id: number;
-  nome: string;
-  ref: string;
-  data: string;
-  status: string;
-}
 
 export default defineComponent({
   name: 'Vendas',
@@ -94,8 +88,12 @@ export default defineComponent({
   },
   data() {
     return {
-      afiliados: [] as Afiliado[],
       dropdownOpen: null as number | null
+    }
+  },
+  computed: {
+    afiliados() {
+      return this.store.afiliados
     }
   },
   methods: {
@@ -110,40 +108,27 @@ export default defineComponent({
     toggleDropdown(id: number) {
       this.dropdownOpen = this.dropdownOpen === id ? null : id
     },
-    handleAction(id: number, action: string) {
-      // Aqui você pode implementar a lógica para cada ação
-      console.log(`Ação ${action} para o afiliado ${id}`)
+    async handleAction(id: number, action: string) {
+      switch (action) {
+        case 'aprovar':
+          await this.store.aprovarAfiliado(id)
+          break
+        case 'bloquear':
+          await this.store.bloquearAfiliado(id)
+          break
+        case 'excluir':
+          await this.store.excluirAfiliado(id)
+          break
+      }
       this.dropdownOpen = null
-    },
-    carregarAfiliados() {
-      // Simulando dados mockados
-      this.afiliados = [
-        {
-          id: 1,
-          nome: 'David Jahnsen',
-          ref: 'ref_david',
-          data: '10/03/2025',
-          status: 'Aprovado'
-        },
-        {
-          id: 2,
-          nome: 'Maria Silva',
-          ref: 'ref_maria',
-          data: '15/03/2025',
-          status: 'Pendente'
-        },
-        {
-          id: 3,
-          nome: 'João Santos',
-          ref: 'ref_joao',
-          data: '20/03/2025',
-          status: 'Rejeitado'
-        }
-      ]
     }
   },
+  setup() {
+    const store = useDashboardStore()
+    return { store }
+  },
   mounted() {
-    this.carregarAfiliados()
+    this.store.carregarAfiliados()
     // Fechar o dropdown quando clicar fora
     document.addEventListener('click', (e) => {
       const target = e.target as HTMLElement

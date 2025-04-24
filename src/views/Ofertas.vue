@@ -44,19 +44,9 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue'
+import { useDashboardStore } from '@/stores/dashboard'
 import Sidebar from '@/components/layout/dashboard/Sidebar.vue'
 import TopBar from '@/components/layout/dashboard/TopBar.vue'
-
-interface Oferta {
-  id: number;
-  data: string;
-  cliente: string;
-  token: string;
-  status: string;
-  metodoPagamento: string;
-  volume: string;
-  valorBRL: string;
-}
 
 export default defineComponent({
   name: 'Ofertas',
@@ -64,9 +54,9 @@ export default defineComponent({
     Sidebar,
     TopBar
   },
-  data() {
-    return {
-      ofertas: [] as Oferta[]
+  computed: {
+    ofertas() {
+      return this.store.ofertas
     }
   },
   methods: {
@@ -77,94 +67,14 @@ export default defineComponent({
         'Cancelado': 'px-2 py-1 rounded-full text-sm bg-red-500/20 text-red-500'
       }
       return classes[status as keyof typeof classes] || ''
-    },
-    carregarOfertas() {
-      this.ofertas = [
-        {
-          id: 1,
-          data: '01/03/2025',
-          cliente: 'Alison Souza',
-          token: 'Binance Coin',
-          status: 'Pago',
-          metodoPagamento: 'PIX',
-          volume: '0.45678 $BNB',
-          valorBRL: 'R$ 5.90'
-        },
-        {
-          id: 2,
-          data: '01/03/2025',
-          cliente: 'Juliana Gonçalves',
-          token: 'Binance Coin',
-          status: 'Pendente',
-          metodoPagamento: 'PIX',
-          volume: '0.45678 $BNB',
-          valorBRL: 'R$ 5.90'
-        },
-        {
-          id: 3,
-          data: '01/03/2025',
-          cliente: 'Lucas Pereira',
-          token: 'Binance Coin',
-          status: 'Cancelado',
-          metodoPagamento: 'Cartão Crédito',
-          volume: '0.45678 $BNB',
-          valorBRL: 'R$ 5.90'
-        },
-        {
-          id: 4,
-          data: '01/03/2025',
-          cliente: 'João Paiva',
-          token: 'Binance Coin',
-          status: 'Pago',
-          metodoPagamento: 'Cartão Crédito',
-          volume: '0.45678 $BNB',
-          valorBRL: 'R$ 5.90'
-        },
-        {
-          id: 5,
-          data: '01/03/2025',
-          cliente: 'Anderson Leão',
-          token: 'Binance Coin',
-          status: 'Pago',
-          metodoPagamento: 'PIX',
-          volume: '0.45678 $BNB',
-          valorBRL: 'R$ 5.90'
-        },
-        {
-          id: 6,
-          data: '01/03/2025',
-          cliente: 'Marilia Ribeiro',
-          token: 'Binance Coin',
-          status: 'Pendente',
-          metodoPagamento: 'PIX',
-          volume: '0.45678 $BNB',
-          valorBRL: 'R$ 5.90'
-        },
-        {
-          id: 7,
-          data: '01/03/2025',
-          cliente: 'Carlos Nunes',
-          token: 'Binance Coin',
-          status: 'Cancelado',
-          metodoPagamento: 'PIX',
-          volume: '0.45678 $BNB',
-          valorBRL: 'R$ 5.90'
-        },
-        {
-          id: 8,
-          data: '01/03/2025',
-          cliente: 'Henrique Pontes',
-          token: 'Binance Coin',
-          status: 'Pendente',
-          metodoPagamento: 'PIX',
-          volume: '0.45678 $BNB',
-          valorBRL: 'R$ 5.90'
-        }
-      ]
     }
   },
+  setup() {
+    const store = useDashboardStore()
+    return { store }
+  },
   mounted() {
-    this.carregarOfertas()
+    this.store.carregarOfertas()
   }
 })
 </script> 
