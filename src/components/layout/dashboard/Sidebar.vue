@@ -91,6 +91,11 @@ export default defineComponent({
           text: 'Saques', 
           route: '/saques',
           icon: 'svg-saques'
+        },
+        { 
+          text: 'Usuários', 
+          route: '/usuarios',
+          icon: 'svg-users'
         }
       ] as MenuItem[]
     }

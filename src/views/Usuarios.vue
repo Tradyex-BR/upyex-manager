@@ -7,58 +7,64 @@
           <TopBar />
           <section class="bg-[#040D25] min-h-[944px] w-full overflow-hidden pt-8 pb-20 px-8 max-md:max-w-full max-md:px-5">
             <div class="flex justify-between items-center mb-6">
-              <p class="text-white text-2xl font-semibold">Saques</p>
+              <p class="text-white text-2xl font-semibold">Usuários</p>
               <button class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg transition-colors">
-                Solicitar Saque
+                Novo Usuário
               </button>
             </div>
             <div class="overflow-x-auto">
               <table class="w-full text-white border-collapse">
                 <thead>
                   <tr class="bg-[#1A1F3C]">
-                    <th class="p-4 text-left">Data</th>
-                    <th class="p-4 text-left">Valor BRL</th>
-                    <th class="p-4 text-left">Destino (Chave Pix)</th>
-                    <th class="p-4 text-left">Tipo</th>
+                    <th class="p-4 text-left">Nome</th>
+                    <th class="p-4 text-left">Email</th>
                     <th class="p-4 text-left">Status</th>
+                    <th class="p-4 text-left">Data de cadastro</th>
+                    <th class="p-4 text-left">Último acesso</th>
                     <th class="p-4 text-left">Ações</th>
                   </tr>
                 </thead>
                 <tbody>
-                  <tr v-for="saque in saques" :key="saque.id" class="border-b border-[#1A1F3C]">
-                    <td class="p-4">{{ saque.data }}</td>
-                    <td class="p-4">{{ saque.valorBRL }}</td>
-                    <td class="p-4">{{ saque.destino }}</td>
-                    <td class="p-4">{{ saque.tipo }}</td>
+                  <tr v-for="usuario in usuarios" :key="usuario.id" class="border-b border-[#1A1F3C]">
+                    <td class="p-4">{{ usuario.nome }}</td>
+                    <td class="p-4">{{ usuario.email }}</td>
                     <td class="p-4">
-                      <span :class="getStatusClass(saque.status)">{{ saque.status }}</span>
+                      <span :class="getStatusClass(usuario.status)">{{ usuario.status }}</span>
                     </td>
+                    <td class="p-4">{{ usuario.dataCadastro }}</td>
+                    <td class="p-4">{{ usuario.ultimoAcesso }}</td>
                     <td class="p-4">
                       <div class="relative">
                         <button 
-                          @click="toggleDropdown(saque.id)"
+                          @click="toggleDropdown(usuario.id)"
                           class="px-3 py-1 bg-[#1A1F3C] rounded-lg hover:bg-[#2A2F4C] transition-colors"
                         >
                           Ações
                         </button>
                         <div 
-                          v-if="dropdownOpen === saque.id"
+                          v-if="dropdownOpen === usuario.id"
                           class="absolute right-0 mt-2 w-48 bg-[#1A1F3C] rounded-lg shadow-lg z-10"
                         >
                           <button 
-                            @click="handleAction(saque.id, 'aprovar')"
-                            class="w-full text-left px-4 py-2 hover:bg-[#2A2F4C] text-green-500"
-                          >
-                            Aprovar
-                          </button>
-                          <button 
-                            @click="handleAction(saque.id, 'bloquear')"
+                            @click="handleAction(usuario.id, 'bloquear')"
                             class="w-full text-left px-4 py-2 hover:bg-[#2A2F4C] text-yellow-500"
                           >
                             Bloquear
                           </button>
                           <button 
-                            @click="handleAction(saque.id, 'excluir')"
+                            @click="handleAction(usuario.id, 'editar-permissao')"
+                            class="w-full text-left px-4 py-2 hover:bg-[#2A2F4C] text-blue-500"
+                          >
+                            Editar Permissão
+                          </button>
+                          <button 
+                            @click="handleAction(usuario.id, 'resetar-senha')"
+                            class="w-full text-left px-4 py-2 hover:bg-[#2A2F4C] text-purple-500"
+                          >
+                            Resetar Senha
+                          </button>
+                          <button 
+                            @click="handleAction(usuario.id, 'excluir')"
                             class="w-full text-left px-4 py-2 hover:bg-[#2A2F4C] text-red-500"
                           >
                             Excluir
@@ -82,33 +88,32 @@ import { defineComponent } from 'vue'
 import Sidebar from '@/components/layout/dashboard/Sidebar.vue'
 import TopBar from '@/components/layout/dashboard/TopBar.vue'
 
-interface Saque {
+interface Usuario {
   id: number;
-  data: string;
-  valorBRL: string;
-  destino: string;
-  tipo: string;
+  nome: string;
+  email: string;
   status: string;
+  dataCadastro: string;
+  ultimoAcesso: string;
 }
 
 export default defineComponent({
-  name: 'Saques',
+  name: 'Usuarios',
   components: {
     Sidebar,
     TopBar
   },
   data() {
     return {
-      saques: [] as Saque[],
+      usuarios: [] as Usuario[],
       dropdownOpen: null as number | null
     }
   },
   methods: {
     getStatusClass(status: string): string {
       const classes = {
-        'Concluído': 'px-2 py-1 rounded-full text-sm bg-green-500/20 text-green-500',
-        'Pendente': 'px-2 py-1 rounded-full text-sm bg-yellow-500/20 text-yellow-500',
-        'Recusado': 'px-2 py-1 rounded-full text-sm bg-red-500/20 text-red-500'
+        'Ativo': 'px-2 py-1 rounded-full text-sm bg-green-500/20 text-green-500',
+        'Bloqueado': 'px-2 py-1 rounded-full text-sm bg-red-500/20 text-red-500'
       }
       return classes[status as keyof typeof classes] || ''
     },
@@ -117,72 +122,72 @@ export default defineComponent({
     },
     handleAction(id: number, action: string) {
       // Aqui você pode implementar a lógica para cada ação
-      console.log(`Ação ${action} para o saque ${id}`)
+      console.log(`Ação ${action} para o usuário ${id}`)
       this.dropdownOpen = null
     },
-    carregarSaques() {
-      this.saques = [
+    carregarUsuarios() {
+      this.usuarios = [
         {
           id: 1,
-          data: '01 de março de 2025',
-          valorBRL: 'R$ 5.90',
-          destino: '053********35',
-          tipo: 'CPF',
-          status: 'Concluído'
+          nome: 'João Silva',
+          email: 'email@email.com',
+          status: 'Ativo',
+          dataCadastro: '12/03/2025',
+          ultimoAcesso: '12/03/2025 14:21'
         },
         {
           id: 2,
-          data: '01 de março de 2025',
-          valorBRL: 'R$ 5.90',
-          destino: 'motti***@gmail.com',
-          tipo: 'Email',
-          status: 'Pendente'
+          nome: 'Maria Souza',
+          email: 'email@email.com',
+          status: 'Ativo',
+          dataCadastro: '12/03/2025',
+          ultimoAcesso: '12/03/2025 14:21'
         },
         {
           id: 3,
-          data: '01 de março de 2025',
-          valorBRL: 'R$ 5.90',
-          destino: 'motti***@gmail.com',
-          tipo: 'Email',
-          status: 'Recusado'
+          nome: 'Carlos Lima',
+          email: 'email@email.com',
+          status: 'Bloqueado',
+          dataCadastro: '12/03/2025',
+          ultimoAcesso: '12/03/2025 14:21'
         },
         {
           id: 4,
-          data: '01 de março de 2025',
-          valorBRL: 'R$ 5.90',
-          destino: 'motti***@gmail.com',
-          tipo: 'Email',
-          status: 'Concluído'
+          nome: 'Aline de Souza',
+          email: 'email@email.com',
+          status: 'Ativo',
+          dataCadastro: '12/03/2025',
+          ultimoAcesso: '12/03/2025 14:21'
         },
         {
           id: 5,
-          data: '01 de março de 2025',
-          valorBRL: 'R$ 5.90',
-          destino: 'motti***@gmail.com',
-          tipo: 'Email',
-          status: 'Concluído'
+          nome: 'Megan Marinho',
+          email: 'email@email.com',
+          status: 'Ativo',
+          dataCadastro: '12/03/2025',
+          ultimoAcesso: '12/03/2025 14:21'
         },
         {
           id: 6,
-          data: '01 de março de 2025',
-          valorBRL: 'R$ 5.90',
-          destino: 'motti***@gmail.com',
-          tipo: 'Email',
-          status: 'Concluído'
+          nome: 'Elizabeth Pinheiro',
+          email: 'email@email.com',
+          status: 'Ativo',
+          dataCadastro: '12/03/2025',
+          ultimoAcesso: '12/03/2025 14:21'
         },
         {
           id: 7,
-          data: '01 de março de 2025',
-          valorBRL: 'R$ 5.90',
-          destino: 'motti***@gmail.com',
-          tipo: 'Email',
-          status: 'Concluído'
+          nome: 'Gabriela de Lima',
+          email: 'email@email.com',
+          status: 'Ativo',
+          dataCadastro: '12/03/2025',
+          ultimoAcesso: '12/03/2025 14:21'
         }
       ]
     }
   },
   mounted() {
-    this.carregarSaques()
+    this.carregarUsuarios()
     // Fechar o dropdown quando clicar fora
     document.addEventListener('click', (e) => {
       const target = e.target as HTMLElement
