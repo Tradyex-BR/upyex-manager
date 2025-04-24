@@ -1,20 +1,22 @@
 import { defineStore } from 'pinia'
-import { authService, LoginCredentials } from '../services/auth'
-import { LoginResponse } from '../mocks/data/auth'
+import { authService } from '@/services/auth'
+
+interface User {
+  id: number
+  name: string
+  email: string
+  role: string
+}
 
 interface AuthState {
-  user: LoginResponse['user'] | null
+  user: User | null
   token: string | null
-  loading: boolean
-  error: string | null
 }
 
 export const useAuthStore = defineStore('auth', {
   state: (): AuthState => ({
     user: null,
-    token: localStorage.getItem('token'),
-    loading: false,
-    error: null
+    token: null
   }),
 
   getters: {
@@ -23,45 +25,52 @@ export const useAuthStore = defineStore('auth', {
   },
 
   actions: {
-    async login(credentials: LoginCredentials) {
-      this.loading = true
-      this.error = null
-
+    async login(credentials: { email: string; password: string }) {
       try {
         const response = await authService.login(credentials)
-        this.token = response.token
+        
         this.user = response.user
+        this.token = response.token
+        
+        // Salvar no localStorage
         localStorage.setItem('token', response.token)
-      } catch (error: any) {
-        this.error = error.response?.data?.message || 'Erro ao fazer login'
+        localStorage.setItem('user', JSON.stringify(response.user))
+        
+        return response.user
+      } catch (error) {
         throw error
-      } finally {
-        this.loading = false
       }
     },
 
-    logout() {
-      this.user = null
-      this.token = null
-      this.error = null
-      authService.logout()
+    async logout() {
+      try {
+        // Limpar o estado
+        this.user = null
+        this.token = null
+        
+        // Limpar o localStorage
+        localStorage.removeItem('token')
+        localStorage.removeItem('user')
+        
+        // Chamar o serviço de logout
+        authService.logout()
+      } catch (error) {
+        throw error
+      }
     },
-    
-    async checkAuth() {
-      // Verifica se existe um token no localStorage
+
+    // Método para verificar se o usuário está autenticado ao carregar a página
+    checkAuth() {
       const token = localStorage.getItem('token')
+      const user = localStorage.getItem('user')
       
-      if (!token) {
-        return false
-      }
-      
-      // Se existir um token, verifica se ele está armazenado no estado
-      if (this.token !== token) {
+      if (token && user) {
         this.token = token
+        this.user = JSON.parse(user)
+        return true
       }
       
-      // Retorna true se o token existir
-      return !!this.token
+      return false
     }
   }
 }) 
