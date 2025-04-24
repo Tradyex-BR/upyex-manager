@@ -20,7 +20,7 @@ const isLoginPage = computed(() => route.path === '/login');
       <Sidebar />
       <div class="flex-1 flex flex-col">
         <TopBar />
-        <main class="flex-1">
+        <main class="flex-1 pt-[32px] pl-[32px] pr-[32px]">
           <router-view></router-view>
         </main>
       </div>
