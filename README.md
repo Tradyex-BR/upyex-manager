@@ -1,5 +1,82 @@
-# Vue 3 + TypeScript + Vite
+# Upyex Manager
 
-This template should help get you started developing with Vue 3 and TypeScript in Vite. The template uses Vue 3 `<script setup>` SFCs, check out the [script setup docs](https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup) to learn more.
+Sistema de gerenciamento para a Upyex.
 
-Learn more about the recommended Project Setup and IDE Support in the [Vue Docs TypeScript Guide](https://vuejs.org/guide/typescript/overview.html#project-setup).
+## 🚀 Tecnologias
+
+- Vue 3
+- TypeScript
+- Vite
+- Tailwind CSS
+- Pinia
+- Vue Router
+- Axios
+- Zod
+
+## 📋 Pré-requisitos
+
+- Node.js 18+
+- npm 9+
+
+## 🔧 Instalação
+
+1. Clone o repositório
+```bash
+git clone https://github.com/seu-usuario/upyex-manager.git
+cd upyex-manager
+```
+
+2. Instale as dependências
+```bash
+npm install
+```
+
+3. Configure as variáveis de ambiente
+```bash
+cp .env.example .env
+```
+
+4. Inicie o servidor de desenvolvimento
+```bash
+npm run dev
+```
+
+## 🏗️ Estrutura do Projeto
+
+```
+src/
+├── assets/         # Recursos estáticos
+├── components/     # Componentes Vue
+│   ├── common/     # Componentes reutilizáveis
+│   ├── layout/     # Componentes de layout
+│   ├── forms/      # Componentes de formulário
+│   └── features/   # Componentes específicos
+├── composables/    # Hooks personalizados
+├── config/         # Configurações
+├── router/         # Rotas
+├── services/       # Serviços de API
+├── stores/         # Stores Pinia
+├── types/          # Tipos TypeScript
+├── utils/          # Funções utilitárias
+└── views/          # Páginas
+```
+
+## 📝 Scripts
+
+- `npm run dev` - Inicia o servidor de desenvolvimento
+- `npm run build` - Gera a versão de produção
+- `npm run lint` - Executa o linter
+- `npm run format` - Formata o código
+- `npm run test` - Executa os testes
+
+## 🤝 Contribuição
+
+1. Faça o fork do projeto
+2. Crie uma branch para sua feature (`git checkout -b feature/AmazingFeature`)
+3. Commit suas mudanças (`git commit -m 'Add some AmazingFeature'`)
+4. Push para a branch (`git push origin feature/AmazingFeature`)
+5. Abra um Pull Request
+
+## 📄 Licença
+
+Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para mais detalhes.
