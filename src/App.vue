@@ -1,22 +1,33 @@
 <script setup lang="ts">
-// O componente App agora é apenas um wrapper para o router-view
+import { useRoute } from 'vue-router';
+import { computed } from 'vue';
+import Sidebar from './components/layout/dashboard/Sidebar.vue';
+import TopBar from './components/layout/dashboard/TopBar.vue';
+
+const route = useRoute();
+const isLoginPage = computed(() => route.path === '/login');
 </script>
 
 <template>
-  <router-view></router-view>
+  <div class="min-h-screen bg-[#040D25]">
+    <!-- Layout para páginas de autenticação -->
+    <div v-if="isLoginPage" class="min-h-screen flex items-center justify-center">
+      <router-view></router-view>
+    </div>
+
+    <!-- Layout padrão para o resto da aplicação -->
+    <div v-else class="min-h-screen flex">
+      <Sidebar />
+      <div class="flex-1 flex flex-col">
+        <TopBar />
+        <main class="flex-1">
+          <router-view></router-view>
+        </main>
+      </div>
+    </div>
+  </div>
 </template>
 
-<style scoped>
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.vue:hover {
-  filter: drop-shadow(0 0 2em #42b883aa);
-}
+<style>
+/* Estilos globais podem ser adicionados aqui */
 </style>

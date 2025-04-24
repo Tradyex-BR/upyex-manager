@@ -1,11 +1,9 @@
 <template>
-  <div class="bg-[#040D25] overflow-hidden">
+  <div class=" overflow-hidden">
     <div class="gap-5 flex max-md:flex-col max-md:items-stretch">
-      <Sidebar />
-      <main class="w-[81%] ml-5 max-md:w-full max-md:ml-0">
+      <main class="w-full max-md:w-full max-md:ml-0">
         <div class="w-full max-md:max-w-full">
-          <TopBar />
-          <section class="bg-[#040D25] min-h-[944px] w-full overflow-hidden pt-8 pb-20 px-8 max-md:max-w-full max-md:px-5">
+          <section class=" min-h-[944px] w-full overflow-hidden max-md:max-w-full max-md:px-5">
             <p class="text-white text-2xl font-semibold mb-6">Ofertas</p>
             <div class="overflow-x-auto">
               <table class="w-full text-white border-collapse">

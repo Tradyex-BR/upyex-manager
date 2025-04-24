@@ -5,7 +5,14 @@ export default {
     "./src/**/*.{vue,js,ts,jsx,tsx}",
   ],
   theme: {
+    fontFamily: {
+      sans: ['"Bricolage Grotesque"', 'sans-serif'],
+    },
     extend: {
+      fontFamily: {
+        'bricolage': ['"Bricolage Grotesque"', 'sans-serif'],
+        'inter': ['Inter', 'sans-serif'],
+      },
       colors: {
         primary: 'var(--primary-color)',
         secondary: 'var(--secondary-color)',

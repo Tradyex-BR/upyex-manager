@@ -2,10 +2,10 @@
   <aside className="w-[19%] max-md:w-full max-md:ml-0">
     <div className="border-r-[color:var(--Borda,#222A3F)] w-full whitespace-nowrap border-r border-solid">
       <div
-        className="self-stretch bg-[#040D25] w-full gap-2.5 overflow-hidden text-2xl text-[rgba(185,89,25,1)] font-bold text-center leading-none p-6 max-md:px-5">
+        className="self-stretch  w-full gap-2.5 overflow-hidden text-2xl text-[rgba(185,89,25,1)] font-bold text-center leading-none p-6 max-md:px-5">
         TRADYEX
       </div>
-      <nav className="bg-[#040D25] min-h-[944px] w-full pt-10 pb-[580px] px-6 max-md:pb-[100px] max-md:px-5">
+      <nav className=" w-full pt-10 pb-[580px] px-6 max-md:pb-[100px] max-md:px-5">
         <div className="flex w-full flex-col items-stretch">
           <div className="gap-2.5 text-sm text-[#8A99AF] font-medium uppercase leading-none pl-[15px]">
             Menu
@@ -15,7 +15,7 @@
               <router-link :to="item.route" custom v-slot="{ navigate }">
                 <li @click="navigate" :class="{
                   'bg-[rgba(207,99,28,0.16)] text-[#CF631C]': isCurrentRoute(item.route),
-                  'bg-[#040D25]': !isCurrentRoute(item.route),
+                  'bg-transparent text-[#DEE4EE]': !isCurrentRoute(item.route),
                   'flex w-full items-center': true,
                   'justify-between': isCurrentRoute(item.route),
                   'gap-2.5': !isCurrentRoute(item.route),
