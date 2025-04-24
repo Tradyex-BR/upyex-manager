@@ -12,23 +12,26 @@
           </div>
           <div class="self-stretch flex flex-col items-start justify-start gap-2.5">
             <div v-for="(item, index) in menuItems" :key="index">
-              <li :class="{
-                'bg-[rgba(207,99,28,0.16)] text-[#CF631C]': item.isActive,
-                'bg-[#040D25]': !item.isActive,
-                'flex w-full items-center': true,
-                'justify-between': item.isActive,
-                'gap-2.5': !item.isActive,
-                [`mt-${index === 0 ? '0' : '6'}`]: true,
-                'pl-4 pr-3 py-2 rounded-[3px]': true
-              }">
-                <div class="self-stretch flex items-center gap-2.5 my-auto">
-                  <div class="self-stretch flex w-6 shrink-0 h-6 my-auto" />
-                  <div class="text-sm font-medium leading-5 self-stretch my-auto">
-                    {{ item.text }}
+              <router-link :to="item.route" custom v-slot="{ navigate }">
+                <li @click="navigate" :class="{
+                  'bg-[rgba(207,99,28,0.16)] text-[#CF631C]': isCurrentRoute(item.route),
+                  'bg-[#040D25]': !isCurrentRoute(item.route),
+                  'flex w-full items-center': true,
+                  'justify-between': isCurrentRoute(item.route),
+                  'gap-2.5': !isCurrentRoute(item.route),
+                  [`mt-${index === 0 ? '0' : '6'}`]: true,
+                  'pl-4 pr-3 py-2 rounded-[3px]': true,
+                  'cursor-pointer': true
+                }">
+                  <div class="self-stretch flex items-center gap-2.5 my-auto">
+                    <div class="self-stretch flex w-6 shrink-0 h-6 my-auto" />
+                    <div class="text-sm font-medium leading-5 self-stretch my-auto">
+                      {{ item.text }}
+                    </div>
                   </div>
-                </div>
-                <div v-if="item.isActive" class="self-stretch flex w-6 shrink-0 h-6 my-auto" />
-              </li>
+                  <div v-if="isCurrentRoute(item.route)" class="self-stretch flex w-6 shrink-0 h-6 my-auto" />
+                </li>
+              </router-link>
             </div>
           </div>
         </div>
@@ -39,21 +42,33 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue'
+import { useRoute } from 'vue-router'
 
 interface MenuItem {
   text: string
-  isActive: boolean
+  route: string
 }
 
 export default defineComponent({
   name: 'Sidebar',
+  setup() {
+    const route = useRoute()
+
+    const isCurrentRoute = (path: string) => {
+      return route.path === path
+    }
+
+    return {
+      isCurrentRoute
+    }
+  },
   data() {
     return {
       menuItems: [
-        { text: 'Dashboard', isActive: true },
-        { text: 'Orders', isActive: false },
-        { text: 'Customers', isActive: false },
-        { text: 'Reports', isActive: false }
+        { text: 'Dashboard', route: '/dashboard' },
+        { text: 'Vendas', route: '/vendas' },
+        { text: 'Ofertas', route: '/ofertas' },
+        { text: 'Saques', route: '/saques' }
       ] as MenuItem[]
     }
   }

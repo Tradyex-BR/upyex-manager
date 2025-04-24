@@ -17,6 +17,24 @@ const routes = [
     name: 'Dashboard',
     component: () => import('../views/Dashboard.vue'),
     meta: { requiresAuth: true }
+  },
+  {
+    path: '/vendas',
+    name: 'Vendas',
+    component: () => import('../views/Vendas.vue'),
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/ofertas',
+    name: 'Ofertas',
+    component: () => import('../views/Ofertas.vue'),
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/saques',
+    name: 'Saques',
+    component: () => import('../views/Saques.vue'),
+    meta: { requiresAuth: true }
   }
 ]
 
