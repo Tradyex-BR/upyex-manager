@@ -4,14 +4,17 @@ import { computed } from 'vue';
 import Sidebar from './components/layout/dashboard/Sidebar.vue';
 import TopBar from './components/layout/dashboard/TopBar.vue';
 
+const pagesThatDontHaveSidebar = ['/login', '/forgot-password', '/cadastro', '/email-sent', '/reset-password', '/password-changed'];
+
 const route = useRoute();
-const isLoginPage = computed(() => route.path === '/login');
+const thisPageHaveSidebar = computed(() => pagesThatDontHaveSidebar.includes(route.path));
+
 </script>
 
 <template>
   <div class="min-h-screen bg-[#040D25]">
     <!-- Layout para páginas de autenticação -->
-    <div v-if="isLoginPage" class="min-h-screen flex items-center justify-center">
+    <div v-if="thisPageHaveSidebar" class="min-h-screen flex items-center justify-center">
       <router-view></router-view>
     </div>
 
