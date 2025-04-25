@@ -1,31 +1,31 @@
 <template>
-  <div class="flex gap-4 max-sm:flex-col">
+  <div class="w flex gap-4 max-sm:flex-col">
     <button
-      class="flex items-center gap-2 flex-1 bg-[#ECECEC] px-4 py-3 rounded-lg max-sm:w-full"
+      class="py-[12px] px-[16px] h-[48px] flex items-center gap-2 flex-1 bg-[#ECECEC] rounded-lg border-none"
       type="button"
       aria-label="Login with Google"
     >
       <div>
         <div v-html="googleIcon"></div>
       </div>
-      <span class="text-sm font-normal text-[rgba(34,42,63,1)]">
+      <span class="font-inter text-[#222A3F] text-[14px] leading-[18px] font-medium">
         Fazer login com Google
       </span>
     </button>
     <button
-      class="flex items-center gap-2 flex-1 bg-[#ECECEC] px-4 py-3 rounded-lg max-sm:w-full"
-      type="button"
+    class="w-max py-[12px] px-[16px] h-[48px] flex items-center gap-2 flex-1 bg-[#ECECEC] rounded-lg border-none"
+    type="button"
       aria-label="Login with Facebook"
     >
       <div>
         <div v-html="facebookIcon"></div>
       </div>
-      <span class="text-sm font-normal text-[rgba(34,42,63,1)]">
+      <span class="font-inter text-[#222A3F] text-[14px] leading-[18px] font-medium">
         Fazer login com Facebook
       </span>
     </button>
   </div>
-  <div class="flex items-center w-full justify-center max-sm:hidden">
+  <div class="flex items-center w-full max-sm:hidden">
     <div>
       <div v-html="dividerSvg"></div>
     </div>
