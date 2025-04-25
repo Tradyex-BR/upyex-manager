@@ -13,7 +13,7 @@
         <img
           src="https://cdn.builder.io/api/v1/image/assets/7f72b52c1e064ab59dcec351fcad2273/af02ba544c49dcfe6925b9408f10a84e26e396f2?placeholderIfAbsent=true"
           class="aspect-[2.44] object-contain w-[83px] self-stretch shrink-0" alt="Notifications" />
-        <div class="border border-red-500 relative">
+        <div class="relative">
           <div class="self-stretch flex items-stretch gap-[10px] my-auto cursor-pointer" @click="toggleDropdown">
             <div class="flex items-center gap-[15px]">
               <p
@@ -81,8 +81,9 @@ const handleLogout = async () => {
 
 // Fechar o dropdown quando clicar fora
 const handleClickOutside = (event: MouseEvent) => {
+  const dropdown = document.querySelector('.relative')
   const target = event.target as HTMLElement
-  if (!target.closest('.border-red-500')) {
+  if (dropdown && !dropdown.contains(target)) {
     isDropdownOpen.value = false
   }
 }

@@ -10,8 +10,8 @@
       <StatCard
         value="34.560 USDT"
         label="Saldo Carteira Bolsão"
-        percent-change="+2.5%"
-        :is-positive="true"
+        percent-change="-2.5%"
+        :is-positive="false"
       />
       <StatCard
         value="R$ 14.560"
