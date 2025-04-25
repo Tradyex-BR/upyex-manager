@@ -26,7 +26,7 @@
                     <div class="self-stretch flex w-6 shrink-0 h-6 my-auto">
                       <menu-icons :name="item.icon" />
                     </div>
-                    <div class="text-sm font-medium leading-5 self-stretch my-auto">
+                    <div class="font-inter text-[16px] leading-5 self-stretch my-auto">
                       {{ item.text }}
                     </div>
                   </div>
