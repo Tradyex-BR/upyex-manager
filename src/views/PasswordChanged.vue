@@ -20,7 +20,7 @@
       <div class="flex flex-col gap-6 w-full max-sm:items-center mt-4">
         <div>
           <router-link to="/login"
-            class="bg-[#CF631C] rounded py-2 px-4 group relative w-full flex justify-center text-[#F7F7F8] font-inter text-[14px] leading-6 font-bold hover:border-[#CF631C] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary inline-block text-center">
+            class="bg-[#CF631C] rounded py-2 px-4 group relative w-full flex justify-center text-[#F7F7F8] hover:text-[#F7F7F8] font-inter text-[14px] leading-6 font-bold hover:border-[#CF631C] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary text-center">
             Login
           </router-link>
         </div>
