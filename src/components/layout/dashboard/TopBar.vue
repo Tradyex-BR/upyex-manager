@@ -34,9 +34,9 @@
           </div>
 
           <!-- Dropdown Menu -->
-          <div v-if="isDropdownOpen" class="absolute right-0 mt-2 w-48 bg-[#222A3F] rounded-md shadow-lg py-1 z-50">
+          <div v-if="isDropdownOpen" class="absolute right-0 mt-2 w-48 bg-[#222A3F] rounded-md shadow-lg z-50">
             
-            <button @click="handleLogout" class="w-full flex items-center gap-2 text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+            <button @click="handleLogout" class="w-full h-[48px] flex items-center gap-[10px] text-left p-3 text-sm text-gray-700 border-none bg-transparent">
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <g clip-path="url(#clip0_1147_3686)">
                   <path d="M19.0711 5.07108L4.92894 19.2132M4.92892 5.07108L19.0711 19.2132" stroke="#B8B8B8"
