@@ -17,8 +17,6 @@
 </template>
 
 <script setup lang="ts">
-import Sidebar from "@/components/layout/dashboard/Sidebar.vue";
-import Topbar from "@/components/layout/dashboard/TopBar.vue";
 import DashboardCards from "@/components/layout/dashboard/DashboardCards.vue";
 import AssetTable from "@/components/layout/dashboard/AssetTable.vue";
 import AffiliateTable from "@/components/layout/dashboard/AfilliateTable.vue";
