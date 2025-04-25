@@ -2,7 +2,7 @@
   <aside className="min-w-[272px] max-md:w-full max-md:ml-0">
     <div className="border-r-[color:var(--Borda,#222A3F)] w-full h-full whitespace-nowrap border-r border-solid">
       <div
-        className="self-stretch justify-center items-center h-[80px] w-full gap-2.5 overflow-hidden text-2xl text-[rgba(185,89,25,1)] font-bold text-center leading-none p-6 max-md:px-5">
+        className="text-2xl font-bold font-inter flex self-stretch justify-center items-center h-[80px] w-full gap-2.5 overflow-hidden text-[rgba(185,89,25,1)] text-center p-6">
         TRADYEX
       </div>
       <nav className="w-full pt-10 px-6 max-md:pb-[100px] max-md:px-5">
