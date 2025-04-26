@@ -5,7 +5,7 @@
         <div class="w-full max-md:max-w-full">
           <section class=" min-h-[944px] w-full overflow-hidden max-md:max-w-full max-md:px-5">
             <p class="text-white text-2xl font-semibold mb-6">Offers</p>
-            <div class="overflow-x-auto">
+            <div>
               <table class="w-full text-white border-collapse">
                 <thead>
                   <tr class="bg-[#1A1F3C]">
