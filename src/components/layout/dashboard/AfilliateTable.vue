@@ -42,7 +42,7 @@
         </div>
       </div>
       <div class="font-normal flex-1 shrink basis-[0%]">
-        <div class="self-stretch w-full gap-2.5 font-medium whitespace-nowrap px-4 py-3 border-[rgba(41,51,76,1)] border-b">
+        <div class="text-center self-stretch w-full gap-2.5 font-medium whitespace-nowrap px-4 py-3 border-[rgba(41,51,76,1)] border-b">
           Volume
         </div>
         <div
@@ -54,7 +54,7 @@
         </div>
       </div>
       <div class="font-normal flex-1 shrink basis-[0%]">
-        <div class="self-stretch w-full gap-2.5 font-medium px-4 py-3 border-[rgba(41,51,76,1)] border-b">
+        <div class="text-center self-stretch w-full gap-2.5 font-medium px-4 py-3 border-[rgba(41,51,76,1)] border-b">
           Valor total
         </div>
         <div

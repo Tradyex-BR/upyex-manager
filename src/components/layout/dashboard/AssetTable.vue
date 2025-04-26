@@ -1,7 +1,7 @@
 <template>
   <div class="bg-[#222A3F] min-w-60 flex-1 shrink basis-[0%] p-8 rounded-lg max-md:max-w-full max-md:px-5">
     <div class="flex w-full items-center text-xl text-white font-semibold leading-[1.2] justify-between max-md:max-w-full">
-      <div class="self-stretch flex-1 shrink basis-[0%] my-auto max-md:max-w-full">
+      <div class="self-stretch flex-1 shrink basis-[0%] my-auto max-md:max-w-full font-inter">
         Top ativos
       </div>
       <div class="self-stretch flex w-6 shrink-0 h-6 my-auto" />
@@ -42,7 +42,7 @@
         </div>
       </div>
       <div class="font-normal whitespace-nowrap flex-1 shrink basis-[0%]">
-        <div class="self-stretch w-full gap-2.5 font-medium px-4 py-3 border-[rgba(41,51,76,1)] border-b">
+        <div class="text-center self-stretch w-full gap-2.5 font-medium px-4 py-3 border-[rgba(41,51,76,1)] border-b">
           Volume
         </div>
         <div
@@ -54,7 +54,7 @@
         </div>
       </div>
       <div class="font-normal flex-1 shrink basis-[0%]">
-        <div class="self-stretch w-full gap-2.5 font-medium px-4 py-3 border-[rgba(41,51,76,1)] border-b">
+        <div class="text-center self-stretch w-full gap-2.5 font-medium px-4 py-3 border-[rgba(41,51,76,1)] border-b">
           Valor total
         </div>
         <div
