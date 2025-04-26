@@ -5,67 +5,67 @@
         <div class="w-full max-md:max-w-full">
           <section class=" min-h-[944px] w-full overflow-hidden max-md:max-w-full max-md:px-5">
             <div class="flex justify-between items-center mb-6">
-              <p class="text-white text-2xl font-semibold">Usuários</p>
+              <p class="text-white text-2xl font-semibold">Users</p>
               <button class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg transition-colors">
-                Novo Usuário
+                New User
               </button>
             </div>
             <div class="overflow-x-auto">
               <table class="w-full text-white border-collapse">
                 <thead>
                   <tr class="bg-[#1A1F3C]">
-                    <th class="p-4 text-left">Nome</th>
+                    <th class="p-4 text-left">Name</th>
                     <th class="p-4 text-left">Email</th>
                     <th class="p-4 text-left">Status</th>
-                    <th class="p-4 text-left">Data de cadastro</th>
-                    <th class="p-4 text-left">Último acesso</th>
-                    <th class="p-4 text-left">Ações</th>
+                    <th class="p-4 text-left">Registration Date</th>
+                    <th class="p-4 text-left">Last Access</th>
+                    <th class="p-4 text-left">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
-                  <tr v-for="usuario in usuarios" :key="usuario.id" class="border-b border-[#1A1F3C]">
-                    <td class="p-4">{{ usuario.nome }}</td>
-                    <td class="p-4">{{ usuario.email }}</td>
+                  <tr v-for="user in users" :key="user.id" class="border-b border-[#1A1F3C]">
+                    <td class="p-4">{{ user.name }}</td>
+                    <td class="p-4">{{ user.email }}</td>
                     <td class="p-4">
-                      <span :class="getStatusClass(usuario.status)">{{ usuario.status }}</span>
+                      <span :class="getStatusClass(user.status)">{{ user.status }}</span>
                     </td>
-                    <td class="p-4">{{ usuario.dataCadastro }}</td>
-                    <td class="p-4">{{ usuario.ultimoAcesso }}</td>
+                    <td class="p-4">{{ user.registrationDate }}</td>
+                    <td class="p-4">{{ user.lastAccess }}</td>
                     <td class="p-4">
                       <div class="relative">
                         <button 
-                          @click="toggleDropdown(usuario.id)"
+                          @click="toggleDropdown(user.id)"
                           class="px-3 py-1 bg-[#1A1F3C] rounded-lg hover:bg-[#2A2F4C] transition-colors"
                         >
-                          Ações
+                          Actions
                         </button>
                         <div 
-                          v-if="dropdownOpen === usuario.id"
+                          v-if="dropdownOpen === user.id"
                           class="absolute right-0 mt-2 w-48 bg-[#1A1F3C] rounded-lg shadow-lg z-10"
                         >
                           <button 
-                            @click="handleAction(usuario.id, 'bloquear')"
+                            @click="handleAction(user.id, 'block')"
                             class="w-full text-left px-4 py-2 hover:bg-[#2A2F4C] text-yellow-500"
                           >
-                            Bloquear
+                            Block
                           </button>
                           <button 
-                            @click="handleAction(usuario.id, 'editar-permissao')"
+                            @click="handleAction(user.id, 'edit-permission')"
                             class="w-full text-left px-4 py-2 hover:bg-[#2A2F4C] text-blue-500"
                           >
-                            Editar Permissão
+                            Edit Permission
                           </button>
                           <button 
-                            @click="handleAction(usuario.id, 'resetar-senha')"
+                            @click="handleAction(user.id, 'reset-password')"
                             class="w-full text-left px-4 py-2 hover:bg-[#2A2F4C] text-purple-500"
                           >
-                            Resetar Senha
+                            Reset Password
                           </button>
                           <button 
-                            @click="handleAction(usuario.id, 'excluir')"
+                            @click="handleAction(user.id, 'delete')"
                             class="w-full text-left px-4 py-2 hover:bg-[#2A2F4C] text-red-500"
                           >
-                            Excluir
+                            Delete
                           </button>
                         </div>
                       </div>
@@ -86,32 +86,32 @@ import { defineComponent } from 'vue'
 import Sidebar from '@/components/layout/dashboard/Sidebar.vue'
 import TopBar from '@/components/layout/dashboard/TopBar.vue'
 
-interface Usuario {
+interface User {
   id: number;
-  nome: string;
+  name: string;
   email: string;
   status: string;
-  dataCadastro: string;
-  ultimoAcesso: string;
+  registrationDate: string;
+  lastAccess: string;
 }
 
 export default defineComponent({
-  name: 'Usuarios',
+  name: 'Users',
   components: {
     Sidebar,
     TopBar
   },
   data() {
     return {
-      usuarios: [] as Usuario[],
+      users: [] as User[],
       dropdownOpen: null as number | null
     }
   },
   methods: {
     getStatusClass(status: string): string {
       const classes = {
-        'Ativo': 'px-2 py-1 rounded-full text-sm bg-green-500/20 text-green-500',
-        'Bloqueado': 'px-2 py-1 rounded-full text-sm bg-red-500/20 text-red-500'
+        'Active': 'px-2 py-1 rounded-full text-sm bg-green-500/20 text-green-500',
+        'Blocked': 'px-2 py-1 rounded-full text-sm bg-red-500/20 text-red-500'
       }
       return classes[status as keyof typeof classes] || ''
     },
@@ -119,74 +119,74 @@ export default defineComponent({
       this.dropdownOpen = this.dropdownOpen === id ? null : id
     },
     handleAction(id: number, action: string) {
-      // Aqui você pode implementar a lógica para cada ação
-      console.log(`Ação ${action} para o usuário ${id}`)
+      // Implement logic for each action here
+      console.log(`Action ${action} for user ${id}`)
       this.dropdownOpen = null
     },
-    carregarUsuarios() {
-      this.usuarios = [
+    loadUsers() {
+      this.users = [
         {
           id: 1,
-          nome: 'João Silva',
+          name: 'John Doe',
           email: 'email@email.com',
-          status: 'Ativo',
-          dataCadastro: '12/03/2025',
-          ultimoAcesso: '12/03/2025 14:21'
+          status: 'Active',
+          registrationDate: '03/12/2025',
+          lastAccess: '03/12/2025 14:21'
         },
         {
           id: 2,
-          nome: 'Maria Souza',
+          name: 'Jane Doe',
           email: 'email@email.com',
-          status: 'Ativo',
-          dataCadastro: '12/03/2025',
-          ultimoAcesso: '12/03/2025 14:21'
+          status: 'Active',
+          registrationDate: '03/12/2025',
+          lastAccess: '03/12/2025 14:21'
         },
         {
           id: 3,
-          nome: 'Carlos Lima',
+          name: 'Bob Smith',
           email: 'email@email.com',
-          status: 'Bloqueado',
-          dataCadastro: '12/03/2025',
-          ultimoAcesso: '12/03/2025 14:21'
+          status: 'Blocked',
+          registrationDate: '03/12/2025',
+          lastAccess: '03/12/2025 14:21'
         },
         {
           id: 4,
-          nome: 'Aline de Souza',
+          name: 'Alice Johnson',
           email: 'email@email.com',
-          status: 'Ativo',
-          dataCadastro: '12/03/2025',
-          ultimoAcesso: '12/03/2025 14:21'
+          status: 'Active',
+          registrationDate: '03/12/2025',
+          lastAccess: '03/12/2025 14:21'
         },
         {
           id: 5,
-          nome: 'Megan Marinho',
+          name: 'Megan Brown',
           email: 'email@email.com',
-          status: 'Ativo',
-          dataCadastro: '12/03/2025',
-          ultimoAcesso: '12/03/2025 14:21'
+          status: 'Active',
+          registrationDate: '03/12/2025',
+          lastAccess: '03/12/2025 14:21'
         },
         {
           id: 6,
-          nome: 'Elizabeth Pinheiro',
+          name: 'Elizabeth Green',
           email: 'email@email.com',
-          status: 'Ativo',
-          dataCadastro: '12/03/2025',
-          ultimoAcesso: '12/03/2025 14:21'
+          status: 'Active',
+          registrationDate: '03/12/2025',
+          lastAccess: '03/12/2025 14:21'
         },
         {
           id: 7,
-          nome: 'Gabriela de Lima',
+          name: 'Gabrielle White',
           email: 'email@email.com',
-          status: 'Ativo',
-          dataCadastro: '12/03/2025',
-          ultimoAcesso: '12/03/2025 14:21'
+          status: 'Active',
+          registrationDate: '03/12/2025',
+          lastAccess: '03/12/2025 14:21'
         }
       ]
     }
   },
   mounted() {
-    this.carregarUsuarios()
-    // Fechar o dropdown quando clicar fora
+    this.loadUsers()
+    // Close the dropdown when clicking outside
     document.addEventListener('click', (e) => {
       const target = e.target as HTMLElement
       if (!target.closest('.relative')) {
@@ -198,4 +198,4 @@ export default defineComponent({
     document.removeEventListener('click', () => {})
   }
 })
-</script> 
+</script>

@@ -13,9 +13,9 @@ const routes = [
     meta: { requiresAuth: false }
   },
   {
-    path: '/cadastro',
-    name: 'Cadastro',
-    component: () => import('../views/Cadastro.vue'),
+    path: '/register',
+    name: 'Register',
+    component: () => import('../views/Register.vue'),
     meta: { requiresAuth: false }
   },
   {
@@ -49,27 +49,27 @@ const routes = [
     meta: { requiresAuth: true }
   },
   {
-    path: '/vendas',
-    name: 'Vendas',
-    component: () => import('../views/Vendas.vue'),
+    path: '/sales',
+    name: 'Sales',
+    component: () => import('../views/Sales.vue'),
     meta: { requiresAuth: true }
   },
   {
-    path: '/ofertas',
-    name: 'Ofertas',
-    component: () => import('../views/Ofertas.vue'),
+    path: '/offers',
+    name: 'Offers',
+    component: () => import('../views/Offers.vue'),
     meta: { requiresAuth: true }
   },
   {
-    path: '/saques',
-    name: 'Saques',
-    component: () => import('../views/Saques.vue'),
+    path: '/withdrawals',
+    name: 'Withdrawals',
+    component: () => import('../views/Withdrawals.vue'),
     meta: { requiresAuth: true }
   },
   {
-    path: '/usuarios',
-    name: 'Usuarios',
-    component: () => import('../views/Usuarios.vue'),
+    path: '/users',
+    name: 'Users',
+    component: () => import('../views/Users.vue'),
     meta: { requiresAuth: true }
   }
 ]

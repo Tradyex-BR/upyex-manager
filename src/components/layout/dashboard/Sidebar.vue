@@ -78,22 +78,22 @@ export default defineComponent({
         },
         { 
           text: 'Vendas', 
-          route: '/vendas',
+          route: '/sales',
           icon: 'svg-vendas'
         },
         { 
           text: 'Ofertas', 
-          route: '/ofertas',
+          route: '/offers',
           icon: 'svg-ofertas'
         },
         { 
           text: 'Saques', 
-          route: '/saques',
+          route: '/withdrawals',
           icon: 'svg-saques'
         },
         { 
           text: 'Usuários', 
-          route: '/usuarios',
+          route: '/users',
           icon: 'svg-users'
         }
       ] as MenuItem[]

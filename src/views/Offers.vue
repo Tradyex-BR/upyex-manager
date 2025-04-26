@@ -4,7 +4,7 @@
       <main class="w-full max-md:w-full max-md:ml-0">
         <div class="w-full max-md:max-w-full">
           <section class=" min-h-[944px] w-full overflow-hidden max-md:max-w-full max-md:px-5">
-            <p class="text-white text-2xl font-semibold mb-6">Ofertas</p>
+            <p class="text-white text-2xl font-semibold mb-6">Offers</p>
             <div class="overflow-x-auto">
               <table class="w-full text-white border-collapse">
                 <thead>
@@ -19,19 +19,19 @@
                   </tr>
                 </thead>
                 <tbody>
-                  <tr v-for="oferta in ofertas" :key="oferta.id" class="border-b border-[#1A1F3C]">
-                    <td class="p-4">{{ oferta.data }}</td>
-                    <td class="p-4">{{ oferta.cliente }}</td>
+                  <tr v-for="offer in offers" :key="offer.id" class="border-b border-[#1A1F3C]">
+                    <td class="p-4">{{ offer.date }}</td>
+                    <td class="p-4">{{ offer.client }}</td>
                     <td class="p-4 flex items-center gap-2">
-                      <img :src="`https://ui-avatars.com/api/?name=${oferta.token}&background=random`" :alt="oferta.token" class="w-10 h-10 rounded-full" />
-                      <p class="text-white text-sm font-semibold">{{ oferta.token }}</p>
+                      <img :src="`https://ui-avatars.com/api/?name=${offer.token}&background=random`" :alt="offer.token" class="w-10 h-10 rounded-full" />
+                      <p class="text-white text-sm font-semibold">{{ offer.token }}</p>
                     </td>
                     <td class="p-4">
-                      <span :class="getStatusClass(oferta.status)">{{ oferta.status }}</span>
+                      <span :class="getStatusClass(offer.status)">{{ offer.status }}</span>
                     </td>
-                    <td class="p-4">{{ oferta.metodoPagamento }}</td>
-                    <td class="p-4">{{ oferta.volume }}</td>
-                    <td class="p-4">{{ oferta.valorBRL }}</td>
+                    <td class="p-4">{{ offer.paymentMethod }}</td>
+                    <td class="p-4">{{ offer.volume }}</td>
+                    <td class="p-4">{{ offer.valueBRL }}</td>
                   </tr>
                 </tbody>
               </table>
@@ -50,14 +50,14 @@ import Sidebar from '@/components/layout/dashboard/Sidebar.vue'
 import TopBar from '@/components/layout/dashboard/TopBar.vue'
 
 export default defineComponent({
-  name: 'Ofertas',
+  name: 'Offers',
   components: {
     Sidebar,
     TopBar
   },
   computed: {
-    ofertas() {
-      return this.store.ofertas
+    offers() {
+      return this.store.offers
     }
   },
   methods: {
@@ -75,7 +75,7 @@ export default defineComponent({
     return { store }
   },
   mounted() {
-    this.store.carregarOfertas()
+    this.store.loadOffers()
   }
 })
 </script> 

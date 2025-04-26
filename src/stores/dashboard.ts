@@ -1,235 +1,235 @@
 import { defineStore } from 'pinia'
 
-interface Afiliado {
+interface Affiliate {
   id: number;
-  nome: string;
+  name: string;
   ref: string;
-  data: string;
+  date: string;
   status: string;
 }
 
-interface Oferta {
+interface Offer {
   id: number;
-  data: string;
-  cliente: string;
+  date: string;
+  client: string;
   token: string;
   status: string;
-  metodoPagamento: string;
+  paymentMethod: string;
   volume: string;
-  valorBRL: string;
+  valueBRL: string;
 }
 
-interface Saque {
+interface Withdrawal {
   id: number;
-  data: string;
-  valorBRL: string;
-  destino: string;
-  tipo: string;
+  date: string;
+  valueBRL: string;
+  destination: string;
+  type: string;
   status: string;
 }
 
-interface Usuario {
+interface User {
   id: number;
-  nome: string;
+  name: string;
   email: string;
   status: string;
-  dataCadastro: string;
-  ultimoAcesso: string;
+  registrationDate: string;
+  lastAccess: string;
 }
 
 export const useDashboardStore = defineStore('dashboard', {
   state: () => ({
-    afiliados: [] as Afiliado[],
-    ofertas: [] as Oferta[],
-    saques: [] as Saque[],
-    usuarios: [] as Usuario[],
+    affiliates: [] as Affiliate[],
+    offers: [] as Offer[],
+    withdrawals: [] as Withdrawal[],
+    users: [] as User[],
   }),
 
   actions: {
-    // Carregar dados mockados
-    carregarDadosMockados() {
-      this.carregarAfiliados()
-      this.carregarOfertas()
-      this.carregarSaques()
-      this.carregarUsuarios()
+    // Load mock data
+    loadMockData() {
+      this.loadAffiliates()
+      this.loadOffers()
+      this.loadWithdrawals()
+      this.loadUsers()
     },
 
-    // Afiliados
-    carregarAfiliados() {
-      this.afiliados = [
+    // Affiliates
+    loadAffiliates() {
+      this.affiliates = [
         {
           id: 1,
-          nome: 'David Jahnsen',
+          name: 'David Jahnsen',
           ref: 'ref_david',
-          data: '10/03/2025',
-          status: 'Aprovado'
+          date: '03/10/2025',
+          status: 'Approved'
         }
       ]
     },
 
-    // Ofertas
-    carregarOfertas() {
-      this.ofertas = [
+    // Offers
+    loadOffers() {
+      this.offers = [
         {
           id: 1,
-          data: '01/03/2025',
-          cliente: 'Alison Souza',
+          date: '03/01/2025',
+          client: 'Alison Souza',
           token: 'Binance Coin',
-          status: 'Pago',
-          metodoPagamento: 'PIX',
+          status: 'Paid',
+          paymentMethod: 'PIX',
           volume: '0.45678 $BNB',
-          valorBRL: 'R$ 5.90'
+          valueBRL: '$ 5.90'
         },
         {
           id: 2,
-          data: '01/03/2025',
-          cliente: 'Juliana Gonçalves',
+          date: '03/01/2025',
+          client: 'Juliana Gonçalves',
           token: 'Binance Coin',
-          status: 'Pendente',
-          metodoPagamento: 'PIX',
+          status: 'Pending',
+          paymentMethod: 'PIX',
           volume: '0.45678 $BNB',
-          valorBRL: 'R$ 5.90'
+          valueBRL: '$ 5.90'
         },
         {
           id: 3,
-          data: '01/03/2025',
-          cliente: 'Lucas Pereira',
+          date: '03/01/2025',
+          client: 'Lucas Pereira',
           token: 'Binance Coin',
-          status: 'Cancelado',
-          metodoPagamento: 'Cartão Crédito',
+          status: 'Cancelled',
+          paymentMethod: 'Credit Card',
           volume: '0.45678 $BNB',
-          valorBRL: 'R$ 5.90'
+          valueBRL: '$ 5.90'
         }
       ]
     },
 
-    // Saques
-    carregarSaques() {
-      this.saques = [
+    // Withdrawals
+    loadWithdrawals() {
+      this.withdrawals = [
         {
           id: 1,
-          data: '01 de março de 2025',
-          valorBRL: 'R$ 5.90',
-          destino: '053********35',
-          tipo: 'CPF',
-          status: 'Concluído'
+          date: 'March 1, 2025',
+          valueBRL: '$ 5.90',
+          destination: '053********35',
+          type: 'CPF',
+          status: 'Completed'
         },
         {
           id: 2,
-          data: '01 de março de 2025',
-          valorBRL: 'R$ 5.90',
-          destino: 'motti***@gmail.com',
-          tipo: 'Email',
-          status: 'Pendente'
+          date: 'March 1, 2025',
+          valueBRL: '$ 5.90',
+          destination: 'motti***@gmail.com',
+          type: 'Email',
+          status: 'Pending'
         },
         {
           id: 3,
-          data: '01 de março de 2025',
-          valorBRL: 'R$ 5.90',
-          destino: 'motti***@gmail.com',
-          tipo: 'Email',
-          status: 'Recusado'
+          date: 'March 1, 2025',
+          valueBRL: '$ 5.90',
+          destination: 'motti***@gmail.com',
+          type: 'Email',
+          status: 'Rejected'
         }
       ]
     },
 
-    // Usuários
-    carregarUsuarios() {
-      this.usuarios = [
+    // Users
+    loadUsers() {
+      this.users = [
         {
           id: 1,
-          nome: 'João Silva',
+          name: 'John Doe',
           email: 'email@email.com',
-          status: 'Ativo',
-          dataCadastro: '12/03/2025',
-          ultimoAcesso: '12/03/2025 14:21'
+          status: 'Active',
+          registrationDate: '03/12/2025',
+          lastAccess: '03/12/2025 14:21'
         },
         {
           id: 2,
-          nome: 'Maria Souza',
+          name: 'Jane Doe',
           email: 'email@email.com',
-          status: 'Ativo',
-          dataCadastro: '12/03/2025',
-          ultimoAcesso: '12/03/2025 14:21'
+          status: 'Active',
+          registrationDate: '03/12/2025',
+          lastAccess: '03/12/2025 14:21'
         },
         {
           id: 3,
-          nome: 'Carlos Lima',
+          name: 'Bob Smith',
           email: 'email@email.com',
-          status: 'Bloqueado',
-          dataCadastro: '12/03/2025',
-          ultimoAcesso: '12/03/2025 14:21'
+          status: 'Blocked',
+          registrationDate: '03/12/2025',
+          lastAccess: '03/12/2025 14:21'
         }
       ]
     },
 
-    // Ações para Afiliados
-    async aprovarAfiliado(id: number) {
-      // Implementar lógica de aprovação
-      console.log('Aprovar afiliado:', id)
+    // Actions for Affiliates
+    async approveAffiliate(id: number) {
+      // Implement approval logic
+      console.log('Approve affiliate:', id)
     },
 
-    async bloquearAfiliado(id: number) {
-      // Implementar lógica de bloqueio
-      console.log('Bloquear afiliado:', id)
+    async blockAffiliate(id: number) {
+      // Implement block logic
+      console.log('Block affiliate:', id)
     },
 
-    async excluirAfiliado(id: number) {
-      // Implementar lógica de exclusão
-      console.log('Excluir afiliado:', id)
+    async deleteAffiliate(id: number) {
+      // Implement delete logic
+      console.log('Delete affiliate:', id)
     },
 
-    // Ações para Ofertas
-    async aprovarOferta(id: number) {
-      // Implementar lógica de aprovação
-      console.log('Aprovar oferta:', id)
+    // Actions for Offers
+    async approveOffer(id: number) {
+      // Implement approval logic
+      console.log('Approve offer:', id)
     },
 
-    async bloquearOferta(id: number) {
-      // Implementar lógica de bloqueio
-      console.log('Bloquear oferta:', id)
+    async blockOffer(id: number) {
+      // Implement block logic
+      console.log('Block offer:', id)
     },
 
-    async excluirOferta(id: number) {
-      // Implementar lógica de exclusão
-      console.log('Excluir oferta:', id)
+    async deleteOffer(id: number) {
+      // Implement delete logic
+      console.log('Delete offer:', id)
     },
 
-    // Ações para Saques
-    async aprovarSaque(id: number) {
-      // Implementar lógica de aprovação
-      console.log('Aprovar saque:', id)
+    // Actions for Withdrawals
+    async approveWithdrawal(id: number) {
+      // Implement approval logic
+      console.log('Approve withdrawal:', id)
     },
 
-    async bloquearSaque(id: number) {
-      // Implementar lógica de bloqueio
-      console.log('Bloquear saque:', id)
+    async blockWithdrawal(id: number) {
+      // Implement block logic
+      console.log('Block withdrawal:', id)
     },
 
-    async excluirSaque(id: number) {
-      // Implementar lógica de exclusão
-      console.log('Excluir saque:', id)
+    async deleteWithdrawal(id: number) {
+      // Implement delete logic
+      console.log('Delete withdrawal:', id)
     },
 
-    // Ações para Usuários
-    async bloquearUsuario(id: number) {
-      // Implementar lógica de bloqueio
-      console.log('Bloquear usuário:', id)
+    // Actions for Users
+    async blockUser(id: number) {
+      // Implement block logic
+      console.log('Block user:', id)
     },
 
-    async editarPermissaoUsuario(id: number) {
-      // Implementar lógica de edição de permissão
-      console.log('Editar permissão do usuário:', id)
+    async editUserPermission(id: number) {
+      // Implement permission edit logic
+      console.log('Edit user permission:', id)
     },
 
-    async resetarSenhaUsuario(id: number) {
-      // Implementar lógica de reset de senha
-      console.log('Resetar senha do usuário:', id)
+    async resetUserPassword(id: number) {
+      // Implement password reset logic
+      console.log('Reset user password:', id)
     },
 
-    async excluirUsuario(id: number) {
-      // Implementar lógica de exclusão
-      console.log('Excluir usuário:', id)
+    async deleteUser(id: number) {
+      // Implement delete logic
+      console.log('Delete user:', id)
     }
   }
-}) 
+})
