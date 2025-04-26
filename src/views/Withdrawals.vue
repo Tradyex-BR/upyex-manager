@@ -94,9 +94,9 @@ export default defineComponent({
     },
     getStatusClass(status: string): string {
       switch (status) {
-        case 'Concluído':
+        case 'Completed':
           return 'px-2 py-1 rounded-full text-sm bg-green-500/20 text-green-500'
-        case 'Recusado':
+        case 'Rejected':
           return 'px-2 py-1 rounded-full text-sm bg-red-500/20 text-red-500'
         default:
           return 'px-2 py-1 rounded-full text-sm bg-yellow-500/20 text-yellow-500'
