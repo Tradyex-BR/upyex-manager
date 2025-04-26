@@ -1,7 +1,7 @@
 <template>
   <div
     class="max-w-none flex flex-row w-full h-screen bg-[#010309] mx-auto max-md:max-w-[991px] max-md:flex-col max-sm:max-w-screen-sm">
-    <div class="flex flex-col w-6/12 backdrop-blur-lg items-start gap-8 bg-white p-28 left-[section] max-md:w-full">
+    <div class="z-[100] flex flex-col w-6/12 backdrop-blur-lg items-start gap-8 bg-white p-28 left-[section] max-md:w-full">
       <div>
         <h1 class="text-[#040D25] text-[32px] leading-[40px] font-semibold">
           Boas vindas ao TradyEx
@@ -16,7 +16,9 @@
       <LoginForm />
     </div>
 
+    <div class="darker-gradient-background"></div>
     <LoginBackground />
+    <VerticalLines />
   </div>
 </template>
 
@@ -55,3 +57,14 @@ const handleLogin = async () => {
   }
 }
 </script>
+
+<style scoped>
+.darker-gradient-background {
+  position: absolute;
+  height: 1031px;
+  width: 100%;
+  background: linear-gradient(to top, #010309 0%, #010309 10%, transparent 100%);
+  z-index: 10;
+
+}
+</style>
