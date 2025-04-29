@@ -12,6 +12,16 @@
       <form @submit.prevent="handleSubmit" class="flex flex-col gap-4 w-full">
         <div class="flex flex-col gap-1 w-full">
           <label class="flex items-center gap-0.5 text-sm font-medium text-[rgba(4,13,37,1)]">
+            <span class="text-[#040D25] text-[14px] font-medium leading-5">Tipo de usuário</span>
+            <span class="text-[#BE3E37] font-inter text-[14px] leading-5 font-medium">*</span>
+          </label>
+          <select v-model="role" :disabled="loading"
+            class="h-[56px] px-3 py-4 border border-[#B8B8B8] rounded-lg outline-none bg-white mb-2">
+            <option v-for="r in roles" :key="r" :value="r">{{ r === 'MANAGER' ? 'Manager' : 'Afiliado' }}</option>
+          </select>
+        </div>
+        <div class="flex flex-col gap-1 w-full">
+          <label class="flex items-center gap-0.5 text-sm font-medium text-[rgba(4,13,37,1)]">
             <span class="text-[#040D25] text-[14px] font-medium leading-5">Email</span>
             <span class="text-[#BE3E37] font-inter text-[14px] leading-5 font-medium">*</span>
           </label>
@@ -93,10 +103,9 @@ const handleSubmit = async () => {
     } else if (role.value === 'AFFILIATE') {
       endpoint = '/affiliate/auth/password/forgot'
     }
-    const res = await fetch(import.meta.env.VITE_API_BASE_URL + endpoint, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email: email.value.trim() })
+    const url = `${import.meta.env.VITE_API_BASE_URL}${endpoint}?email=${encodeURIComponent(email.value.trim())}`
+    const res = await fetch(url, {
+      method: 'GET'
     })
     const data = await res.json()
     if (!res.ok) {

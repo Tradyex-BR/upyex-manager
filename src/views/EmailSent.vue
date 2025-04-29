@@ -13,21 +13,6 @@
       </div>
 
       <form @submit.prevent="handleSubmit" class="flex flex-col gap-4 w-full">
-        <div class="flex flex-col gap-1 w-full">
-          <label class="flex items-center gap-0.5 text-sm font-medium text-[rgba(4,13,37,1)]">
-            <span class="text-[#040D25] text-[14px] font-medium leading-5">Email</span>
-            <span class="text-[#BE3E37] font-inter text-[14px] leading-5 font-medium">*</span>
-          </label>
-          <div class="h-[56px] flex items-center border gap-2 px-3 py-4 rounded-lg border-solid border-[#B8B8B8]">
-            <div>
-              <div v-html="emailIcon"></div>
-            </div>
-            <input v-model="email" type="email" placeholder="Digite seu email"
-              class="flex-1 bg-transparent outline-none font-inter text-[#222A3F] leading-5" required
-              :disabled="loading" />
-          </div>
-        </div>
-
         <div class="flex flex-col gap-6 w-full max-sm:items-center mt-4">
           <div>
             <button type="submit"
@@ -43,7 +28,7 @@
                 </svg>
                 Enviando...
               </span>
-              <span v-else>Redefinir</span>
+              <span v-else>Voltar</span>
             </button>
           </div>
           <div class="text-center font-inter text-[14px] leading-[18px] text-[#040D25]">
