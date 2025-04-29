@@ -34,6 +34,7 @@ npm install
 3. Configure as variáveis de ambiente
 ```bash
 cp .env.example .env
+# Edite o arquivo .env conforme necessário
 ```
 
 4. Inicie o servidor de desenvolvimento
@@ -41,7 +42,7 @@ cp .env.example .env
 npm run dev
 ```
 
-## 🏗️ Estrutura do Projeto
+## Estrutura do Projeto
 
 ```
 src/
@@ -58,10 +59,12 @@ src/
 ├── stores/         # Stores Pinia
 ├── types/          # Tipos TypeScript
 ├── utils/          # Funções utilitárias
+├── validators/     # Schemas de validação
+├── styles/         # Estilos globais
 └── views/          # Páginas
 ```
 
-## 📝 Scripts
+## Scripts
 
 - `npm run dev` - Inicia o servidor de desenvolvimento
 - `npm run build` - Gera a versão de produção
@@ -69,14 +72,21 @@ src/
 - `npm run format` - Formata o código
 - `npm run test` - Executa os testes
 
-## 🤝 Contribuição
+## Outras informações
+
+- O projeto utiliza Pinia para gerenciamento de estado.
+- O controle de autenticação está em `src/stores/auth.ts`.
+- As rotas protegidas e regras de acesso estão em `src/router/index.ts`.
+- Para rodar em produção, configure corretamente as variáveis de ambiente.
+
+## Contribuição
 
 1. Faça o fork do projeto
-2. Crie uma branch para sua feature (`git checkout -b feature/AmazingFeature`)
-3. Commit suas mudanças (`git commit -m 'Add some AmazingFeature'`)
-4. Push para a branch (`git push origin feature/AmazingFeature`)
+2. Crie uma branch para sua feature (`git checkout -b feature/NomeDaFeature`)
+3. Commit suas mudanças (`git commit -m 'feat: minha feature'`)
+4. Push para a branch (`git push origin feature/NomeDaFeature`)
 5. Abra um Pull Request
 
-## 📄 Licença
+## Licença
 
 Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para mais detalhes.
