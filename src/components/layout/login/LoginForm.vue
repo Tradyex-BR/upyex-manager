@@ -30,8 +30,7 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
-import { managerService } from '@/services/managerService'
-import { affiliateService } from '@/services/affiliateService'
+import { useAuthStore } from '@/stores/auth'
 
 const router = useRouter()
 const email = ref('')
@@ -41,32 +40,19 @@ const roles = ['MANAGER', 'AFFILIATE']
 const loading = ref(false)
 const error = ref('')
 const message = ref('')
-
+const authStore = useAuthStore()
 
 const handleLogin = async () => {
   loading.value = true
   error.value = ''
   try {
-    let response
-    // Ajuste: fingerprint fixo conforme backend
-    const fingerprint = 'Qg0JCu3FzrLMH3tPTWIP'
-    if (role.value === 'MANAGER') {
-      response = await managerService.auth.login({ email: email.value, password: password.value, fingerprint })
-    } else if (role.value === 'AFFILIATE') {
-      response = await affiliateService.auth.login({ email: email.value, password: password.value, fingerprint })
-    }
-    // Ajuste: backend retorna auth_token, não access_token
-    if (response?.auth_token) {
-      // Ajuste: salvar token conforme tipo de usuário
-      if (role.value === 'MANAGER') {
-        localStorage.setItem('manager_auth_token', response.auth_token)
-      } else if (role.value === 'AFFILIATE') {
-        localStorage.setItem('affiliate_auth_token', response.auth_token)
-      }
-      router.push('/dashboard')
-    } else {
-      error.value = 'Credenciais inválidas'
-    }
+    await authStore.login({
+      email: email.value,
+      password: password.value,
+      role: role.value,
+      fingerprint: 'Qg0JCu3FzrLMH3tPTWIP'
+    })
+    router.push('/dashboard')
   } catch (err: any) {
     if (err.response?.data?.message && err.response.data.message.toLowerCase().includes('senha')) {
       error.value = 'Você precisa definir uma senha antes do primeiro acesso. Clique em "Esqueci minha senha" para criar sua senha.'
@@ -77,6 +63,7 @@ const handleLogin = async () => {
     loading.value = false
   }
 }
+
 
 const goToForgotPassword = () => {
   router.push({ path: '/forgot-password', query: { email: email.value, role: role.value } })

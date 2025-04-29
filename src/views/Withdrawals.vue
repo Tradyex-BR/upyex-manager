@@ -4,7 +4,12 @@
       <main class="w-full max-md:w-full max-md:ml-0">
         <div class="w-full max-md:max-w-full">
           <section class=" min-h-[944px] w-full overflow-hidden max-md:max-w-full max-md:px-5">
-            <p class="text-white text-2xl font-semibold mb-6">Withdrawals</p>
+            <div class="flex justify-between items-center mb-6">
+  <p class="text-white text-2xl font-semibold">Withdrawals</p>
+  <BaseButton @click="" class="ml-2">
+    Novo Saque
+  </BaseButton>
+</div>
             <div>
               <table class="w-full text-white border-collapse">
                 <thead>
@@ -69,13 +74,14 @@ import { defineComponent } from 'vue'
 import { useDashboardStore } from '@/stores/dashboard'
 import Sidebar from '@/components/layout/dashboard/Sidebar.vue'
 import TopBar from '@/components/layout/dashboard/TopBar.vue'
-
+import BaseButton from '@/components/common/BaseButton.vue'
 
 export default defineComponent({
   name: 'Withdrawals',
   components: {
     Sidebar,
-    TopBar
+    TopBar,
+    BaseButton
   },
   data() {
     return {

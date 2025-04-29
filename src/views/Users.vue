@@ -6,9 +6,9 @@
           <section class=" min-h-[944px] w-full overflow-hidden max-md:max-w-full max-md:px-5">
             <div class="flex justify-between items-center mb-6">
               <p class="text-white text-2xl font-semibold">Usuários</p>
-              <button class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg transition-colors">
+              <BaseButton @click="" class="ml-2">
                 Novo Usuário
-              </button>
+              </BaseButton>
             </div>
             <div>
               <table class="w-full text-white border-collapse">
@@ -85,6 +85,7 @@
 import { defineComponent } from 'vue'
 import Sidebar from '@/components/layout/dashboard/Sidebar.vue'
 import TopBar from '@/components/layout/dashboard/TopBar.vue'
+import BaseButton from '@/components/common/BaseButton.vue'
 
 interface Usuario {
   id: number;
@@ -99,7 +100,8 @@ export default defineComponent({
   name: 'Usuarios',
   components: {
     Sidebar,
-    TopBar
+    TopBar,
+    BaseButton
   },
   data() {
     return {

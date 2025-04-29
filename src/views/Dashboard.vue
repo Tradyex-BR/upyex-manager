@@ -9,8 +9,15 @@
           <section class="min-h-[944px] w-full overflow-hidden max-md:max-w-full max-md:px-5">
             <DashboardCards />
             <div class="flex w-full gap-6 flex-wrap mt-6 max-md:max-w-full">
-              <AssetTable />
-              <AffiliateTable />
+              <AssetTable v-if="authStore.user && authStore.user.role === 'MANAGER'" />
+              <AffiliateTable v-if="authStore.user && authStore.user.role === 'MANAGER'" />
+              <div v-if="authStore.user && authStore.user.role === 'AFFILIATE'" class="w-full">
+                <!-- Exemplo de exibição para afiliado: pode customizar conforme necessário -->
+                <p class="text-lg font-semibold mb-2">Bem-vindo, {{ authStore.user.name }}!</p>
+                <p>Seu email: {{ authStore.user.email }}</p>
+                <p>Perfil: Afiliado</p>
+                <!-- Aqui você pode adicionar componentes ou tabelas específicas do afiliado -->
+              </div>
             </div>
           </section>
         </div>

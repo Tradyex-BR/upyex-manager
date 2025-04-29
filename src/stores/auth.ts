@@ -26,20 +26,30 @@ export const useAuthStore = defineStore('auth', {
   },
 
   actions: {
-    async login(credentials: { email: string; password: string; role: 'MANAGER' | 'AFFILIATE' }) {
+    async login(credentials: { email: string; password: string; role: 'MANAGER' | 'AFFILIATE'; fingerprint: string }) {
   try {
     let response
     let token
     let user
     if (credentials.role === 'MANAGER') {
-      response = await managerService.auth.login(credentials)
+      response = await managerService.auth.login({
+        email: credentials.email,
+        password: credentials.password,
+        fingerprint: credentials.fingerprint
+      })
       token = response.auth_token
       // Buscar dados do usuário logado
       user = await managerService.auth.current()
+      user.role = 'MANAGER'
     } else {
-      response = await affiliateService.auth.login(credentials)
+      response = await affiliateService.auth.login({
+        email: credentials.email,
+        password: credentials.password,
+        fingerprint: credentials.fingerprint
+      })
       token = response.auth_token
       user = await affiliateService.auth.current()
+      user.role = 'AFFILIATE'
     }
     this.user = user
     this.token = token

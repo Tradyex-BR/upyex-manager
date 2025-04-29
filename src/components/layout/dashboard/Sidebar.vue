@@ -77,12 +77,12 @@ export default defineComponent({
           icon: 'svg-dashboard'
         },
         { 
-          text: 'Vendas', 
+          text: 'Afiliados', 
           route: '/sales',
           icon: 'svg-vendas'
         },
         { 
-          text: 'Ofertas', 
+          text: 'Vendas', 
           route: '/offers',
           icon: 'svg-ofertas'
         },
