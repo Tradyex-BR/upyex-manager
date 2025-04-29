@@ -6,9 +6,19 @@
           <section class=" min-h-[944px] w-full overflow-hidden max-md:max-w-full max-md:px-5">
             <div class="flex justify-between items-center mb-6">
   <p class="text-white text-2xl font-semibold">Withdrawals</p>
-  <BaseButton @click="" class="ml-2">
+  <BaseButton @click="showRequestModal = true" class="ml-2">
     Novo Saque
   </BaseButton>
+
+  <WithdrawalRequestModal
+    v-if="showRequestModal"
+    @close="showRequestModal = false"
+    @submit="handleWithdrawalRequest"
+  />
+  <WithdrawalSuccessModal
+    v-if="showSuccessModal"
+    @close="showSuccessModal = false"
+  />
 </div>
             <div>
               <table class="w-full text-white border-collapse">
@@ -75,18 +85,24 @@ import { useDashboardStore } from '@/stores/dashboard'
 import Sidebar from '@/components/layout/dashboard/Sidebar.vue'
 import TopBar from '@/components/layout/dashboard/TopBar.vue'
 import BaseButton from '@/components/common/BaseButton.vue'
+import WithdrawalRequestModal from '@/components/withdrawals/WithdrawalRequestModal.vue'
+import WithdrawalSuccessModal from '@/components/withdrawals/WithdrawalSuccessModal.vue'
 
 export default defineComponent({
   name: 'Withdrawals',
   components: {
     Sidebar,
     TopBar,
-    BaseButton
+    BaseButton,
+    WithdrawalRequestModal,
+    WithdrawalSuccessModal
   },
   data() {
     return {
       store: useDashboardStore(),
-      dropdownOpen: null as number | null
+      dropdownOpen: null as number | null,
+      showRequestModal: false,
+      showSuccessModal: false
     }
   },
   computed: {
@@ -95,6 +111,12 @@ export default defineComponent({
     }
   },
   methods: {
+    handleWithdrawalRequest({ amount, pixKey }: { amount: string, pixKey: string }) {
+      // Aqui você pode chamar a action de saque, ex: this.store.requestWithdrawal({ amount, pixKey })
+      // Após sucesso, fecha a modal de request e abre a de sucesso
+      this.showRequestModal = false;
+      this.showSuccessModal = true;
+    },
     toggleDropdown(id: number) {
       this.dropdownOpen = this.dropdownOpen === id ? null : id
     },
