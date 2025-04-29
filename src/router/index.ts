@@ -88,7 +88,12 @@ router.beforeEach(async (to, _from, next) => {
     if (!isAuthenticated) {
       next('/login')
     } else {
-      next()
+      // Proteção para afiliados não acessarem /users
+      if (to.path === '/users' && authStore.user?.role === 'AFFILIATE') {
+        next('/dashboard')
+      } else {
+        next()
+      }
     }
   } else {
     if (authStore.isAuthenticated && to.path === '/login') {

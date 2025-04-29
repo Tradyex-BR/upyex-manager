@@ -40,22 +40,24 @@ const role = ref<'MANAGER' | 'AFFILIATE'>('MANAGER')
 const loading = ref(false)
 const error = ref('')
 
-try {
-  loading.value = true
-  error.value = ''
+const login = async () => {
+  try {
+    loading.value = true
+    error.value = ''
 
-  await authStore.login({
-    email: email.value,
-    password: password.value,
-    role: role.value,
-    fingerprint: 'Qg0JCu3FzrLMH3tPTWIP'
-  })
+    await authStore.login({
+      email: email.value,
+      password: password.value,
+      role: role.value,
+      fingerprint: 'Qg0JCu3FzrLMH3tPTWIP'
+    })
 
-  router.push('/dashboard')
-} catch (err: any) {
-  error.value = err.response?.data?.message || 'Ocorreu um erro ao fazer login'
-} finally {
-  loading.value = false
+    router.push('/dashboard')
+  } catch (err: any) {
+    error.value = err.response?.data?.message || 'Ocorreu um erro ao fazer login'
+  } finally {
+    loading.value = false
+  }
 }
 </script>
 
