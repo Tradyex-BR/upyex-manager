@@ -125,8 +125,14 @@ export default defineComponent({
   },
   async mounted() {
     try {
-      const response = await managerService.affiliates.list({});
-      this.affiliates = response.data || response.affiliates || response; // ajuste conforme o retorno real
+      const response = await managerService.affiliates.list({
+  search: '',
+  page: 1,
+  per_page: 20,
+  sort_by: 'name',
+  sort_order: 'asc'
+});
+      this.affiliates = response.data || response; // ajuste conforme o retorno real
     } catch (e) {
       // Trate erro se necessário
     } finally {

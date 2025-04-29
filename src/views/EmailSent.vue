@@ -53,7 +53,7 @@ import LoginBackground from '@/components/layout/login/LoginBackground.vue'
 import VerticalLines from '@/components/layout/login/VerticalLines.vue'
 
 const router = useRouter()
-const email = ref('')
+
 const loading = ref(false)
 
 const paperPlaneIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="122" height="48" viewBox="0 0 122 48" fill="none">

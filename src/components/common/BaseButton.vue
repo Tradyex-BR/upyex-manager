@@ -17,24 +17,12 @@
 <script setup lang="ts">
 import { defineProps, defineEmits } from 'vue'
 
-const props = defineProps({
-  type: {
-    type: String,
-    default: 'button'
-  },
-  disabled: {
-    type: Boolean,
-    default: false
-  },
-  loading: {
-    type: Boolean,
-    default: false
-  },
-  customClass: {
-    type: String,
-    default: ''
-  }
-})
+const props = defineProps<{
+  type?: 'button' | 'reset' | 'submit',
+  disabled?: boolean,
+  loading?: boolean,
+  customClass?: string
+}>()
 
 defineEmits(['click'])
 </script>

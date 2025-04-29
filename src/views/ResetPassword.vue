@@ -106,7 +106,7 @@ import { useRouter, useRoute } from 'vue-router'
 
 
 const router = useRouter()
-const route = useRoute()
+
 const password = ref('')
 const confirmPassword = ref('')
 const showPassword = ref(false)

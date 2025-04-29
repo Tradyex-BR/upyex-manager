@@ -28,18 +28,18 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 
 const router = useRouter()
 const email = ref('')
 const password = ref('')
-const role = ref('MANAGER')
+const role = ref<'MANAGER' | 'AFFILIATE'>('MANAGER')
 const roles = ['MANAGER', 'AFFILIATE']
 const loading = ref(false)
 const error = ref('')
-const message = ref('')
+
 const authStore = useAuthStore()
 
 const handleLogin = async () => {
@@ -65,9 +65,6 @@ const handleLogin = async () => {
 }
 
 
-const goToForgotPassword = () => {
-  router.push({ path: '/forgot-password', query: { email: email.value, role: role.value } })
-}
 
 
 </script>

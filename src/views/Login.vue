@@ -35,29 +35,27 @@ const authStore = useAuthStore()
 
 const email = ref('')
 const password = ref('')
-const role = ref('MANAGER')
-const roles = ['MANAGER', 'AFFILIATE']
+const role = ref<'MANAGER' | 'AFFILIATE'>('MANAGER')
+
 const loading = ref(false)
 const error = ref('')
-const isDev = import.meta.env.DEV
 
-const handleLogin = async () => {
-  try {
-    loading.value = true
-    error.value = ''
+try {
+  loading.value = true
+  error.value = ''
 
-    await authStore.login({
-      email: email.value,
-      password: password.value,
-      role: role.value as 'MANAGER' | 'AFFILIATE'
-    })
+  await authStore.login({
+    email: email.value,
+    password: password.value,
+    role: role.value,
+    fingerprint: 'Qg0JCu3FzrLMH3tPTWIP'
+  })
 
-    router.push('/dashboard')
-  } catch (err: any) {
-    error.value = err.response?.data?.message || 'Ocorreu um erro ao fazer login'
-  } finally {
-    loading.value = false
-  }
+  router.push('/dashboard')
+} catch (err: any) {
+  error.value = err.response?.data?.message || 'Ocorreu um erro ao fazer login'
+} finally {
+  loading.value = false
 }
 </script>
 

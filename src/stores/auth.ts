@@ -73,9 +73,9 @@ export const useAuthStore = defineStore('auth', {
         localStorage.removeItem('user')
         
         // Chamar o serviço de logout
-        if (this.user?.role === 'MANAGER') {
+        if ((this.user as any)?.role === 'MANAGER') {
   await managerService.auth.logout()
-} else if (this.user?.role === 'AFFILIATE') {
+} else if ((this.user as any)?.role === 'AFFILIATE') {
   await affiliateService.auth.logout()
 }
       } catch (error) {
