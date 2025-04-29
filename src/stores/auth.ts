@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
-import { authService } from '@/services/auth'
+import { managerService } from '@/services/managerService'
+import { affiliateService } from '@/services/affiliateService'
 
 interface User {
   id: number
@@ -25,22 +26,31 @@ export const useAuthStore = defineStore('auth', {
   },
 
   actions: {
-    async login(credentials: { email: string; password: string }) {
-      try {
-        const response = await authService.login(credentials)
-        
-        this.user = response.user
-        this.token = response.token
-        
-        // Salvar no localStorage
-        localStorage.setItem('token', response.token)
-        localStorage.setItem('user', JSON.stringify(response.user))
-        
-        return response.user
-      } catch (error) {
-        throw error
-      }
-    },
+    async login(credentials: { email: string; password: string; role: 'MANAGER' | 'AFFILIATE' }) {
+  try {
+    let response
+    let token
+    let user
+    if (credentials.role === 'MANAGER') {
+      response = await managerService.auth.login(credentials)
+      token = response.auth_token
+      // Buscar dados do usuário logado
+      user = await managerService.auth.current()
+    } else {
+      response = await affiliateService.auth.login(credentials)
+      token = response.auth_token
+      user = await affiliateService.auth.current()
+    }
+    this.user = user
+    this.token = token
+    // Salvar no localStorage
+    localStorage.setItem('token', token)
+    localStorage.setItem('user', JSON.stringify(user))
+    return user
+  } catch (error) {
+    throw error
+  }
+},
 
     async logout() {
       try {
@@ -53,23 +63,25 @@ export const useAuthStore = defineStore('auth', {
         localStorage.removeItem('user')
         
         // Chamar o serviço de logout
-        authService.logout()
+        if (this.user?.role === 'MANAGER') {
+  await managerService.auth.logout()
+} else if (this.user?.role === 'AFFILIATE') {
+  await affiliateService.auth.logout()
+}
       } catch (error) {
         throw error
       }
     },
 
     // Método para verificar se o usuário está autenticado ao carregar a página
-    checkAuth() {
+    async checkAuth() {
       const token = localStorage.getItem('token')
       const user = localStorage.getItem('user')
-      
       if (token && user) {
         this.token = token
         this.user = JSON.parse(user)
         return true
       }
-      
       return false
     }
   }

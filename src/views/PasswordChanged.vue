@@ -27,10 +27,12 @@
       </div>
     </div>
 
-    <ForgotPasswordBackground />
+    <LoginBackground />
+    <VerticalLines />
   </div>
 </template>
 
 <script setup lang="ts">
-import ForgotPasswordBackground from '@/components/layout/login/ForgotPasswordBackground.vue'
+import LoginBackground from '@/components/layout/login/LoginBackground.vue'
+import VerticalLines from '@/components/layout/login/VerticalLines.vue'
 </script>

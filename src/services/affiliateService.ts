@@ -100,25 +100,49 @@ export interface ListWithdrawalsParams {
   sort_order: string;
 }
 
+import { setToken, removeToken } from './tokenService';
+
 export const affiliateService = {
   auth: {
+    /**
+     * Login do afiliado. Salva o token no localStorage.
+     */
     login: async (credentials: AffiliateLoginCredentials): Promise<AffiliateLoginResponse> => {
       const response = await api.post<AffiliateLoginResponse>('/affiliate/auth', credentials);
+      if (response.data?.auth_token) {
+        setToken(response.data.auth_token);
+      }
       return response.data;
     },
+    /**
+     * Logout do afiliado. Remove o token do localStorage.
+     */
     logout: async (): Promise<void> => {
       await api.delete('/affiliate/auth');
+      removeToken();
     },
+    /**
+     * Retorna dados do usuário afiliado logado.
+     */
     current: async (): Promise<any> => {
       const response = await api.get('/affiliate/auth');
       return response.data;
     },
+    /**
+     * Envia email para recuperação de senha.
+     */
     forgotPassword: async (payload: ForgotPasswordPayload): Promise<void> => {
       await api.request({ method: 'GET', url: '/affiliate/auth/password/forgot', data: payload });
     },
+    /**
+     * Reseta a senha usando token enviado por email.
+     */
     resetPassword: async (payload: ResetPasswordPayload): Promise<void> => {
       await api.post('/affiliate/auth/password/reset', payload);
     },
+    /**
+     * Troca a senha do afiliado autenticado.
+     */
     changePassword: async (payload: ChangePasswordPayload): Promise<void> => {
       await api.post('/affiliate/auth/password/change', payload);
     },

@@ -93,14 +93,17 @@
       </form>
     </div>
 
-    <ForgotPasswordBackground />
+    <LoginBackground />
+    <VerticalLines />
   </div>
 </template>
 
 <script setup lang="ts">
+import LoginBackground from '@/components/layout/login/LoginBackground.vue'
+import VerticalLines from '@/components/layout/login/VerticalLines.vue'
 import { ref, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
-import ForgotPasswordBackground from '@/components/layout/login/ForgotPasswordBackground.vue'
+
 
 const router = useRouter()
 const route = useRoute()

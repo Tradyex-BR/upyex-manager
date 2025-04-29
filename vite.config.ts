@@ -9,5 +9,24 @@ export default defineConfig({
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url))
     }
+  },
+  server: {
+    proxy: {
+      '/manager': {
+        target: 'https://api.manager.upyex.com',
+        changeOrigin: true,
+        secure: true,
+      },
+      '/affiliate': {
+        target: 'https://api.manager.upyex.com',
+        changeOrigin: true,
+        secure: true,
+      },
+      '/external': {
+        target: 'https://api.manager.upyex.com',
+        changeOrigin: true,
+        secure: true,
+      },
+    }
   }
 })

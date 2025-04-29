@@ -13,12 +13,6 @@ const routes = [
     meta: { requiresAuth: false }
   },
   {
-    path: '/register',
-    name: 'Register',
-    component: () => import('../views/Register.vue'),
-    meta: { requiresAuth: false }
-  },
-  {
     path: '/forgot-password',
     name: 'ForgotPassword',
     component: () => import('../views/ForgotPassword.vue'),
@@ -71,6 +65,11 @@ const routes = [
     name: 'Users',
     component: () => import('../views/Users.vue'),
     meta: { requiresAuth: true }
+  },
+  {
+    path: '/:pathMatch(.*)*',
+    name: 'NotFound',
+    component: () => import('../views/NotFound.vue'),
   }
 ]
 

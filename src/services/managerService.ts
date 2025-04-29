@@ -88,25 +88,49 @@ export interface ListApplicationsResponse {
   per_page: number;
 }
 
+import { setToken, removeToken } from './tokenService';
+
 export const managerService = {
   auth: {
+    /**
+     * Login do manager. Salva o token no localStorage.
+     */
     login: async (credentials: ManagerLoginCredentials): Promise<ManagerLoginResponse> => {
       const response = await api.post<ManagerLoginResponse>('/manager/auth', credentials);
+      if (response.data?.auth_token) {
+        setToken(response.data.auth_token);
+      }
       return response.data;
     },
+    /**
+     * Logout do manager. Remove o token do localStorage.
+     */
     logout: async (): Promise<void> => {
       await api.delete('/manager/auth');
+      removeToken();
     },
+    /**
+     * Retorna dados do usuário logado.
+     */
     current: async (): Promise<any> => {
       const response = await api.get('/manager/auth');
       return response.data;
     },
+    /**
+     * Envia email para recuperação de senha.
+     */
     forgotPassword: async (payload: ForgotPasswordPayload): Promise<void> => {
       await api.request({ method: 'GET', url: '/manager/auth/password/forgot', data: payload });
     },
+    /**
+     * Reseta a senha usando token enviado por email.
+     */
     resetPassword: async (payload: ResetPasswordPayload): Promise<void> => {
       await api.post('/manager/auth/password/reset', payload);
     },
+    /**
+     * Troca a senha do usuário autenticado.
+     */
     changePassword: async (payload: ChangePasswordPayload): Promise<void> => {
       await api.post('/manager/auth/password/change', payload);
     },

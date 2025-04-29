@@ -4,10 +4,12 @@ import { computed } from 'vue';
 import Sidebar from './components/layout/dashboard/Sidebar.vue';
 import TopBar from './components/layout/dashboard/TopBar.vue';
 
-const pagesThatDontHaveSidebar = ['/login', '/forgot-password', '/cadastro', '/email-sent', '/reset-password', '/password-changed'];
+const pagesThatDontHaveSidebar = ['/login', '/forgot-password', '/email-sent', '/reset-password', '/password-changed'];
 
 const route = useRoute();
-const thisPageHaveSidebar = computed(() => pagesThatDontHaveSidebar.includes(route.path));
+const thisPageHaveSidebar = computed(() =>
+  pagesThatDontHaveSidebar.includes(route.path) || route.name === 'NotFound'
+);
 
 </script>
 

@@ -11,13 +11,13 @@
         </div>
       </div>
 
-      <SocialLogin />
+     <!--  <SocialLogin /> -->
 
       <LoginForm />
     </div>
 
-    <div class="darker-gradient-background"></div>
-    <LoginBackground />
+<!--     <div class="darker-gradient-background"></div>
+ -->    <LoginBackground />
     <VerticalLines />
   </div>
 </template>
@@ -26,15 +26,17 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
-import SocialLogin from '@/components/layout/login/SocialLogin.vue'
 import LoginForm from '@/components/layout/login/LoginForm.vue'
 import LoginBackground from '@/components/layout/login/LoginBackground.vue'
+import VerticalLines from '@/components/layout/login/VerticalLines.vue'
 
 const router = useRouter()
 const authStore = useAuthStore()
 
 const email = ref('')
 const password = ref('')
+const role = ref('MANAGER')
+const roles = ['MANAGER', 'AFFILIATE']
 const loading = ref(false)
 const error = ref('')
 const isDev = import.meta.env.DEV
@@ -46,7 +48,8 @@ const handleLogin = async () => {
 
     await authStore.login({
       email: email.value,
-      password: password.value
+      password: password.value,
+      role: role.value as 'MANAGER' | 'AFFILIATE'
     })
 
     router.push('/dashboard')

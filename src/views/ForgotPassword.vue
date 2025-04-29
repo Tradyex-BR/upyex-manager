@@ -57,18 +57,25 @@
       </form>
     </div>
 
-    <ForgotPasswordBackground />
+<!--     <div class="darker-gradient-background"></div>
+ -->    <LoginBackground />
+    <VerticalLines />
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import ForgotPasswordBackground from '@/components/layout/login/ForgotPasswordBackground.vue'
+import LoginBackground from '@/components/layout/login/LoginBackground.vue'
+import VerticalLines from '@/components/layout/login/VerticalLines.vue'
 
 const router = useRouter()
 const email = ref('')
+const role = ref('MANAGER')
+const roles = ['MANAGER', 'AFFILIATE']
 const loading = ref(false)
+const error = ref('')
+const message = ref('')
 
 const emailIcon = `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
 <path fill-rule="evenodd" clip-rule="evenodd" d="M15.374 12.718L19.88 9.663C20.581 9.189 21 8.398 21 7.552V7.552C21 6.142 19.858 5 18.449 5H5.56601C4.15701 5 3.01501 6.142 3.01501 7.551V7.551C3.01501 8.397 3.43401 9.188 4.13501 9.663L8.64101 12.718C10.674 14.096 13.341 14.096 15.374 12.718V12.718Z" stroke="#85B1FF" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
@@ -76,16 +83,31 @@ const emailIcon = `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" x
 </svg>`
 
 const handleSubmit = async () => {
+  error.value = ''
+  message.value = ''
+  loading.value = true
   try {
-    loading.value = true
-    // Aqui você implementará a lógica de recuperação de senha
-    // await authStore.forgotPassword(email.value)
-    // Após o envio bem-sucedido, você pode redirecionar ou mostrar uma mensagem
-    router.push('/email-sent')
-  } catch (error) {
-    console.error('Erro ao solicitar recuperação de senha:', error)
+    let endpoint = ''
+    if (role.value === 'MANAGER') {
+      endpoint = '/manager/auth/password/forgot'
+    } else if (role.value === 'AFFILIATE') {
+      endpoint = '/affiliate/auth/password/forgot'
+    }
+    const res = await fetch(import.meta.env.VITE_API_BASE_URL + endpoint, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: email.value.trim() })
+    })
+    const data = await res.json()
+    if (!res.ok) {
+      throw new Error(data.message || 'Erro ao solicitar recuperação de senha')
+    }
+    message.value = data.message || 'Email enviado com instruções para redefinir a senha.'
+    setTimeout(() => router.push('/email-sent'), 1200)
+  } catch (err: any) {
+    error.value = err.message || 'Erro ao solicitar recuperação de senha'
   } finally {
     loading.value = false
   }
 }
-</script> 
+</script>
