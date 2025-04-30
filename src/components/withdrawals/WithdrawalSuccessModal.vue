@@ -17,7 +17,7 @@
 .modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.6);
+  background: rgba(24, 28, 47, 0.75); /* Mais escuro e fiel ao Figma */
   display: flex;
   align-items: center;
   justify-content: center;
