@@ -6,8 +6,12 @@
           src="https://cdn.builder.io/api/v1/image/assets/7f72b52c1e064ab59dcec351fcad2273/5697248805177b7c44034604d6594552a9fa39ff?placeholderIfAbsent=true"
           class="aspect-[1] object-contain w-5 self-stretch shrink-0 my-auto" alt="Search icon" />
         <input
-v-model="searchQuery" type="text" placeholder="Digite para pesquisar"
-          class="text-[#B8B8B8] text-sm leading-5 self-stretch my-auto bg-transparent border-none outline-none w-full" />
+  v-model="searchQuery"
+  type="text"
+  placeholder="Digite para pesquisar"
+  class="text-[#B8B8B8] text-sm leading-5 self-stretch my-auto bg-transparent border-none outline-none w-full"
+  @keyup.enter="emitSearch"
+/>
       </div>
       <div
         class="font-inter text-[14px] leading-5 self-stretch flex min-w-60 items-center gap-[30px] text-white my-auto">
@@ -105,4 +109,16 @@ onMounted(() => {
 onUnmounted(() => {
   document.removeEventListener('click', handleClickOutside)
 })
+const emitSearch = () => {
+  console.log('emitSearch (TopBar) enviando:', searchQuery.value);
+  if (searchQuery.value && searchQuery.value.trim() !== '') {
+    // Emite o evento para o pai
+    // @ts-ignore
+    emit('search', searchQuery.value.trim())
+  }
+}
+
+// Adiciona o emit ao setup
+const emit = defineEmits(['search'])
+
 </script>

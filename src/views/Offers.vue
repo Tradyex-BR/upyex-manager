@@ -51,8 +51,15 @@ import { defineComponent, ref } from 'vue'
 import { useDashboardStore } from '@/stores/dashboard'
 import Sidebar from '@/components/layout/dashboard/Sidebar.vue'
 import TopBar from '@/components/layout/dashboard/TopBar.vue'
+import { managerService } from '@/services/managerService'
 
 export default defineComponent({
+  props: {
+    searchTerm: {
+      type: String,
+      default: ''
+    }
+  },
   name: 'Offers',
   components: {
     Sidebar,
@@ -73,12 +80,30 @@ export default defineComponent({
     this.loading = true
     this.offersSuccess = false
     try {
-      await this.store.loadOffers()
+      const response = await managerService.sales.list({
+        page: 1,
+        per_page: 20
+      })
+      this.store.offers = response.data.map((sale: any) => {
+        const product = (sale.products && sale.products.length > 0) ? sale.products[0] : null;
+        return {
+          id: sale.id,
+          date: sale.created_at ? new Date(sale.created_at).toLocaleString('pt-BR') : '',
+          client: sale.customer?.name || '',
+          token: product ? product.name : '',
+          status: sale.status || '',
+          paymentMethod: sale.payment_method || '',
+          volume: product ? product.amount : '',
+          valueBRL: product ? (Number(product.price) * Number(product.amount)).toFixed(2) : '',
+        };
+      })
+      
       // Considere sucesso se vierem dados (ajuste conforme a API real)
       if (this.store.offers && Array.isArray(this.store.offers) && this.store.offers.length > 0) {
         this.offersSuccess = true
       }
     } catch (e) {
+      console.error('Erro ao buscar ofertas:', e)
       // Não faz nada, continua carregando
     } finally {
       if (!this.offersSuccess) {
@@ -89,6 +114,41 @@ export default defineComponent({
     }
   },
   methods: {
+    async handleSearch(term: string) {
+      this.loading = true;
+      this.offersSuccess = false;
+      try {
+        const response = await managerService.sales.list({
+          search: term,
+          page: 1,
+          per_page: 20
+        });
+        this.store.offers = response.data.map((sale: any) => {
+          const product = (sale.products && sale.products.length > 0) ? sale.products[0] : null;
+          return {
+            id: sale.id,
+            date: sale.created_at ? new Date(sale.created_at).toLocaleString('pt-BR') : '',
+            client: sale.customer?.name || '',
+            token: product ? product.name : '',
+            status: sale.status || '',
+            paymentMethod: sale.payment_method || '',
+            volume: product ? product.amount : '',
+            valueBRL: product ? (Number(product.price) * Number(product.amount)).toFixed(2) : '',
+          };
+        });
+        if (this.store.offers && Array.isArray(this.store.offers) && this.store.offers.length > 0) {
+          this.offersSuccess = true;
+        }
+      } catch (e) {
+        // Trate erro se necessário
+      } finally {
+        if (!this.offersSuccess) {
+          this.loading = true;
+        } else {
+          this.loading = false;
+        }
+      }
+    },
     getStatusClass(status: string): string {
       const classes = {
         'Pago': 'px-2 py-1 rounded-full text-sm bg-green-500/20 text-green-500',

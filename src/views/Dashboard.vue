@@ -7,23 +7,17 @@
       <main class="w-full max-md:w-full max-md:ml-0">
         <div class="w-full max-md:max-w-full">
           <section class="min-h-[944px] w-full overflow-hidden max-md:max-w-full max-md:px-5">
-            <DashboardCards
-  v-if="authStore.user && authStore.user.role === 'MANAGER' && dashboardData.value"
-  :cards="dashboardData.value.cards || {}"
-  :withdrawals="dashboardData.value.withdrawals || {}"
-  :customers="dashboardData.value.customers || {}"
-/>
-            <div class="flex w-full gap-6 flex-wrap mt-6 max-md:max-w-full">
+            <TopBar @search="handleSearch" />
+            <DashboardCards v-if="dashboardData" :data="dashboardData" />
+            <!-- <div class="flex w-full gap-6 flex-wrap mt-6 max-md:max-w-full">
               <AssetTable v-if="authStore.user && authStore.user.role === 'MANAGER'" />
               <AffiliateTable v-if="authStore.user && authStore.user.role === 'MANAGER'" />
               <div v-if="authStore.user && authStore.user.role === 'AFFILIATE'" class="w-full">
-                <!-- Exemplo de exibição para afiliado: pode customizar conforme necessário -->
                 <p class="text-lg font-semibold mb-2">Bem-vindo, {{ authStore.user.name }}!</p>
                 <p>Seu email: {{ authStore.user.email }}</p>
                 <p>Perfil: Afiliado</p>
-                <!-- Aqui você pode adicionar componentes ou tabelas específicas do afiliado -->
               </div>
-            </div>
+            </div> -->
           </section>
         </div>
       </main>
@@ -44,7 +38,7 @@ import { managerService } from '@/services/managerService';
 
 const authStore = useAuthStore()
 const checkingAuth = ref(true)
-const dashboardData = ref<any>(null)
+const dashboardData = ref<any>({})
 const dashboardLoading = ref(false)
 const dashboardError = ref('')
 
@@ -53,17 +47,38 @@ async function fetchDashboardData() {
   dashboardError.value = ''
   try {
     // Default params for sales list (adjust as needed)
-    const today = new Date()
-    const end_date = today.toISOString().slice(0, 10)
-    const start_date = new Date(today.getTime() - 6 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10)
+    const start_date = "2025-04-25"
+    const end_date = "2025-04-29"
     const params = {
-      start_date,
-      end_date,
+      start_date: start_date,
+      end_date: end_date,
+    }
+    console.log('Iniciando fetch do dashboard', params);
+    const response = await managerService.dashboard.getData(params)
+    console.log('Resposta do dashboard:', response);
+    dashboardData.value = response
+  } catch (e: any) {
+    console.error('Erro ao buscar dashboard:', e);
+    dashboardError.value = e?.message || 'Erro ao carregar dados do dashboard'
+    dashboardData.value = {} // Evita erro de acesso a null
+  } finally {
+    dashboardLoading.value = false
+  }
+}
+
+async function handleSearch(term: string) {
+  dashboardLoading.value = true
+  dashboardError.value = ''
+  try {
+    // Exemplo: use o termo de busca como parte dos parâmetros
+    const params = {
+      search: term
     }
     const response = await managerService.dashboard.getData(params)
     dashboardData.value = response
   } catch (e: any) {
     dashboardError.value = e?.message || 'Erro ao carregar dados do dashboard'
+    dashboardData.value = {}
   } finally {
     dashboardLoading.value = false
   }

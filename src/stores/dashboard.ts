@@ -74,16 +74,19 @@ export const useDashboardStore = defineStore('dashboard', {
         const params = { page: 1, per_page: 20 };
         const response = await managerService.sales.list(params);
         // Map API sales to Offer interface
-        this.offers = response.data.map((sale: any) => ({
-          id: sale.id,
-          date: sale.date || '',
-          client: sale.client || '',
-          token: sale.token || '',
-          status: sale.status || '',
-          paymentMethod: sale.payment_method || '',
-          volume: sale.volume || '',
-          valueBRL: sale.value_brl || ''
-        }));
+        this.offers = response.data.map((sale: any) => {
+          const product = (sale.products && sale.products.length > 0) ? sale.products[0] : null;
+          return {
+            id: sale.id,
+            date: sale.created_at ? new Date(sale.created_at).toLocaleString('pt-BR') : '',
+            client: sale.customer?.name || '',
+            token: product ? product.name : '',
+            status: sale.status || '',
+            paymentMethod: sale.payment_method || '',
+            volume: product ? product.amount : '',
+            valueBRL: product ? (Number(product.price) * Number(product.amount)).toFixed(2) : '',
+          };
+        });
       } catch (error) {
         console.error('Failed to load offers:', error);
         this.offers = [];

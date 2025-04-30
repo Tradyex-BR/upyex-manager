@@ -89,6 +89,12 @@ import Sidebar from '@/components/layout/dashboard/Sidebar.vue'
 import TopBar from '@/components/layout/dashboard/TopBar.vue'
 
 export default defineComponent({
+  props: {
+    searchTerm: {
+      type: String,
+      default: ''
+    }
+  },
   name: 'Vendas',
   components: {
     Sidebar,
@@ -131,7 +137,32 @@ export default defineComponent({
   beforeUnmount() {
     document.removeEventListener('click', () => { })
   },
+  watch: {
+    searchTerm(newTerm) {
+      if (newTerm) {
+        this.handleSearch(newTerm)
+      }
+    }
+  },
   methods: {
+    async handleSearch(term: string) {
+  console.log('Termo recebido do search:', term);
+      this.loading = true;
+      try {
+        const response = await managerService.affiliates.list({
+          search: term,
+          page: 1,
+          per_page: 20,
+          sort_by: 'name',
+          sort_order: 'asc'
+        });
+        this.affiliates = response.data || response;
+      } catch (e) {
+        // Trate erro se necessário
+      } finally {
+        this.loading = false;
+      }
+    },
     getStatusClass(status: string): string {
       const classes = {
         'Aprovado': 'px-2 py-1 rounded-full text-sm bg-green-500/20 text-green-500',

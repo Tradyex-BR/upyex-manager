@@ -229,7 +229,7 @@ export const managerService = {
       const response = await api.request<ListAffiliatesResponse>({
         method: 'GET',
         url: '/manager/affiliates',
-        data: params,
+        params,
       });
       return response.data;
     },
@@ -274,7 +274,7 @@ export const managerService = {
       const response = await api.request<DashboardResponse>({
         method: 'GET',
         url: '/manager/dashboard',
-        data: payload,
+        params: payload, // Envia como query params
       });
       return response.data;
     },
