@@ -9,7 +9,7 @@
         Digite os dados abaixo corretamente
       </div>
 
-      <form @submit.prevent="handleSubmit" class="flex flex-col gap-4 w-full">
+      <form class="flex flex-col gap-4 w-full" @submit.prevent="handleSubmit">
         <div class="flex flex-col gap-1 w-full">
           <label class="flex items-center gap-0.5 text-sm font-medium text-[rgba(4,13,37,1)]">
             <span class="text-[#040D25] text-[14px] font-medium leading-5">Senha</span>
@@ -29,9 +29,9 @@
             />
             <button 
               type="button" 
-              @click="showPassword = !showPassword"
               :aria-label="showPassword ? 'Hide password' : 'Show password'"
               class="p-0 bg-transparent border-none outline-none transition-all duration-300 hover:bg-[#b8b8b82f]"
+              @click="showPassword = !showPassword"
             >
               <div v-html="eyeIcon"></div>
             </button>
@@ -57,9 +57,9 @@
             />
             <button 
               type="button" 
-              @click="showConfirmPassword = !showConfirmPassword"
               :aria-label="showConfirmPassword ? 'Hide password' : 'Show password'"
               class="p-0 bg-transparent border-none outline-none transition-all duration-300 hover:bg-[#b8b8b82f]"
+              @click="showConfirmPassword = !showConfirmPassword"
             >
               <div v-html="eyeIcon"></div>
             </button>

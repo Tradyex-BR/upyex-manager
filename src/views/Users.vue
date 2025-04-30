@@ -1,12 +1,15 @@
 <template>
-  <div class=" overflow-hidden">
+  <div v-if="loading" class="flex w-full h-full items-center justify-center text-gray-400">
+    Carregando...
+  </div>
+  <div v-else-if="offersSuccess" class="overflow-hidden">
     <div class="gap-5 flex max-md:flex-col max-md:items-stretch">
       <main class="w-full max-md:w-full max-md:ml-0">
         <div class="w-full max-md:max-w-full">
           <section class=" min-h-[944px] w-full overflow-hidden max-md:max-w-full max-md:px-5">
             <div class="flex justify-between items-center mb-6">
               <p class="text-white text-2xl font-semibold">Usuários</p>
-              <BaseButton @click="" class="ml-2">
+              <BaseButton class="ml-2" @click="">
                 Novo Usuário
               </BaseButton>
             </div>
@@ -34,8 +37,8 @@
                     <td class="p-4">
                       <div class="relative">
                         <button 
-                          @click="toggleDropdown(usuario.id)"
                           class="px-3 py-1 bg-[#1A1F3C] rounded-lg hover:bg-[#2A2F4C] transition-colors"
+                          @click="toggleDropdown(usuario.id)"
                         >
                           Ações
                         </button>
@@ -44,26 +47,26 @@
                           class="absolute right-0 mt-2 w-48 bg-[#1a1a1a] rounded-lg shadow-lg z-10"
                         >
                           <button 
-                            @click="handleAction(usuario.id, 'bloquear')"
                             class="w-full text-left px-4 py-2 hover:bg-[#2A2F4C] text-yellow-500"
+                            @click="handleAction(usuario.id, 'bloquear')"
                           >
                             Bloquear
                           </button>
                           <button 
-                            @click="handleAction(usuario.id, 'editar-permissao')"
                             class="w-full text-left px-4 py-2 hover:bg-[#2A2F4C] text-blue-500"
+                            @click="handleAction(usuario.id, 'editar-permissao')"
                           >
                             Editar Permissão
                           </button>
                           <button 
-                            @click="handleAction(usuario.id, 'resetar-senha')"
                             class="w-full text-left px-4 py-2 hover:bg-[#2A2F4C] text-purple-500"
+                            @click="handleAction(usuario.id, 'resetar-senha')"
                           >
                             Resetar Senha
                           </button>
                           <button 
-                            @click="handleAction(usuario.id, 'excluir')"
                             class="w-full text-left px-4 py-2 hover:bg-[#2A2F4C] text-red-500"
+                            @click="handleAction(usuario.id, 'excluir')"
                           >
                             Excluir
                           </button>
@@ -86,9 +89,11 @@ import { defineComponent } from 'vue'
 import Sidebar from '@/components/layout/dashboard/Sidebar.vue'
 import TopBar from '@/components/layout/dashboard/TopBar.vue'
 import BaseButton from '@/components/common/BaseButton.vue'
+import { managerService } from '@/services/managerService';
+
 
 interface Usuario {
-  id: number;
+  id: string;
   nome: string;
   email: string;
   status: string;
@@ -106,8 +111,48 @@ export default defineComponent({
   data() {
     return {
       usuarios: [] as Usuario[],
-      dropdownOpen: null as number | null
+      dropdownOpen: null as string | null,
+      loading: true,
+      offersSuccess: false
     }
+  },
+  async mounted() {
+    this.loading = true
+    this.offersSuccess = false
+    try {
+      // Ajuste os parâmetros conforme necessário para o endpoint correto de usuários
+      const response = await managerService.customers.list({
+        search: null,
+        page: 1,
+        per_page: 10,
+        sort_by: 'created_at',
+        sort_order: 'desc'
+      });
+      // Mapeia o retorno do backend para o formato esperado pela tabela
+      this.usuarios = (response.data || []).map((item: any) => ({
+        id: item.id.toString(),
+        nome: item.name || '',
+        email: item.email || '',
+        status: item.status || '',
+        dataCadastro: item.dataCadastro || item.created_at || '',
+        ultimoAcesso: item.ultimoAcesso || item.last_access || ''
+      }));
+      if (this.usuarios && Array.isArray(this.usuarios) && this.usuarios.length > 0) {
+        this.offersSuccess = true;
+      }
+    } catch (e) {
+      // Não faz nada, continua carregando
+    } finally {
+      if (!this.offersSuccess) {
+        this.loading = true // mantém loading se não houver sucesso
+      } else {
+        this.loading = false
+      }
+    }
+  },
+
+  beforeUnmount() {
+    document.removeEventListener('click', () => {})
   },
   methods: {
     getStatusClass(status: string): string {
@@ -117,87 +162,14 @@ export default defineComponent({
       }
       return classes[status as keyof typeof classes] || ''
     },
-    toggleDropdown(id: number) {
+    toggleDropdown(id: string) {
       this.dropdownOpen = this.dropdownOpen === id ? null : id
     },
-    handleAction(id: number, action: string) {
+    handleAction(id: string, action: string) {
       // Aqui você pode implementar a lógica para cada ação
       console.log(`Ação ${action} para o usuário ${id}`)
       this.dropdownOpen = null
     },
-    carregarUsuarios() {
-      this.usuarios = [
-        {
-          id: 1,
-          nome: 'João Silva',
-          email: 'email@email.com',
-          status: 'Ativo',
-          dataCadastro: '12/03/2025',
-          ultimoAcesso: '12/03/2025 14:21'
-        },
-        {
-          id: 2,
-          nome: 'Maria Souza',
-          email: 'email@email.com',
-          status: 'Ativo',
-          dataCadastro: '12/03/2025',
-          ultimoAcesso: '12/03/2025 14:21'
-        },
-        {
-          id: 3,
-          nome: 'Carlos Lima',
-          email: 'email@email.com',
-          status: 'Bloqueado',
-          dataCadastro: '12/03/2025',
-          ultimoAcesso: '12/03/2025 14:21'
-        },
-        {
-          id: 4,
-          nome: 'Aline de Souza',
-          email: 'email@email.com',
-          status: 'Ativo',
-          dataCadastro: '12/03/2025',
-          ultimoAcesso: '12/03/2025 14:21'
-        },
-        {
-          id: 5,
-          nome: 'Megan Marinho',
-          email: 'email@email.com',
-          status: 'Ativo',
-          dataCadastro: '12/03/2025',
-          ultimoAcesso: '12/03/2025 14:21'
-        },
-        {
-          id: 6,
-          nome: 'Elizabeth Pinheiro',
-          email: 'email@email.com',
-          status: 'Ativo',
-          dataCadastro: '12/03/2025',
-          ultimoAcesso: '12/03/2025 14:21'
-        },
-        {
-          id: 7,
-          nome: 'Gabriela de Lima',
-          email: 'email@email.com',
-          status: 'Ativo',
-          dataCadastro: '12/03/2025',
-          ultimoAcesso: '12/03/2025 14:21'
-        }
-      ]
-    }
-  },
-  mounted() {
-    this.carregarUsuarios()
-    // Fechar o dropdown quando clicar fora
-    document.addEventListener('click', (e) => {
-      const target = e.target as HTMLElement
-      if (!target.closest('.relative')) {
-        this.dropdownOpen = null
-      }
-    })
-  },
-  beforeUnmount() {
-    document.removeEventListener('click', () => {})
   }
 })
 </script> 

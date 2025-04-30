@@ -7,7 +7,12 @@
       <main class="w-full max-md:w-full max-md:ml-0">
         <div class="w-full max-md:max-w-full">
           <section class="min-h-[944px] w-full overflow-hidden max-md:max-w-full max-md:px-5">
-            <DashboardCards />
+            <DashboardCards
+  v-if="authStore.user && authStore.user.role === 'MANAGER' && dashboardData.value"
+  :cards="dashboardData.value.cards || {}"
+  :withdrawals="dashboardData.value.withdrawals || {}"
+  :customers="dashboardData.value.customers || {}"
+/>
             <div class="flex w-full gap-6 flex-wrap mt-6 max-md:max-w-full">
               <AssetTable v-if="authStore.user && authStore.user.role === 'MANAGER'" />
               <AffiliateTable v-if="authStore.user && authStore.user.role === 'MANAGER'" />
@@ -35,11 +40,40 @@ import { useAuthStore } from '@/stores/auth'
 import DashboardCards from "@/components/layout/dashboard/DashboardCards.vue";
 import AssetTable from "@/components/layout/dashboard/AssetTable.vue";
 import AffiliateTable from "@/components/layout/dashboard/AfilliateTable.vue";
+import { managerService } from '@/services/managerService';
 
 const authStore = useAuthStore()
 const checkingAuth = ref(true)
+const dashboardData = ref<any>(null)
+const dashboardLoading = ref(false)
+const dashboardError = ref('')
+
+async function fetchDashboardData() {
+  dashboardLoading.value = true
+  dashboardError.value = ''
+  try {
+    // Default params for sales list (adjust as needed)
+    const today = new Date()
+    const end_date = today.toISOString().slice(0, 10)
+    const start_date = new Date(today.getTime() - 6 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10)
+    const params = {
+      start_date,
+      end_date,
+    }
+    const response = await managerService.dashboard.getData(params)
+    dashboardData.value = response
+  } catch (e: any) {
+    dashboardError.value = e?.message || 'Erro ao carregar dados do dashboard'
+  } finally {
+    dashboardLoading.value = false
+  }
+}
+
 onMounted(async () => {
   await authStore.checkAuth()
   checkingAuth.value = false
+  if (authStore.user && authStore.user.role === 'MANAGER') {
+    await fetchDashboardData()
+  }
 })
 </script>

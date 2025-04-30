@@ -1,12 +1,15 @@
 <template>
-  <div class=" overflow-hidden">
+  <div v-if="loading" class="flex w-full h-full items-center justify-center text-gray-400">
+    Carregando...
+  </div>
+  <div v-else-if="withdrawalsSuccess" class="overflow-hidden">
     <div class="gap-5 flex max-md:flex-col max-md:items-stretch">
       <main class="w-full max-md:w-full max-md:ml-0">
         <div class="w-full max-md:max-w-full">
           <section class=" min-h-[944px] w-full overflow-hidden max-md:max-w-full max-md:px-5">
             <div class="flex justify-between items-center mb-6">
   <p class="text-white text-2xl font-semibold">Withdrawals</p>
-  <BaseButton @click="showRequestModal = true" class="ml-2">
+  <BaseButton class="ml-2" @click="showRequestModal = true">
     Novo Saque
   </BaseButton>
 
@@ -44,8 +47,8 @@
                     <td class="p-4">
                       <div class="relative">
                         <button 
-                          @click="toggleDropdown(withdrawal.id)"
                           class="px-3 py-1 bg-[#1A1F3C] rounded-lg hover:bg-[#2A2F4C] transition-colors"
+                          @click="toggleDropdown(withdrawal.id)"
                         >
                           Ações
                         </button>
@@ -54,14 +57,14 @@
                           class="absolute right-0 mt-2 w-48 bg-[#1a1a1a] rounded-lg shadow-lg z-10"
                         >
                           <button 
-                            @click="aprovar(withdrawal.id)"
                             class="w-full text-left px-4 py-2 hover:bg-[#2A2F4C] text-green-500"
+                            @click="aprovar(withdrawal.id)"
                           >
                             Aprovar
                           </button>
                           <button 
-                            @click="rejeitar(withdrawal.id)"
                             class="w-full text-left px-4 py-2 hover:bg-[#2A2F4C] text-red-500"
+                            @click="rejeitar(withdrawal.id)"
                           >
                             Rejeitar
                           </button>
@@ -80,13 +83,17 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue'
+import { defineComponent, ref } from 'vue'
 import { useDashboardStore } from '@/stores/dashboard'
 import Sidebar from '@/components/layout/dashboard/Sidebar.vue'
 import TopBar from '@/components/layout/dashboard/TopBar.vue'
 import BaseButton from '@/components/common/BaseButton.vue'
 import WithdrawalRequestModal from '@/components/withdrawals/WithdrawalRequestModal.vue'
 import WithdrawalSuccessModal from '@/components/withdrawals/WithdrawalSuccessModal.vue'
+import { managerService } from '@/services/managerService'
+
+const loading = ref(true)
+const withdrawalsSuccess = ref(false)
 
 export default defineComponent({
   name: 'Withdrawals',
@@ -102,13 +109,51 @@ export default defineComponent({
       store: useDashboardStore(),
       dropdownOpen: null as number | null,
       showRequestModal: false,
-      showSuccessModal: false
+      showSuccessModal: false,
+      loading: true,
+      withdrawalsSuccess: false,
+      withdrawals: [] as Array<any>
     }
   },
-  computed: {
-    withdrawals() {
-      return this.store.withdrawals
+  // Removido computed withdrawals para evitar conflito de tipo.
+  // O withdrawals agora é controlado apenas pelo data().
+  async mounted() {
+    this.loading = true;
+    this.withdrawalsSuccess = false;
+    try {
+      const response = await managerService.withdrawals.list({
+        start_date: '',
+        end_date: '',
+        status: null,
+        method: null,
+        page: 1,
+        per_page: 10,
+        sort_by: 'created_at',
+        sort_order: 'desc'
+      });
+      this.withdrawals = response.data || response; // ajuste conforme o retorno real
+      if (this.withdrawals && Array.isArray(this.withdrawals) && this.withdrawals.length > 0) {
+        this.withdrawalsSuccess = true;
+      }
+    } catch (e) {
+      // Não faz nada, continua carregando
+    } finally {
+      if (!this.withdrawalsSuccess) {
+        this.loading = true; // mantém loading se não houver sucesso
+      } else {
+        this.loading = false;
+      }
     }
+    // Fechar o dropdown quando clicar fora
+    document.addEventListener('click', (e) => {
+      const target = e.target as HTMLElement
+      if (!target.closest('.relative')) {
+        this.dropdownOpen = null
+      }
+    })
+  },
+  beforeUnmount() {
+    document.removeEventListener('click', () => {})
   },
   methods: {
     handleWithdrawalRequest({ amount, pixKey }: { amount: string, pixKey: string }) {
@@ -138,19 +183,6 @@ export default defineComponent({
       await this.store.blockWithdrawal(id)
       this.dropdownOpen = null
     }
-  },
-  mounted() {
-    this.store.loadWithdrawals()
-    // Fechar o dropdown quando clicar fora
-    document.addEventListener('click', (e) => {
-      const target = e.target as HTMLElement
-      if (!target.closest('.relative')) {
-        this.dropdownOpen = null
-      }
-    })
-  },
-  beforeUnmount() {
-    document.removeEventListener('click', () => {})
   }
 })
 </script> 

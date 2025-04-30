@@ -1,5 +1,8 @@
 <template>
-  <div class=" overflow-hidden">
+  <div v-if="loading" class="flex w-full h-full items-center justify-center text-gray-400">
+    Carregando...
+  </div>
+  <div v-else-if="offersSuccess" class="overflow-hidden">
     <div class="gap-5 flex max-md:flex-col max-md:items-stretch">
       <main class="w-full max-md:w-full max-md:ml-0">
         <div class="w-full max-md:max-w-full">
@@ -44,7 +47,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue'
+import { defineComponent, ref } from 'vue'
 import { useDashboardStore } from '@/stores/dashboard'
 import Sidebar from '@/components/layout/dashboard/Sidebar.vue'
 import TopBar from '@/components/layout/dashboard/TopBar.vue'
@@ -55,9 +58,34 @@ export default defineComponent({
     Sidebar,
     TopBar
   },
+  setup() {
+    const store = useDashboardStore()
+    const loading = ref(true)
+    const offersSuccess = ref(false)
+    return { store, loading, offersSuccess }
+  },
   computed: {
     offers() {
       return this.store.offers
+    }
+  },
+  async mounted() {
+    this.loading = true
+    this.offersSuccess = false
+    try {
+      await this.store.loadOffers()
+      // Considere sucesso se vierem dados (ajuste conforme a API real)
+      if (this.store.offers && Array.isArray(this.store.offers) && this.store.offers.length > 0) {
+        this.offersSuccess = true
+      }
+    } catch (e) {
+      // Não faz nada, continua carregando
+    } finally {
+      if (!this.offersSuccess) {
+        this.loading = true // mantém loading se não houver sucesso
+      } else {
+        this.loading = false
+      }
     }
   },
   methods: {
@@ -69,13 +97,6 @@ export default defineComponent({
       }
       return classes[status as keyof typeof classes] || ''
     }
-  },
-  setup() {
-    const store = useDashboardStore()
-    return { store }
-  },
-  mounted() {
-    this.store.loadOffers()
   }
 })
 </script> 

@@ -1,4 +1,5 @@
 import { defineStore } from 'pinia'
+import { managerService } from '@/services/managerService'
 
 interface Affiliate {
   id: number;
@@ -68,39 +69,25 @@ export const useDashboardStore = defineStore('dashboard', {
     },
 
     // Offers
-    loadOffers() {
-      this.offers = [
-        {
-          id: 1,
-          date: '03/01/2025',
-          client: 'Alison Souza',
-          token: 'Binance Coin',
-          status: 'Paid',
-          paymentMethod: 'PIX',
-          volume: '0.45678 $BNB',
-          valueBRL: '$ 5.90'
-        },
-        {
-          id: 2,
-          date: '03/01/2025',
-          client: 'Juliana Gonçalves',
-          token: 'Binance Coin',
-          status: 'Pending',
-          paymentMethod: 'PIX',
-          volume: '0.45678 $BNB',
-          valueBRL: '$ 5.90'
-        },
-        {
-          id: 3,
-          date: '03/01/2025',
-          client: 'Lucas Pereira',
-          token: 'Binance Coin',
-          status: 'Cancelled',
-          paymentMethod: 'Credit Card',
-          volume: '0.45678 $BNB',
-          valueBRL: '$ 5.90'
-        }
-      ]
+    async loadOffers() {
+      try {
+        const params = { page: 1, per_page: 20 };
+        const response = await managerService.sales.list(params);
+        // Map API sales to Offer interface
+        this.offers = response.data.map((sale: any) => ({
+          id: sale.id,
+          date: sale.date || '',
+          client: sale.client || '',
+          token: sale.token || '',
+          status: sale.status || '',
+          paymentMethod: sale.payment_method || '',
+          volume: sale.volume || '',
+          valueBRL: sale.value_brl || ''
+        }));
+      } catch (error) {
+        console.error('Failed to load offers:', error);
+        this.offers = [];
+      }
     },
 
     // Withdrawals

@@ -9,13 +9,14 @@
         Insira o endereço de e-mail vinculado à sua conta e enviaremos um link para redefinir sua senha.
       </div>
 
-      <form @submit.prevent="handleSubmit" class="flex flex-col gap-4 w-full">
+      <form class="flex flex-col gap-4 w-full" @submit.prevent="handleSubmit">
         <div class="flex flex-col gap-1 w-full">
           <label class="flex items-center gap-0.5 text-sm font-medium text-[rgba(4,13,37,1)]">
             <span class="text-[#040D25] text-[14px] font-medium leading-5">Tipo de usuário</span>
             <span class="text-[#BE3E37] font-inter text-[14px] leading-5 font-medium">*</span>
           </label>
-          <select v-model="role" :disabled="loading"
+          <select
+v-model="role" :disabled="loading"
             class="h-[56px] px-3 py-4 border border-[#B8B8B8] rounded-lg outline-none bg-white mb-2">
             <option v-for="r in roles" :key="r" :value="r">{{ r === 'MANAGER' ? 'Manager' : 'Afiliado' }}</option>
           </select>

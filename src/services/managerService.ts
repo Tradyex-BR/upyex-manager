@@ -57,6 +57,26 @@ export interface ListAffiliatesResponse {
 }
 
 // Application interfaces
+
+// Sales interfaces
+export interface Sale {
+  id: string;
+  // TODO: add more sale fields as needed
+}
+export interface ListSalesParams {
+  search?: string | null;
+  page: number;
+  per_page: number;
+  sort_by?: string;
+  sort_order?: string;
+}
+export interface ListSalesResponse {
+  data: Sale[];
+  total: number;
+  page: number;
+  per_page: number;
+}
+
 export interface Application {
   id: string;
   name: string;
@@ -88,7 +108,71 @@ export interface ListApplicationsResponse {
   per_page: number;
 }
 
+export interface ListWithdrawalsParams {
+  start_date: string;
+  end_date: string;
+  status: string | null;
+  method: string | null;
+  page: number;
+  per_page: number;
+  sort_by: string;
+  sort_order: string;
+}
+
+export interface Withdrawal {
+  id: string;
+  // TODO: add more withdrawal fields as needed
+}
+export interface ListWithdrawalsResponse {
+  data: Withdrawal[];
+  total: number;
+  page: number;
+  per_page: number;
+}
+
 import { setToken, removeToken } from './tokenService';
+
+// Dashboard interfaces
+export interface DashboardParams {
+  start_date: string;
+  end_date: string;
+}
+export interface DashboardResponse {
+  cards?: {
+    by_status?: Record<string, number>;
+    by_payment_method?: Record<string, number>;
+  };
+  withdrawals?: {
+    by_status?: Record<string, number>;
+  };
+  customers?: {
+    total?: number;
+    new?: number;
+  };
+  // Add more fields as needed to match the API response
+}
+
+export interface ListCustomersParams {
+  search: string | null;
+  page: number;
+  per_page: number;
+  sort_by: string;
+  sort_order: string;
+}
+
+export interface Customer {
+  id: string;
+  // Adicione outros campos relevantes do usuário aqui
+  name?: string;
+  email?: string;
+}
+
+export interface ListCustomersResponse {
+  data: Customer[];
+  total: number;
+  page: number;
+  per_page: number;
+}
 
 export const managerService = {
   auth: {
@@ -185,7 +269,58 @@ export const managerService = {
     },
   },
 
+  dashboard: {
+    getData: async (payload: DashboardParams): Promise<DashboardResponse> => {
+      const response = await api.request<DashboardResponse>({
+        method: 'GET',
+        url: '/manager/dashboard',
+        data: payload,
+      });
+      return response.data;
+    },
+  },
+
+  withdrawals: {
+    /**
+     * Lista saques (withdrawals) do manager.
+     */
+    list: async (params: ListWithdrawalsParams): Promise<ListWithdrawalsResponse> => {
+      const response = await api.request<ListWithdrawalsResponse>({
+        method: 'GET',
+        url: '/manager/withdrawals',
+        data: params,
+      });
+      return response.data;
+    },
+  },
+
+  customers: {
+    /**
+     * Lista usuários (customers) do manager.
+     */
+    list: async (params: ListCustomersParams): Promise<ListCustomersResponse> => {
+      const response = await api.request<ListCustomersResponse>({
+        method: 'GET',
+        url: '/manager/customers',
+        data: params,
+      });
+      return response.data;
+    },
+  },
+
+  // Keep other services below
+
   sales: {
-    // No sales endpoints defined for manager
+    /**
+     * Lista vendas (sales) do manager.
+     */
+    list: async (params: ListSalesParams): Promise<ListSalesResponse> => {
+      const response = await api.request<ListSalesResponse>({
+        method: 'GET',
+        url: '/manager/sales',
+        data: params,
+      });
+      return response.data;
+    },
   },
 };

@@ -158,7 +158,7 @@ export const affiliateService = {
       return response.data;
     },
   },
-
+  
   applications: {
     get: async (id: string): Promise<Application> => {
       const response = await api.get<Application>(`/affiliate/applications/${id}`);

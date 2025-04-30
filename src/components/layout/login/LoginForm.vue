@@ -1,18 +1,22 @@
 <template>
-  <form @submit.prevent="handleLogin" class="flex flex-col gap-4 w-full">
+  <form class="flex flex-col gap-4 w-full" @submit.prevent="handleLogin">
     <div class="flex flex-col gap-4">
       <label class="text-[14px] font-medium">Email <span class="text-[#BE3E37]">*</span></label>
-      <input type="email" v-model="email" placeholder="Digite seu email" required :disabled="loading"
+      <input
+v-model="email" type="email" placeholder="Digite seu email" required :disabled="loading"
         autocomplete="username" class="h-[56px] px-3 py-4 border border-[#B8B8B8] rounded-lg outline-none" />
       <label class="text-[14px] font-medium">Senha <span class="text-[#BE3E37]">*</span></label>
-      <input type="password" v-model="password" placeholder="Digite sua senha" required :disabled="loading"
+      <input
+v-model="password" type="password" placeholder="Digite sua senha" required :disabled="loading"
         autocomplete="current-password" class="h-[56px] px-3 py-4 border border-[#B8B8B8] rounded-lg outline-none" />
       <label class="text-[14px] font-medium">Tipo de usuário <span class="text-[#BE3E37]">*</span></label>
-      <select v-model="role" :disabled="loading"
+      <select
+v-model="role" :disabled="loading"
         class="h-[56px] px-3 py-4 border border-[#B8B8B8] rounded-lg outline-none bg-white">
         <option v-for="r in roles" :key="r" :value="r">{{ r }}</option>
       </select>
-      <button type="submit" :disabled="loading"
+      <button
+type="submit" :disabled="loading"
         class="bg-[#CF631C] text-white font-bold py-2 px-4 rounded-lg disabled:opacity-50">
         {{ loading ? 'Entrando...' : 'Entrar' }}
       </button>

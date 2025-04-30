@@ -12,8 +12,9 @@
           </p>
           <div class="self-stretch flex flex-col justify-start gap-6">
             <div v-for="(item, index) in menuItems" :key="index">
-              <router-link :to="item.route" custom v-slot="{ navigate }">
-                <li @click="navigate" :class="{
+              <router-link v-slot="{ navigate }" :to="item.route" custom>
+                <li
+:class="{
                   'bg-[rgba(207,99,28,0.16)] text-[#CF631C]': isCurrentRoute(item.route),
                   'bg-transparent text-[#DEE4EE]': !isCurrentRoute(item.route),
                   'flex w-full items-center': true,
@@ -21,7 +22,7 @@
                   'gap-2.5': !isCurrentRoute(item.route),
                   'pl-4 pr-3 py-2 rounded-[3px]': true,
                   'cursor-pointer': true
-                }">
+                }" @click="navigate">
                   <div class="self-stretch flex items-center gap-2.5 my-auto">
                     <div class="self-stretch flex w-6 shrink-0 h-6 my-auto">
                       <menu-icons :name="item.icon" />

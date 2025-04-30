@@ -1,5 +1,8 @@
 <template>
-  <div class=" overflow-hidden">
+  <div v-if="loading" class="flex w-full h-full items-center justify-center text-gray-400">
+    Carregando...
+  </div>
+  <div v-else class="overflow-hidden">
     <div class="gap-5 flex max-md:flex-col max-md:items-stretch">
       <main class="w-full max-md:w-full max-md:ml-0">
         <div class="w-full max-md:max-w-full">
@@ -24,7 +27,8 @@
                 <tbody>
                   <tr v-for="affiliate in affiliates" :key="affiliate.id" class="border-b border-[#1A1F3C]">
                     <td class="p-4 flex items-center gap-2">
-                      <img :src="`https://ui-avatars.com/api/?name=${affiliate.name}&background=random`"
+                      <img
+:src="`https://ui-avatars.com/api/?name=${affiliate.name}&background=random`"
                         :alt="affiliate.name" class="w-10 h-10 rounded-full" />
                       <p class="text-white text-sm font-semibold">{{ affiliate.name }}</p>
                     </td>
@@ -40,22 +44,27 @@
                     </td>
                     <td class="p-4">
                       <div class="relative">
-                        <button @click="toggleDropdown(affiliate.id)"
-                          class="px-3 py-1 bg-[#1A1F3C] rounded-lg hover:bg-[#2A2F4C] transition-colors">
+                        <button
+class="px-3 py-1 bg-[#1A1F3C] rounded-lg hover:bg-[#2A2F4C] transition-colors"
+                          @click="toggleDropdown(affiliate.id)">
                           Ações
                         </button>
-                        <div v-if="dropdownOpen === affiliate.id"
+                        <div
+v-if="dropdownOpen === affiliate.id"
                           class="absolute right-0 mt-2 w-48 bg-[#1a1a1a] rounded-lg shadow-lg z-10">
-                          <button @click="handleAction(affiliate.id, 'aprovar')"
-                            class="w-full text-left px-4 py-2 hover:bg-[#2A2F4C] text-green-500">
+                          <button
+class="w-full text-left px-4 py-2 hover:bg-[#2A2F4C] text-green-500"
+                            @click="handleAction(affiliate.id, 'aprovar')">
                             Aprovar
                           </button>
-                          <button @click="handleAction(affiliate.id, 'bloquear')"
-                            class="w-full text-left px-4 py-2 hover:bg-[#2A2F4C] text-yellow-500">
+                          <button
+class="w-full text-left px-4 py-2 hover:bg-[#2A2F4C] text-yellow-500"
+                            @click="handleAction(affiliate.id, 'bloquear')">
                             Bloquear
                           </button>
-                          <button @click="handleAction(affiliate.id, 'excluir')"
-                            class="w-full text-left px-4 py-2 hover:bg-[#2A2F4C] text-red-500">
+                          <button
+class="w-full text-left px-4 py-2 hover:bg-[#2A2F4C] text-red-500"
+                            @click="handleAction(affiliate.id, 'excluir')">
                             Excluir
                           </button>
                         </div>
@@ -85,12 +94,42 @@ export default defineComponent({
     Sidebar,
     TopBar
   },
+  setup() {
+    const store = useDashboardStore()
+    return { store }
+  },
   data() {
     return {
       affiliates: [] as any[],
       dropdownOpen: null as number | null,
       loading: true
     }
+  },
+  async mounted() {
+    try {
+      const response = await managerService.affiliates.list({
+  search: '',
+  page: 1,
+  per_page: 20,
+  sort_by: 'name',
+  sort_order: 'asc'
+});
+      this.affiliates = response.data || response; // ajuste conforme o retorno real
+    } catch (e) {
+      // Trate erro se necessário
+    } finally {
+      this.loading = false;
+    }
+    // Fechar o dropdown quando clicar fora
+    document.addEventListener('click', (e) => {
+      const target = e.target as HTMLElement
+      if (!target.closest('.relative')) {
+        this.dropdownOpen = null
+      }
+    })
+  },
+  beforeUnmount() {
+    document.removeEventListener('click', () => { })
   },
   methods: {
     getStatusClass(status: string): string {
@@ -118,36 +157,6 @@ export default defineComponent({
       }
       this.dropdownOpen = null
     }
-  },
-  setup() {
-    const store = useDashboardStore()
-    return { store }
-  },
-  async mounted() {
-    try {
-      const response = await managerService.affiliates.list({
-  search: '',
-  page: 1,
-  per_page: 20,
-  sort_by: 'name',
-  sort_order: 'asc'
-});
-      this.affiliates = response.data || response; // ajuste conforme o retorno real
-    } catch (e) {
-      // Trate erro se necessário
-    } finally {
-      this.loading = false;
-    }
-    // Fechar o dropdown quando clicar fora
-    document.addEventListener('click', (e) => {
-      const target = e.target as HTMLElement
-      if (!target.closest('.relative')) {
-        this.dropdownOpen = null
-      }
-    })
-  },
-  beforeUnmount() {
-    document.removeEventListener('click', () => { })
   }
 })
 </script>
