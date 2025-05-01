@@ -105,9 +105,9 @@ export default {
     0 0 20px #397DFF,
     0 0 30px #696C8E;
   animation: drop 4s linear infinite;
-  animation-timing-function: cubic-bezier(0.075, 0.82, 0.165, 1);
-  opacity: 0;
-  filter: blur(6px);
+  animation-timing-function: cubic-bezier(0.445, 0.05, 0.55, 0.95);
+  opacity: 1;
+  filter: blur(20px);
 }
 
 @keyframes drop {
