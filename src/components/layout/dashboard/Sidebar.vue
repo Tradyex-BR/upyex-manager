@@ -79,7 +79,7 @@ export default defineComponent({
         },
         { 
           text: 'Afiliados', 
-          route: '/sales',
+          route: '/affiliates',
           icon: 'svg-vendas'
         },
         { 
