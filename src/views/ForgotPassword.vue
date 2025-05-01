@@ -1,26 +1,18 @@
 <template>
   <div
     class="max-w-none flex flex-row w-full h-screen bg-[#010309] mx-auto max-md:max-w-[991px] max-md:flex-col max-sm:max-w-screen-sm">
-    <div class="z-[100] flex flex-col w-6/12 backdrop-blur-lg items-start gap-8 bg-white p-28 left-[section] max-md:w-full">
-      <h1 class="text-[#040D25] text-[32px] leading-[40px] font-semibold">
-        Esqueceu a senha
-      </h1>
-      <div class="font-inter text-[#222A3F] text-[14px] leading-[18px]">
-        Insira o endereço de e-mail vinculado à sua conta e enviaremos um link para redefinir sua senha.
+    <div
+      class="z-[100] flex flex-col justify-center w-6/12 backdrop-blur-lg items-start gap-8 bg-white p-28 left-[section] max-md:w-full">
+      <div class="flex flex-col gap-2">
+        <h1 class="text-[#040D25] text-[32px] leading-[40px] font-semibold">
+          Esqueceu a senha
+        </h1>
+        <div class="font-inter text-[#222A3F] text-[14px] leading-[18px]">
+          Insira o endereço de e-mail vinculado à sua conta e enviaremos um link para redefinir sua senha.
+        </div>
       </div>
 
       <form class="flex flex-col gap-4 w-full" @submit.prevent="handleSubmit">
-        <div class="flex flex-col gap-1 w-full">
-          <label class="flex items-center gap-0.5 text-sm font-medium text-[rgba(4,13,37,1)]">
-            <span class="text-[#040D25] text-[14px] font-medium leading-5">Tipo de usuário</span>
-            <span class="text-[#BE3E37] font-inter text-[14px] leading-5 font-medium">*</span>
-          </label>
-          <select
-v-model="role" :disabled="loading"
-            class="h-[56px] px-3 py-4 border border-[#B8B8B8] rounded-lg outline-none bg-white mb-2">
-            <option v-for="r in roles" :key="r" :value="r">{{ r === 'MANAGER' ? 'Manager' : 'Afiliado' }}</option>
-          </select>
-        </div>
         <div class="flex flex-col gap-1 w-full">
           <label class="flex items-center gap-0.5 text-sm font-medium text-[rgba(4,13,37,1)]">
             <span class="text-[#040D25] text-[14px] font-medium leading-5">Email</span>
@@ -30,46 +22,55 @@ v-model="role" :disabled="loading"
             <div>
               <div v-html="emailIcon"></div>
             </div>
-            <input
-              v-model="email"
-              type="email"
-              placeholder="Digite seu email"
-              class="flex-1 bg-transparent outline-none font-inter text-[#222A3F] leading-5"
-              required
-              :disabled="loading"
-            />
+            <input v-model="email" type="email" placeholder="Digite seu email"
+              class="flex-1 bg-transparent outline-none font-inter text-[#222A3F] leading-5" required
+              :disabled="loading" />
           </div>
         </div>
-
-        <div class="flex flex-col gap-6 w-full max-sm:items-center mt-4">
-          <div>
-            <button
-              type="submit"
-              class="bg-[#CF631C] rounded py-2 px-4 group relative w-full flex justify-center text-[#F7F7F8] font-inter text-[14px] leading-6 font-bold hover:border-[#CF631C] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary disabled:opacity-50 disabled:cursor-not-allowed"
-              :disabled="loading"
-            >
-              <span v-if="loading" class="flex items-center">
-                <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
-                Enviando...
-              </span>
-              <span v-else>Redefinir</span>
-            </button>
-          </div>
-          <div class="text-center font-inter text-[14px] leading-[18px] text-[#040D25]">
-            <span>Lembrou sua senha? </span>
-            <router-link to="/login" class="text-[#CF631C] hover:underline hover:text-[#CF631C]">
-              Faça login
-            </router-link>
-          </div>
+        
+        <div class="flex flex-col gap-1 w-full">
+          <label class="flex items-center gap-0.5 text-sm font-medium text-[rgba(4,13,37,1)]">
+            <span class="text-[#040D25] text-[14px] font-medium leading-5">Tipo de usuário</span>
+            <span class="text-[#BE3E37] font-inter text-[14px] leading-5 font-medium">*</span>
+          </label>
+          <select v-model="role" :disabled="loading"
+            class="h-[56px] px-3 py-4 border border-[#B8B8B8] rounded-lg outline-none bg-white">
+            <option v-for="r in roles" :key="r" :value="r">{{ r === 'MANAGER' ? 'Manager' : 'Afiliado' }}</option>
+          </select>
         </div>
       </form>
+
+      <div class="flex flex-col gap-6 w-full max-sm:items-center">
+        <div>
+          <button type="submit"
+            class="bg-[#CF631C] rounded py-2 px-4 group relative w-full flex justify-center text-[#F7F7F8] font-inter text-[14px] leading-6 font-bold hover:border-[#CF631C] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary disabled:opacity-50 disabled:cursor-not-allowed"
+            :disabled="loading">
+            <span v-if="loading" class="flex items-center">
+              <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none"
+                viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor"
+                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                </path>
+              </svg>
+              Enviando...
+            </span>
+            <span v-else>Redefinir</span>
+          </button>
+        </div>
+
+        <div class="text-center font-inter text-[14px] leading-[18px] text-[#040D25]">
+          <span>Lembrou sua senha? </span>
+          <router-link to="/login" class="text-[#CF631C] hover:underline hover:text-[#CF631C]">
+            Faça login
+          </router-link>
+        </div>
+      </div>
     </div>
 
-<!--     <div class="darker-gradient-background"></div>
- -->    <LoginBackground />
+    <!--     <div class="darker-gradient-background"></div>
+ -->
+    <LoginBackground />
     <VerticalLines />
   </div>
 </template>

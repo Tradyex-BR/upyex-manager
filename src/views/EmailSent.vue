@@ -1,19 +1,21 @@
 <template>
   <div
     class="max-w-none flex flex-row w-full h-screen bg-[#010309] mx-auto max-md:max-w-[991px] max-md:flex-col max-sm:max-w-screen-sm">
-    <div class="flex z-50 flex-col  w-6/12 backdrop-blur-lg items-center gap-8 bg-white p-28 left-[section] max-md:w-full">
+    <div class="flex z-50 flex-col justify-center  w-6/12 backdrop-blur-lg items-center gap-8 bg-white p-28 left-[section] max-md:w-full">
       <span v-html="paperPlaneIcon"></span>
       
-      <h1 class="text-[#040D25] text-[32px] leading-[40px] font-semibold">
-        Enviamos um email para você
-      </h1>
-      <div class="font-inter text-[#222A3F] text-[14px] leading-[18px]">
-        Enviamos para seu email cadastrado uma mensagem de redefinição. Caso não encontre, por favor, procurar na caixa
-        de SPAM
+      <div class="flex flex-col gap-2">
+        <h1 class="text-[#040D25] text-[32px] leading-[40px] font-semibold">
+          Enviamos um email para você
+        </h1>
+        <div class="font-inter text-[#222A3F] text-[14px] leading-[18px]">
+          Enviamos para seu email cadastrado uma mensagem de redefinição. Caso não encontre, por favor, procurar na caixa
+          de SPAM
+        </div>
       </div>
 
       <form class="flex flex-col gap-4 w-full" @submit.prevent="handleSubmit">
-        <div class="flex flex-col gap-6 w-full max-sm:items-center mt-4">
+        <div class="flex flex-col gap-6 w-full max-sm:items-center">
           <div>
             <button
 type="submit"

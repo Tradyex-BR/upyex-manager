@@ -1,12 +1,15 @@
 <template>
   <div
     class="max-w-none flex flex-row w-full h-screen bg-[#010309] mx-auto max-md:max-w-[991px] max-md:flex-col max-sm:max-w-screen-sm">
-    <div class="z-[100] flex flex-col w-6/12 backdrop-blur-lg items-start gap-8 bg-white p-28 left-[section] max-md:w-full">
-      <h1 class="text-[#040D25] text-[32px] leading-[40px] font-semibold">
-        Criar nova senha
-      </h1>
-      <div class="font-inter text-[#222A3F] text-[14px] leading-[18px]">
-        Digite os dados abaixo corretamente
+    <div
+      class="z-[100] justify-center flex flex-col w-6/12 backdrop-blur-lg items-start gap-8 bg-white p-28 left-[section] max-md:w-full">
+      <div class="flex flex-col gap-2">
+        <h1 class="text-[#040D25] text-[32px] leading-[40px] font-semibold">
+          Criar nova senha
+        </h1>
+        <div class="font-inter text-[#222A3F] text-[14px] leading-[18px]">
+          Digite os dados abaixo corretamente
+        </div>
       </div>
 
       <form class="flex flex-col gap-4 w-full" @submit.prevent="handleSubmit">
@@ -19,20 +22,12 @@
             <div>
               <div v-html="passwordIcon"></div>
             </div>
-            <input
-              v-model="password"
-              :type="showPassword ? 'text' : 'password'"
-              placeholder="Digite sua senha"
-              class="flex-1 bg-transparent outline-none font-inter text-[#222A3F] leading-5"
-              required
-              :disabled="loading"
-            />
-            <button 
-              type="button" 
-              :aria-label="showPassword ? 'Hide password' : 'Show password'"
+            <input v-model="password" :type="showPassword ? 'text' : 'password'" placeholder="Digite sua senha"
+              class="flex-1 bg-transparent outline-none font-inter text-[#222A3F] leading-5" required
+              :disabled="loading" />
+            <button type="button" :aria-label="showPassword ? 'Hide password' : 'Show password'"
               class="p-0 bg-transparent border-none outline-none transition-all duration-300 hover:bg-[#b8b8b82f]"
-              @click="showPassword = !showPassword"
-            >
+              @click="showPassword = !showPassword">
               <div v-html="eyeIcon"></div>
             </button>
           </div>
@@ -47,20 +42,13 @@
             <div>
               <div v-html="passwordIcon"></div>
             </div>
-            <input
-              v-model="confirmPassword"
-              :type="showConfirmPassword ? 'text' : 'password'"
+            <input v-model="confirmPassword" :type="showConfirmPassword ? 'text' : 'password'"
               placeholder="Digite sua senha"
-              class="flex-1 bg-transparent outline-none font-inter text-[#222A3F] leading-5"
-              required
-              :disabled="loading"
-            />
-            <button 
-              type="button" 
-              :aria-label="showConfirmPassword ? 'Hide password' : 'Show password'"
+              class="flex-1 bg-transparent outline-none font-inter text-[#222A3F] leading-5" required
+              :disabled="loading" />
+            <button type="button" :aria-label="showConfirmPassword ? 'Hide password' : 'Show password'"
               class="p-0 bg-transparent border-none outline-none transition-all duration-300 hover:bg-[#b8b8b82f]"
-              @click="showConfirmPassword = !showConfirmPassword"
-            >
+              @click="showConfirmPassword = !showConfirmPassword">
               <div v-html="eyeIcon"></div>
             </button>
           </div>
@@ -68,21 +56,24 @@
 
         <div class="flex flex-col gap-6 w-full max-sm:items-center mt-4">
           <div>
-            <button
-              type="submit"
+            <button type="submit"
               class="bg-[#CF631C] rounded py-2 px-4 group relative w-full flex justify-center text-[#F7F7F8] font-inter text-[14px] leading-6 font-bold hover:border-[#CF631C] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary disabled:opacity-50 disabled:cursor-not-allowed"
-              :disabled="loading || !isFormValid"
-            >
+              :disabled="loading">
               <span v-if="loading" class="flex items-center">
-                <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none"
+                  viewBox="0 0 24 24">
                   <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  <path class="opacity-75" fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                  </path>
                 </svg>
                 Processando...
               </span>
               <span v-else>Redefinir</span>
             </button>
           </div>
+
+
           <div class="text-center font-inter text-[14px] leading-[18px] text-[#040D25]">
             <span>Lembrou sua senha? </span>
             <router-link to="/login" class="text-[#CF631C] hover:underline hover:text-[#CF631C]">
@@ -154,4 +145,4 @@ const handleSubmit = async () => {
     loading.value = false
   }
 }
-</script> 
+</script>
