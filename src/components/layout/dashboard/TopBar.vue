@@ -9,8 +9,9 @@
   v-model="searchQuery"
   type="text"
   placeholder="Digite para pesquisar"
-  class="text-[#B8B8B8] text-sm leading-5 self-stretch my-auto bg-transparent border-none outline-none w-full"
+  :class="['text-[#B8B8B8] text-sm leading-5 self-stretch my-auto bg-transparent border-none outline-none w-full', searchDisabled ? 'cursor-not-allowed opacity-60' : '']"
   @keyup.enter="emitSearch"
+  :disabled="searchDisabled"
 />
       </div>
       <div
@@ -70,9 +71,11 @@ d="M19.0711 5.07108L4.92894 19.2132M4.92892 5.07108L19.0711 19.2132" stroke="#B8
   </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue'
-import { useRouter } from 'vue-router'
+import { computed, ref, onMounted, onUnmounted } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
+const route = useRoute()
+const searchDisabled = computed(() => route.path === '/dashboard') // ajuste para o path correto se necessário
 
 const router = useRouter()
 const authStore = useAuthStore()
