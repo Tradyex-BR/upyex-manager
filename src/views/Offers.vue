@@ -113,6 +113,13 @@ export default defineComponent({
       }
     }
   },
+  watch: {
+    searchTerm(newTerm) {
+      if (newTerm) {
+        this.handleSearch(newTerm)
+      }
+    }
+  },
   methods: {
     async handleSearch(term: string) {
       this.loading = true;
