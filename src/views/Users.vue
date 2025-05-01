@@ -21,33 +21,37 @@
                 <thead>
                   <tr class="bg-[#1A1F3C]">
                     <th class="p-4 text-left">Nome</th>
-                    <th class="p-4 text-left">Email</th>
-                    <th class="p-4 text-left">Status</th>
-                    <th class="p-4 text-left">Data de cadastro</th>
-                    <th class="p-4 text-left">Último acesso</th>
-                    <th class="p-4 text-left">Ações</th>
+<th class="p-4 text-left">Email</th>
+<th class="p-4 text-left">Aplicação</th>
+<th class="p-4 text-left">Afiliado</th>
+<th class="p-4 text-left">Status</th>
+<th class="p-4 text-left">Data de cadastro</th>
+<th class="p-4 text-left">Último acesso</th>
+<th class="p-4 text-left">Ações</th>
                   </tr>
                 </thead>
                 <tbody>
                   <tr v-for="usuario in usuarios" :key="usuario.id" class="border-b border-[#1A1F3C]">
-                    <td class="p-4">{{ usuario.nome }}</td>
-                    <td class="p-4">{{ usuario.email }}</td>
-                    <td class="p-4">
-                      <span :class="getStatusClass(usuario.status)">{{ usuario.status }}</span>
-                    </td>
-                    <td class="p-4">{{ usuario.dataCadastro }}</td>
-                    <td class="p-4">{{ usuario.ultimoAcesso }}</td>
-                    <td class="p-4">
-                      <div class="relative">
-                        <button 
-                          class="px-3 py-1 bg-[#1A1F3C] rounded-lg hover:bg-[#2A2F4C] transition-colors"
-                          @click="toggleDropdown(usuario.id)"
-                        >
-                          Ações
-                        </button>
-                        <div 
-                          v-if="dropdownOpen === usuario.id"
-                          class="absolute right-0 mt-2 w-48 bg-[#1a1a1a] rounded-lg shadow-lg z-10"
+  <td class="p-4">{{ usuario.nome }}</td>
+  <td class="p-4">{{ usuario.email }}</td>
+  <td class="p-4">{{ usuario.aplicacao }}</td>
+  <td class="p-4">{{ usuario.afiliado }}</td>
+  <td class="p-4">
+    <span :class="getStatusClass(usuario.status)">{{ usuario.status }}</span>
+  </td>
+  <td class="p-4">{{ usuario.dataCadastro }}</td>
+  <td class="p-4">{{ usuario.ultimoAcesso }}</td>
+  <td class="p-4">
+    <div class="relative">
+      <button 
+        class="px-3 py-1 bg-[#1A1F3C] rounded-lg hover:bg-[#2A2F4C] transition-colors"
+        @click="toggleDropdown(usuario.id)"
+      >
+        Ações
+      </button>
+      <div 
+        v-if="dropdownOpen === usuario.id"
+        class="absolute right-0 mt-2 w-48 bg-[#1a1a1a] rounded-lg shadow-lg z-10"
                         >
                           <button 
                             class="w-full text-left px-4 py-2 hover:bg-[#2A2F4C] text-yellow-500"
@@ -99,6 +103,8 @@ interface Usuario {
   id: string;
   nome: string;
   email: string;
+  aplicacao: string;
+  afiliado: string;
   status: string;
   dataCadastro: string;
   ultimoAcesso: string;
@@ -131,13 +137,15 @@ export default defineComponent({
       });
       // Mapeia o retorno do backend para o formato esperado pela tabela
       this.usuarios = (response.data || []).map((item: any) => ({
-        id: item.id.toString(),
-        nome: item.name || '',
-        email: item.email || '',
-        status: item.status || '',
-        dataCadastro: item.dataCadastro || item.created_at || '',
-        ultimoAcesso: item.ultimoAcesso || item.last_access || ''
-      }));
+  id: item.id.toString(),
+  nome: item.name || '',
+  email: item.email || '',
+  aplicacao: item.application?.name || '-',
+  afiliado: item.affiliate?.name || '-',
+  status: item.status || (item.affiliate?.is_active === false ? 'Bloqueado' : 'Ativo'),
+  dataCadastro: item.created_at ? new Date(item.created_at).toLocaleDateString('pt-BR') : '-',
+  ultimoAcesso: item.updated_at ? new Date(item.updated_at).toLocaleDateString('pt-BR') : '-'
+}));
       // offersSuccess removido, não é mais necessário
     } catch (e) {
       // Não faz nada, continua carregando
