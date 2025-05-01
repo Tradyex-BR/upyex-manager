@@ -10,7 +10,7 @@
       <main class="w-full max-md:w-full max-md:ml-0">
         <div class="w-full max-md:max-w-full">
           <section class=" min-h-[944px] w-full overflow-hidden max-md:max-w-full max-md:px-5">
-            <p class="text-white text-2xl font-semibold mb-6">Affiliates</p>
+            <p class="text-white text-2xl font-semibold mb-6">Sales</p>
             <div>
               <div v-if="loading" class="flex items-center justify-center py-10">
                 <span class="text-white text-lg">Carregando afiliados...</span>
@@ -31,7 +31,7 @@
                   <tr v-for="affiliate in affiliates" :key="affiliate.id" class="border-b border-[#1A1F3C]">
                     <td class="p-4 flex items-center gap-2">
                       <img
-:src="`https://ui-avatars.com/api/?name=${affiliate.name}&background=random`"
+                        :src="`https://ui-avatars.com/api/?name=${affiliate.name}&background=random`"
                         :alt="affiliate.name" class="w-10 h-10 rounded-full" />
                       <p class="text-white text-sm font-semibold">{{ affiliate.name }}</p>
                     </td>
@@ -48,15 +48,15 @@
                     <td class="p-4">
                       <div class="relative">
                         <button
-class="px-3 py-1 bg-[#1A1F3C] rounded-lg hover:bg-[#2A2F4C] transition-colors"
+                          class="px-3 py-1 bg-[#1A1F3C] rounded-lg hover:bg-[#2A2F4C] transition-colors"
                           @click="toggleDropdown(affiliate.id)">
                           Ações
                         </button>
                         <div
-v-if="dropdownOpen === affiliate.id"
+                          v-if="dropdownOpen === affiliate.id"
                           class="absolute right-0 mt-2 w-48 bg-[#1a1a1a] rounded-lg shadow-lg z-10">
                           <button
-class="w-full text-left px-4 py-2 hover:bg-[#2A2F4C] text-green-500"
+                            class="w-full text-left px-4 py-2 hover:bg-[#2A2F4C] text-green-500"
                             @click="handleAction(affiliate.id, 'editar')">
                             Editar
                           </button>
@@ -140,7 +140,7 @@ export default defineComponent({
       default: ''
     }
   },
-  name: 'Vendas',
+  name: 'Sales',
   components: {
     Sidebar,
     TopBar

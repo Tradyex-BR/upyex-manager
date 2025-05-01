@@ -84,7 +84,7 @@ export default defineComponent({
         },
         { 
           text: 'Vendas', 
-          route: '/offers',
+          route: '/sales',
           icon: 'svg-ofertas'
         },
         { 
