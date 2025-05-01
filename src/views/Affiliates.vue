@@ -11,6 +11,9 @@
         <div class="w-full max-md:max-w-full">
           <section class=" min-h-[944px] w-full overflow-hidden max-md:max-w-full max-md:px-5">
             <p class="text-white text-2xl font-semibold mb-6">Afiliados</p>
+            <BaseButton class="ml-2" @click="">
+                Novo Afiliado
+              </BaseButton>
             <div>
               <div v-if="loading" class="flex items-center justify-center py-10">
                 <span class="text-white text-lg">Carregando afiliados...</span>
@@ -130,6 +133,7 @@ import { useDashboardStore } from '@/stores/dashboard'
 import { managerService } from '@/services/managerService'
 import Sidebar from '@/components/layout/dashboard/Sidebar.vue'
 import TopBar from '@/components/layout/dashboard/TopBar.vue'
+import BaseButton from '@/components/common/BaseButton.vue'
 
 export default defineComponent({
   props: {

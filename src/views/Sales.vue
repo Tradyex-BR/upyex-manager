@@ -2,8 +2,8 @@
   <div v-if="loading" class="flex w-full h-full items-center justify-center text-gray-400">
     Carregando...
   </div>
-  <div v-else-if="affiliates.length === 0" class="flex w-full h-full items-center justify-center text-gray-400">
-    Nenhum afiliado encontrado.
+  <div v-else-if="sales.length === 0" class="flex w-full h-full items-center justify-center text-gray-400">
+    Nenhuma venda encontrada.
   </div>
   <div v-else class="overflow-hidden">
     <div class="gap-5 flex max-md:flex-col max-md:items-stretch">
@@ -18,51 +18,24 @@
               <table v-else class="w-full text-white border-collapse">
                 <thead>
                   <tr class="bg-[#1A1F3C]">
-                    <th class="p-4 text-left">Nome</th>
-                    <!-- <th class="p-4 text-left">E-mail</th>
- -->
-                    <th class="p-4 text-left">Código de Integração</th>
-                    <th class="p-4 text-left">Data de Cadastro</th>
+                    <th class="p-4 text-left">ID</th>
+                    <th class="p-4 text-left">Cliente</th>
+                    <th class="p-4 text-left">Produto</th>
+                    <th class="p-4 text-left">Valor</th>
                     <th class="p-4 text-left">Status</th>
-                    <th class="p-4 text-left">Ações</th>
+                    <th class="p-4 text-left">Método</th>
+                    <th class="p-4 text-left">Data</th>
                   </tr>
                 </thead>
                 <tbody>
-                  <tr v-for="affiliate in affiliates" :key="affiliate.id" class="border-b border-[#1A1F3C]">
-                    <td class="p-4 flex items-center gap-2">
-                      <img
-                        :src="`https://ui-avatars.com/api/?name=${affiliate.name}&background=random`"
-                        :alt="affiliate.name" class="w-10 h-10 rounded-full" />
-                      <p class="text-white text-sm font-semibold">{{ affiliate.name }}</p>
-                    </td>
-                    <!--   <td class="p-4">{{ affiliate.email }}</td>
- -->
-                    <td class="p-4">{{ affiliate.integration_code }}</td>
-                    <td class="p-4">{{ new Date(affiliate.created_at).toLocaleDateString() }}</td>
-                    <td class="p-4">
-                      <span
-                        :class="affiliate.is_active ? 'px-2 py-1 rounded-full text-sm bg-green-500/20 text-green-500' : 'px-2 py-1 rounded-full text-sm bg-red-500/20 text-red-500'">
-                        {{ affiliate.is_active ? 'Ativo' : 'Inativo' }}
-                      </span>
-                    </td>
-                    <td class="p-4">
-                      <div class="relative">
-                        <button
-                          class="px-3 py-1 bg-[#1A1F3C] rounded-lg hover:bg-[#2A2F4C] transition-colors"
-                          @click="toggleDropdown(affiliate.id)">
-                          Ações
-                        </button>
-                        <div
-                          v-if="dropdownOpen === affiliate.id"
-                          class="absolute right-0 mt-2 w-48 bg-[#1a1a1a] rounded-lg shadow-lg z-10">
-                          <button
-                            class="w-full text-left px-4 py-2 hover:bg-[#2A2F4C] text-green-500"
-                            @click="handleAction(affiliate.id, 'editar')">
-                            Editar
-                          </button>
-                        </div>
-                      </div>
-                    </td>
+                  <tr v-for="sale in sales" :key="sale.id" class="border-b border-[#1A1F3C]">
+                    <td class="p-4">{{ sale.id }}</td>
+                    <td class="p-4">{{ sale.customer?.name }}</td>
+                    <td class="p-4">{{ sale.products && sale.products.length ? sale.products[0].name : '-' }}</td>
+                    <td class="p-4">R$ {{ sale.products && sale.products.length ? sale.products[0].price.toFixed(2) : '-' }}</td>
+                    <td class="p-4">{{ sale.status }}</td>
+                    <td class="p-4">{{ sale.payment_method }}</td>
+                    <td class="p-4">{{ new Date(sale.created_at).toLocaleDateString('pt-BR') }}</td>
                   </tr>
                 </tbody>
               </table>
@@ -151,7 +124,7 @@ export default defineComponent({
   },
   data() {
     return {
-      affiliates: [] as any[],
+      sales: [] as any[],
       dropdownOpen: null as number | null,
       loading: true,
       showEditModal: false,
@@ -169,14 +142,14 @@ export default defineComponent({
   },
   async mounted() {
     try {
-      const response = await managerService.affiliates.list({
+      const response = await managerService.sales.list({
   search: '',
   page: 1,
   per_page: 20,
   sort_by: 'name',
   sort_order: 'asc'
 });
-      this.affiliates = response.data || response; // ajuste conforme o retorno real
+      this.sales = response.data || response; // ajuste conforme o retorno real
     } catch (e) {
       // Trate erro se necessário
     } finally {
@@ -205,14 +178,14 @@ export default defineComponent({
   console.log('Termo recebido do search:', term);
       this.loading = true;
       try {
-        const response = await managerService.affiliates.list({
+        const response = await managerService.sales.list({
           search: term,
           page: 1,
           per_page: 20,
           sort_by: 'name',
           sort_order: 'asc'
         });
-        this.affiliates = response.data || response;
+        this.sales = response.data || response;
       } catch (e) {
         // Trate erro se necessário
       } finally {
