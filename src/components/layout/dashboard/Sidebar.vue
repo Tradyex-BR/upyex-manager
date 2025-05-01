@@ -94,7 +94,7 @@ export default defineComponent({
         },
         { 
           text: 'Usuários', 
-          route: '/users',
+          route: '/customers',
           icon: 'svg-users'
         }
       ] as MenuItem[]

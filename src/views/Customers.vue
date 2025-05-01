@@ -3,7 +3,7 @@
     Carregando...
   </div>
   <div v-else-if="usuarios.length === 0" class="flex w-full h-full items-center justify-center text-gray-400">
-    Nenhum usuário encontrado.
+    Nenhum cliente encontrado.
   </div>
   <div v-else class="overflow-hidden">
     <div class="gap-5 flex max-md:flex-col max-md:items-stretch">
@@ -11,9 +11,9 @@
         <div class="w-full max-md:max-w-full">
           <section class=" min-h-[944px] w-full overflow-hidden max-md:max-w-full max-md:px-5">
             <div class="flex justify-between items-center mb-6">
-              <p class="text-white text-2xl font-semibold">Usuários</p>
+              <p class="text-white text-2xl font-semibold">Clientes</p>
               <BaseButton class="ml-2" @click="">
-                Novo Usuário
+                Novo Cliente
               </BaseButton>
             </div>
             <div>
@@ -53,7 +53,6 @@
                             @click="goToCustomerDetail(usuario.id)">
                             Visualizar detalhes
                           </button>
-
                         </div>
                       </div>
                     </td>
@@ -77,7 +76,6 @@ import BaseButton from '@/components/common/BaseButton.vue'
 import UserDetailModal from '@/components/users/UserDetailModal.vue';
 import { managerService } from '@/services/managerService';
 
-
 interface Usuario {
   id: string;
   nome: string;
@@ -91,7 +89,7 @@ interface Usuario {
 }
 
 export default defineComponent({
-  name: 'Usuarios',
+  name: 'Customers',
   components: {
     Sidebar,
     TopBar,
@@ -110,7 +108,7 @@ export default defineComponent({
   async mounted() {
     this.loading = true
     try {
-      // Ajuste os parâmetros conforme necessário para o endpoint correto de usuários
+      // Ajuste os parâmetros conforme necessário para o endpoint correto de clientes
       const response = await managerService.customers.list({
         search: null,
         page: 1,
@@ -154,12 +152,11 @@ export default defineComponent({
     },
     handleAction(id: string, action: string) {
       // Aqui você pode implementar a lógica para cada ação
-      console.log(`Ação ${action} para o usuário ${id}`)
+      console.log(`Ação ${action} para o cliente ${id}`)
       this.dropdownOpen = null
     },
     goToCustomerDetail(id: string) {
       this.$router.push({ name: 'CustomerDetail', params: { id } });
-      this.dropdownOpen = null;
     }
   }
 })

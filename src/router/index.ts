@@ -61,9 +61,9 @@ const routes = [
     meta: { requiresAuth: true }
   },
   {
-    path: '/users',
-    name: 'Users',
-    component: () => import('../views/Users.vue'),
+    path: '/customers',
+    name: 'Customers',
+    component: () => import('../views/Customers.vue'),
     meta: { requiresAuth: true }
   },
   {
@@ -94,8 +94,8 @@ router.beforeEach(async (to, _from, next) => {
     if (!isAuthenticated) {
       next('/login')
     } else {
-      // Proteção para afiliados não acessarem /users
-      if (to.path === '/users' && authStore.user?.role === 'AFFILIATE') {
+      // Proteção para afiliados não acessarem /customers
+      if (to.path === '/customers' && authStore.user?.role === 'AFFILIATE') {
         next('/dashboard')
       } else {
         next()
