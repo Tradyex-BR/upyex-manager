@@ -158,9 +158,9 @@ export default defineComponent({
     },
     getStatusClass(status: string): string {
       const classes = {
-        'Pago': 'px-2 py-1 rounded-full text-sm bg-green-500/20 text-green-500',
-        'Pendente': 'px-2 py-1 rounded-full text-sm bg-yellow-500/20 text-yellow-500',
-        'Cancelado': 'px-2 py-1 rounded-full text-sm bg-red-500/20 text-red-500'
+        'pending': 'px-2 py-1 rounded-full text-sm bg-green-500/20 text-green-500',
+        'awaiting_payment': 'px-2 py-1 rounded-full text-sm bg-yellow-500/20 text-yellow-500',
+        'canceled': 'px-2 py-1 rounded-full text-sm bg-red-500/20 text-red-500'
       }
       return classes[status as keyof typeof classes] || ''
     }
