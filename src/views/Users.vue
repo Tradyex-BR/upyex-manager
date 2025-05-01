@@ -2,7 +2,10 @@
   <div v-if="loading" class="flex w-full h-full items-center justify-center text-gray-400">
     Carregando...
   </div>
-  <div v-else-if="offersSuccess" class="overflow-hidden">
+  <div v-else-if="usuarios.length === 0" class="flex w-full h-full items-center justify-center text-gray-400">
+    Nenhum usuário encontrado.
+  </div>
+  <div v-else class="overflow-hidden">
     <div class="gap-5 flex max-md:flex-col max-md:items-stretch">
       <main class="w-full max-md:w-full max-md:ml-0">
         <div class="w-full max-md:max-w-full">
@@ -112,13 +115,11 @@ export default defineComponent({
     return {
       usuarios: [] as Usuario[],
       dropdownOpen: null as string | null,
-      loading: true,
-      offersSuccess: false
+      loading: true
     }
   },
   async mounted() {
     this.loading = true
-    this.offersSuccess = false
     try {
       // Ajuste os parâmetros conforme necessário para o endpoint correto de usuários
       const response = await managerService.customers.list({
@@ -137,17 +138,11 @@ export default defineComponent({
         dataCadastro: item.dataCadastro || item.created_at || '',
         ultimoAcesso: item.ultimoAcesso || item.last_access || ''
       }));
-      if (this.usuarios && Array.isArray(this.usuarios) && this.usuarios.length > 0) {
-        this.offersSuccess = true;
-      }
+      // offersSuccess removido, não é mais necessário
     } catch (e) {
       // Não faz nada, continua carregando
     } finally {
-      if (!this.offersSuccess) {
-        this.loading = true // mantém loading se não houver sucesso
-      } else {
-        this.loading = false
-      }
+      this.loading = false
     }
   },
 

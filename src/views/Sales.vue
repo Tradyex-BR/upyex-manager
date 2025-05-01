@@ -2,6 +2,9 @@
   <div v-if="loading" class="flex w-full h-full items-center justify-center text-gray-400">
     Carregando...
   </div>
+  <div v-else-if="affiliates.length === 0" class="flex w-full h-full items-center justify-center text-gray-400">
+    Nenhum afiliado encontrado.
+  </div>
   <div v-else class="overflow-hidden">
     <div class="gap-5 flex max-md:flex-col max-md:items-stretch">
       <main class="w-full max-md:w-full max-md:ml-0">

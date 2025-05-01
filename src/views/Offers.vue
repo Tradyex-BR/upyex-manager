@@ -2,7 +2,10 @@
   <div v-if="loading" class="flex w-full h-full items-center justify-center text-gray-400">
     Carregando...
   </div>
-  <div v-else-if="offersSuccess" class="overflow-hidden">
+  <div v-else-if="offers.length === 0" class="flex w-full h-full items-center justify-center text-gray-400">
+    Nenhuma oferta encontrada.
+  </div>
+  <div v-else class="overflow-hidden">
     <div class="gap-5 flex max-md:flex-col max-md:items-stretch">
       <main class="w-full max-md:w-full max-md:ml-0">
         <div class="w-full max-md:max-w-full">
@@ -68,14 +71,12 @@ export default defineComponent({
   setup() {
     const store = useDashboardStore()
     const loading = ref(true)
-    const offersSuccess = ref(false)
-    return { store, loading, offersSuccess }
+    return { store, loading }
   },
   data() {
     return {
       offers: [] as any[],
-      loading: true,
-      offersSuccess: false
+      loading: true
     }
   },
   async mounted() {
@@ -89,7 +90,6 @@ export default defineComponent({
   methods: {
     async handleSearch(term: string) {
       this.loading = true;
-      this.offersSuccess = false;
       try {
         const response = await managerService.sales.list({
           search: term,
@@ -109,17 +109,11 @@ export default defineComponent({
             valueBRL: product ? (Number(product.price) * Number(product.amount)).toFixed(2) : '',
           };
         });
-        if (this.offers && Array.isArray(this.offers) && this.offers.length > 0) {
-          this.offersSuccess = true;
-        }
+        // offersSuccess removido, não é mais necessário
       } catch (e) {
         // Trate erro se necessário
       } finally {
-        if (!this.offersSuccess) {
-          this.loading = true;
-        } else {
-          this.loading = false;
-        }
+        this.loading = false;
       }
     },
     getStatusClass(status: string): string {

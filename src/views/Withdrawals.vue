@@ -2,7 +2,10 @@
   <div v-if="loading" class="flex w-full h-full items-center justify-center text-gray-400">
     Carregando...
   </div>
-  <div v-else-if="withdrawalsSuccess" class="overflow-hidden">
+  <div v-else-if="withdrawals.length === 0" class="flex w-full h-full items-center justify-center text-gray-400">
+    Nenhum saque encontrado.
+  </div>
+  <div v-else class="overflow-hidden">
     <div class="gap-5 flex max-md:flex-col max-md:items-stretch">
       <main class="w-full max-md:w-full max-md:ml-0">
         <div class="w-full max-md:max-w-full">
@@ -46,6 +49,7 @@
                     </td>
                     <td class="p-4">
                       <div class="relative">
+                        <a v-if="withdrawal.link" :href="withdrawal.link" target="_blank" class="text-blue-400 underline mr-2">Detalhes</a>
                         <button 
                           class="px-3 py-1 bg-[#1A1F3C] rounded-lg hover:bg-[#2A2F4C] transition-colors"
                           @click="toggleDropdown(withdrawal.id)"
@@ -74,6 +78,17 @@
                   </tr>
                 </tbody>
               </table>
+            </div>
+            <!-- Paginação -->
+            <div v-if="pagination && pagination.links && pagination.links.length > 1" class="flex justify-center mt-6">
+              <button
+                v-for="link in pagination.links"
+                :key="link.label"
+                :disabled="!link.url"
+                @click="goToPageByUrl(link.url)"
+                :class="['mx-1 px-3 py-1 rounded', link.active ? 'bg-blue-600 text-white' : 'bg-gray-700 text-gray-300', !link.url ? 'opacity-50 cursor-not-allowed' : 'hover:bg-blue-800']"
+                v-html="link.label"
+              />
             </div>
           </section>
         </div>
@@ -111,38 +126,54 @@ export default defineComponent({
       showRequestModal: false,
       showSuccessModal: false,
       loading: true,
-      withdrawalsSuccess: false,
-      withdrawals: [] as Array<any>
+      // withdrawalsSuccess removido, não é mais necessário
+      withdrawals: [] as Array<any>,
+      pagination: {
+        current_page: 1,
+        last_page: 1,
+        per_page: 20,
+        total: 0,
+        links: [] as Array<any>
+      }
     }
   },
   // Removido computed withdrawals para evitar conflito de tipo.
   // O withdrawals agora é controlado apenas pelo data().
   async mounted() {
     this.loading = true;
-    this.withdrawalsSuccess = false;
     try {
       const response = await managerService.withdrawals.list({
         start_date: '',
         end_date: '',
         status: null,
         method: null,
-        page: 1,
-        per_page: 10,
+        page: this.pagination.current_page,
+        per_page: this.pagination.per_page,
         sort_by: 'created_at',
         sort_order: 'desc'
       });
-      this.withdrawals = response.data || response; // ajuste conforme o retorno real
-      if (this.withdrawals && Array.isArray(this.withdrawals) && this.withdrawals.length > 0) {
-        this.withdrawalsSuccess = true;
+      // Nova estrutura: response = { data, links, meta }
+      this.withdrawals = (response.data || []).map((item: any) => ({
+        id: item.id,
+        date: item.created_at ? new Date(item.created_at).toLocaleString('pt-BR') : '',
+        valueBRL: Number(item.amount).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }),
+        destination: item.destination,
+        type: item.method,
+        status: item.status,
+        link: item.links?.frontend || ''
+      }));
+      if (response.meta) {
+        this.pagination.current_page = response.meta.current_page;
+        this.pagination.last_page = response.meta.last_page;
+        this.pagination.per_page = response.meta.per_page;
+        this.pagination.total = response.meta.total;
+        this.pagination.links = response.meta.links;
       }
+      // withdrawalsSuccess removido, não é mais necessário
     } catch (e) {
       // Não faz nada, continua carregando
     } finally {
-      if (!this.withdrawalsSuccess) {
-        this.loading = true; // mantém loading se não houver sucesso
-      } else {
-        this.loading = false;
-      }
+      this.loading = false;
     }
     // Fechar o dropdown quando clicar fora
     document.addEventListener('click', (e) => {
@@ -156,13 +187,20 @@ export default defineComponent({
     document.removeEventListener('click', () => {})
   },
   methods: {
+    goToPageByUrl(url: string) {
+      // Extrai o número da página da URL e chama goToPage
+      const match = url && url.match(/page=(\d+)/);
+      if (match && match[1]) {
+        this.goToPage(Number(match[1]));
+      }
+    },
     handleWithdrawalRequest({ amount, pixKey }: { amount: string, pixKey: string }) {
       // Aqui você pode chamar a action de saque, ex: this.store.requestWithdrawal({ amount, pixKey })
       // Após sucesso, fecha a modal de request e abre a de sucesso
       this.showRequestModal = false;
       this.showSuccessModal = true;
     },
-    toggleDropdown(id: number) {
+    toggleDropdown(id: string) {
       this.dropdownOpen = this.dropdownOpen === id ? null : id
     },
     getStatusClass(status: string): string {
@@ -175,13 +213,19 @@ export default defineComponent({
           return 'px-2 py-1 rounded-full text-sm bg-yellow-500/20 text-yellow-500'
       }
     },
-    async aprovar(id: number) {
+    async aprovar(id: string) {
       await this.store.approveWithdrawal(id)
       this.dropdownOpen = null
     },
-    async rejeitar(id: number) {
+    async rejeitar(id: string) {
       await this.store.blockWithdrawal(id)
       this.dropdownOpen = null
+    },
+    async goToPage(page: number) {
+      if (page < 1 || page > this.pagination.last_page) return;
+      this.pagination.current_page = page;
+      this.loading = true;
+      await this.$options.mounted.call(this);
     }
   }
 })
