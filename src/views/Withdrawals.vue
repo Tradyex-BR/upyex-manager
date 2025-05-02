@@ -1,32 +1,36 @@
 <template>
-  <div v-if="loading" class="flex w-full h-full items-center justify-center text-gray-400">
-    Carregando...
-  </div>
-  <div v-else-if="withdrawals.length === 0" class="flex w-full h-full items-center justify-center text-gray-400">
-    Nenhum saque encontrado.
-  </div>
-  <div v-else class="overflow-hidden">
+  <div class="overflow-hidden">
     <div class="gap-5 flex max-md:flex-col max-md:items-stretch">
       <main class="w-full max-md:w-full max-md:ml-0">
         <div class="w-full max-md:max-w-full">
-          <section class=" min-h-[944px] w-full overflow-hidden max-md:max-w-full max-md:px-5">
+          <section class="min-h-[944px] w-full overflow-hidden max-md:max-w-full max-md:px-5">
+            <!-- Título e botão sempre visíveis -->
             <div class="flex justify-between items-center mb-6">
-  <p class="text-white text-2xl font-semibold">Withdrawals</p>
-  <BaseButton class="ml-2" @click="showRequestModal = true">
-    Novo Saque
-  </BaseButton>
+              <p class="text-white text-2xl font-semibold">Withdrawals</p>
+              <BaseButton class="ml-2" @click="showRequestModal = true">
+                Novo Saque
+              </BaseButton>
+            </div>
 
-  <WithdrawalRequestModal
-    v-if="showRequestModal"
-    @close="showRequestModal = false"
-    @submit="handleWithdrawalRequest"
-  />
-  <WithdrawalSuccessModal
-    v-if="showSuccessModal"
-    @close="showSuccessModal = false"
-  />
-</div>
-            <div>
+            <!-- Modais -->
+            <WithdrawalRequestModal
+              v-if="showRequestModal"
+              @close="showRequestModal = false"
+              @submit="handleWithdrawalRequest"
+            />
+            <WithdrawalSuccessModal
+              v-if="showSuccessModal"
+              @close="showSuccessModal = false"
+            />
+
+            <!-- Conteúdo condicional -->
+            <div v-if="loading" class="flex w-full h-full items-center justify-center text-gray-400">
+              Carregando...
+            </div>
+            <div v-else-if="withdrawals.length === 0" class="flex w-full h-full items-center justify-center text-gray-400">
+              Nenhum saque encontrado.
+            </div>
+            <div v-else>
               <table class="w-full text-white border-collapse">
                 <thead>
                   <tr class="bg-[#1A1F3C]">
@@ -79,6 +83,7 @@
                 </tbody>
               </table>
             </div>
+
             <!-- Paginação -->
             <div v-if="pagination && pagination.links && pagination.links.length > 1" class="flex justify-center mt-6">
               <button
@@ -126,7 +131,6 @@ export default defineComponent({
       showRequestModal: false,
       showSuccessModal: false,
       loading: true,
-      // withdrawalsSuccess removido, não é mais necessário
       withdrawals: [] as Array<any>,
       pagination: {
         current_page: 1,
@@ -137,44 +141,8 @@ export default defineComponent({
       }
     }
   },
-  // Removido computed withdrawals para evitar conflito de tipo.
-  // O withdrawals agora é controlado apenas pelo data().
   async mounted() {
-    this.loading = true;
-    try {
-      const response = await managerService.withdrawals.list({
-        start_date: '',
-        end_date: '',
-        status: null,
-        method: null,
-        page: this.pagination.current_page,
-        per_page: this.pagination.per_page,
-        sort_by: 'created_at',
-        sort_order: 'desc'
-      });
-      // Nova estrutura: response = { data, links, meta }
-      this.withdrawals = (response.data || []).map((item: any) => ({
-        id: item.id,
-        date: item.created_at ? new Date(item.created_at).toLocaleString('pt-BR') : '',
-        valueBRL: Number(item.amount).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }),
-        destination: item.destination,
-        type: item.method,
-        status: item.status,
-        link: item.links?.frontend || ''
-      }));
-      if (response.meta) {
-        this.pagination.current_page = response.meta.current_page;
-        this.pagination.last_page = response.meta.last_page;
-        this.pagination.per_page = response.meta.per_page;
-        this.pagination.total = response.meta.total;
-        this.pagination.links = response.meta.links;
-      }
-      // withdrawalsSuccess removido, não é mais necessário
-    } catch (e) {
-      // Não faz nada, continua carregando
-    } finally {
-      this.loading = false;
-    }
+    await this.loadWithdrawals();
     // Fechar o dropdown quando clicar fora
     document.addEventListener('click', (e) => {
       const target = e.target as HTMLElement
@@ -187,18 +155,56 @@ export default defineComponent({
     document.removeEventListener('click', () => {})
   },
   methods: {
-    goToPageByUrl(url: string) {
-      // Extrai o número da página da URL e chama goToPage
-      const match = url && url.match(/page=(\d+)/);
-      if (match && match[1]) {
-        this.goToPage(Number(match[1]));
+    async loadWithdrawals() {
+      this.loading = true;
+      try {
+        const response = await managerService.withdrawals.list({
+          start_date: '',
+          end_date: '',
+          status: null,
+          method: null,
+          page: this.pagination.current_page,
+          per_page: this.pagination.per_page,
+          sort_by: 'created_at',
+          sort_order: 'desc'
+        });
+        
+        this.withdrawals = (response.data || []).map((item: any) => ({
+          id: item.id,
+          date: item.created_at ? new Date(item.created_at).toLocaleString('pt-BR') : '',
+          valueBRL: Number(item.amount).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }),
+          destination: item.destination,
+          type: item.method,
+          status: item.status,
+          link: item.links?.frontend || ''
+        }));
+
+        if (response.meta) {
+          this.pagination.current_page = response.meta.current_page;
+          this.pagination.last_page = response.meta.last_page;
+          this.pagination.per_page = response.meta.per_page;
+          this.pagination.total = response.meta.total;
+          this.pagination.links = response.meta.links;
+        }
+      } catch (error) {
+        console.error('Erro ao carregar saques:', error);
+      } finally {
+        this.loading = false;
       }
     },
-    handleWithdrawalRequest({ amount, pixKey }: { amount: string, pixKey: string }) {
-      // Aqui você pode chamar a action de saque, ex: this.store.requestWithdrawal({ amount, pixKey })
-      // Após sucesso, fecha a modal de request e abre a de sucesso
-      this.showRequestModal = false;
-      this.showSuccessModal = true;
+    async handleWithdrawalRequest({ amount, pixKey }: { amount: string, pixKey: string }) {
+      try {
+        await managerService.withdrawals.request({
+          amount: Number(amount),
+          pix_key: pixKey
+        });
+        this.showRequestModal = false;
+        this.showSuccessModal = true;
+        await this.loadWithdrawals(); // Recarrega a lista após o sucesso
+      } catch (error) {
+        console.error('Erro ao solicitar saque:', error);
+        // Aqui você pode adicionar uma notificação de erro se desejar
+      }
     },
     toggleDropdown(id: string) {
       this.dropdownOpen = this.dropdownOpen === id ? null : id
@@ -214,18 +220,35 @@ export default defineComponent({
       }
     },
     async aprovar(id: string) {
-      await this.store.approveWithdrawal(id)
-      this.dropdownOpen = null
+      try {
+        await managerService.withdrawals.approve(id);
+        this.dropdownOpen = null;
+        await this.loadWithdrawals(); // Recarrega a lista após a aprovação
+      } catch (error) {
+        console.error('Erro ao aprovar saque:', error);
+      }
     },
     async rejeitar(id: string) {
-      await this.store.blockWithdrawal(id)
-      this.dropdownOpen = null
+      try {
+        await managerService.withdrawals.reject(id);
+        this.dropdownOpen = null;
+        await this.loadWithdrawals(); // Recarrega a lista após a rejeição
+      } catch (error) {
+        console.error('Erro ao rejeitar saque:', error);
+      }
+    },
+    goToPageByUrl(url: string) {
+      // Extrai o número da página da URL e chama goToPage
+      const match = url && url.match(/page=(\d+)/);
+      if (match && match[1]) {
+        this.goToPage(Number(match[1]));
+      }
     },
     async goToPage(page: number) {
       if (page < 1 || page > this.pagination.last_page) return;
       this.pagination.current_page = page;
       this.loading = true;
-      await this.$options.mounted.call(this);
+      await this.loadWithdrawals();
     }
   }
 })

@@ -121,8 +121,27 @@ export interface ListWithdrawalsParams {
 
 export interface Withdrawal {
   id: string;
-  // TODO: add more withdrawal fields as needed
+  amount: number;
+  status: string;
+  method: string;
+  destination: string;
+  created_at: string;
+  links?: {
+    frontend?: string;
+  };
 }
+
+export interface CreateWithdrawalPayload {
+  amount: number;
+  pix_key: string;
+}
+
+export interface WithdrawalResponse {
+  id: string;
+  status: string;
+  message: string;
+}
+
 export interface ListWithdrawalsResponse {
   data: Withdrawal[];
   total: number;
@@ -292,6 +311,30 @@ export const managerService = {
       });
       return response.data;
     },
+
+    /**
+     * Solicita um novo saque
+     */
+    request: async (payload: CreateWithdrawalPayload): Promise<WithdrawalResponse> => {
+      const response = await api.post<WithdrawalResponse>('/withdrawals', payload);
+      return response.data;
+    },
+
+    /**
+     * Aprova um saque
+     */
+    approve: async (id: string): Promise<WithdrawalResponse> => {
+      const response = await api.post<WithdrawalResponse>(`/withdrawals/${id}/approve`);
+      return response.data;
+    },
+
+    /**
+     * Rejeita um saque
+     */
+    reject: async (id: string): Promise<WithdrawalResponse> => {
+      const response = await api.post<WithdrawalResponse>(`/withdrawals/${id}/reject`);
+      return response.data;
+    }
   },
 
   customers: {
