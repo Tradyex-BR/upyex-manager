@@ -12,7 +12,7 @@
           <section class=" min-h-[944px] w-full overflow-hidden max-md:max-w-full max-md:px-5">
             <div class="flex justify-between items-center mb-6">
               <p class="text-white text-2xl font-semibold">Clientes</p>
-              <BaseButton class="ml-2" @click="">
+              <BaseButton class="ml-2" @click="showCreateModal = true">
                 Novo Cliente
               </BaseButton>
             </div>
@@ -194,8 +194,114 @@
             <i class="fas fa-key"></i>
             Resetar Senha
           </button>
+          <button @click="openEditModal(editingCustomer)" 
+            class="flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 rounded-lg text-white font-medium transition-colors">
+            <i class="fas fa-edit"></i>
+            Editar Cliente
+          </button>
         </div>
       </div>
+    </div>
+  </div>
+
+  <!-- Modal de Criação de Cliente -->
+  <div v-if="showCreateModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60">
+    <div class="bg-[#23263a] rounded-lg p-8 w-full max-w-2xl relative">
+      <div class="flex justify-between items-center mb-6">
+        <h2 class="text-xl font-bold text-white">Novo Cliente</h2>
+        <button @click="showCreateModal = false" class="text-gray-400 hover:text-white transition-colors">
+          <i class="fas fa-times text-xl"></i>
+        </button>
+      </div>
+
+      <form @submit.prevent="handleCreateCustomer" class="space-y-6">
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-gray-400 mb-2">Nome</label>
+            <input v-model="newCustomer.name" type="text" required
+              class="w-full bg-[#1a1a2a] text-white rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#CF631C]">
+          </div>
+          <div>
+            <label class="block text-gray-400 mb-2">Email</label>
+            <input v-model="newCustomer.email" type="email" required
+              class="w-full bg-[#1a1a2a] text-white rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#CF631C]">
+          </div>
+          <div>
+            <label class="block text-gray-400 mb-2">Telefone</label>
+            <input v-model="newCustomer.phone" type="tel" required
+              class="w-full bg-[#1a1a2a] text-white rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#CF631C]">
+          </div>
+          <div>
+            <label class="block text-gray-400 mb-2">CPF/CNPJ</label>
+            <input v-model="newCustomer.document_number" type="text"
+              class="w-full bg-[#1a1a2a] text-white rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#CF631C]">
+          </div>
+          <div>
+            <label class="block text-gray-400 mb-2">Código do Afiliado</label>
+            <input v-model="newCustomer.affiliate_code" type="text" required
+              class="w-full bg-[#1a1a2a] text-white rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#CF631C]">
+          </div>
+        </div>
+
+        <div class="flex justify-end gap-4 mt-6">
+          <button type="button" @click="showCreateModal = false"
+            class="px-6 py-2 bg-gray-600 hover:bg-gray-700 rounded-lg text-white font-medium transition-colors">
+            Cancelar
+          </button>
+          <button type="submit"
+            class="px-6 py-2 bg-[#CF631C] hover:bg-[#E67E22] rounded-lg text-white font-medium transition-colors">
+            Criar Cliente
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal de Edição de Cliente -->
+  <div v-if="showEditModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60">
+    <div class="bg-[#23263a] rounded-lg p-8 w-full max-w-2xl relative">
+      <div class="flex justify-between items-center mb-6">
+        <h2 class="text-xl font-bold text-white">Editar Cliente</h2>
+        <button @click="showEditModal = false" class="text-gray-400 hover:text-white transition-colors">
+          <i class="fas fa-times text-xl"></i>
+        </button>
+      </div>
+
+      <form @submit.prevent="handleEditCustomer" class="space-y-6">
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-gray-400 mb-2">Nome</label>
+            <input v-model="editingCustomer.name" type="text" required
+              class="w-full bg-[#1a1a2a] text-white rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#CF631C]">
+          </div>
+          <div>
+            <label class="block text-gray-400 mb-2">Email</label>
+            <input v-model="editingCustomer.email" type="email" required
+              class="w-full bg-[#1a1a2a] text-white rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#CF631C]">
+          </div>
+          <div>
+            <label class="block text-gray-400 mb-2">Telefone</label>
+            <input v-model="editingCustomer.phone" type="tel" required
+              class="w-full bg-[#1a1a2a] text-white rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#CF631C]">
+          </div>
+          <div>
+            <label class="block text-gray-400 mb-2">CPF/CNPJ</label>
+            <input v-model="editingCustomer.document_number" type="text"
+              class="w-full bg-[#1a1a2a] text-white rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#CF631C]">
+          </div>
+        </div>
+
+        <div class="flex justify-end gap-4 mt-6">
+          <button type="button" @click="showEditModal = false"
+            class="px-6 py-2 bg-gray-600 hover:bg-gray-700 rounded-lg text-white font-medium transition-colors">
+            Cancelar
+          </button>
+          <button type="submit"
+            class="px-6 py-2 bg-[#CF631C] hover:bg-[#E67E22] rounded-lg text-white font-medium transition-colors">
+            Salvar Alterações
+          </button>
+        </div>
+      </form>
     </div>
   </div>
 </template>
@@ -206,6 +312,16 @@ import Sidebar from '@/components/layout/dashboard/Sidebar.vue'
 import TopBar from '@/components/layout/dashboard/TopBar.vue'
 import BaseButton from '@/components/common/BaseButton.vue'
 import { managerService } from '@/services/managerService';
+import { externalService } from '@/services/externalService';
+
+// Função para gerar ID único
+function generateUniqueId(): string {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+    const r = Math.random() * 16 | 0;
+    const v = c === 'x' ? r : (r & 0x3 | 0x8);
+    return v.toString(16);
+  });
+}
 
 interface Usuario {
   id: string;
@@ -217,6 +333,8 @@ interface Usuario {
   dataCadastro: string;
   ultimoAcesso: string;
   linkApi: string;
+  phone?: string;
+  document_number?: string;
 }
 
 export default defineComponent({
@@ -232,7 +350,17 @@ export default defineComponent({
       dropdownOpen: null as string | null,
       loading: true,
       showDetailModal: false,
-      editingCustomer: null as Usuario | null
+      showCreateModal: false,
+      showEditModal: false,
+      editingCustomer: null as Usuario | null,
+      newCustomer: {
+        id: '',
+        name: '',
+        email: '',
+        phone: '',
+        document_number: '',
+        affiliate_code: ''
+      }
     }
   },
   async mounted() {
@@ -254,7 +382,9 @@ export default defineComponent({
         status: item.status || (item.affiliate?.is_active === false ? 'Bloqueado' : 'Ativo'),
         dataCadastro: item.created_at ? new Date(item.created_at).toLocaleDateString('pt-BR') : '-',
         ultimoAcesso: item.updated_at ? new Date(item.updated_at).toLocaleDateString('pt-BR') : '-',
-        linkApi: item.links?.api || ''
+        linkApi: item.links?.api || '',
+        phone: item.phone || '',
+        document_number: item.document_number || ''
       }));
     } catch (e) {
       console.error('Erro ao carregar clientes:', e)
@@ -305,6 +435,88 @@ export default defineComponent({
         this.editingCustomer = customer
         this.showDetailModal = true
       }
+    },
+    async handleCreateCustomer() {
+      try {
+        const payload = {
+          ...this.newCustomer,
+          id: generateUniqueId()
+        };
+        
+        await externalService.customers.register(payload);
+        
+        // Atualizar a lista de clientes
+        await this.loadCustomers();
+        
+        this.showCreateModal = false;
+        this.newCustomer = {
+          id: '',
+          name: '',
+          email: '',
+          phone: '',
+          document_number: '',
+          affiliate_code: ''
+        };
+      } catch (error) {
+        console.error('Erro ao criar cliente:', error);
+      }
+    },
+
+    async handleEditCustomer() {
+      if (!this.editingCustomer) return;
+
+      try {
+        const payload = {
+          name: this.editingCustomer.nome,
+          email: this.editingCustomer.email,
+          phone: this.editingCustomer.phone || '',
+          document_number: this.editingCustomer.document_number || ''
+        };
+
+        await externalService.customers.update(this.editingCustomer.id, payload);
+        
+        // Atualizar a lista de clientes
+        await this.loadCustomers();
+        
+        this.showEditModal = false;
+      } catch (error) {
+        console.error('Erro ao editar cliente:', error);
+      }
+    },
+
+    async loadCustomers() {
+      this.loading = true;
+      try {
+        const response = await managerService.customers.list({
+          search: null,
+          page: 1,
+          per_page: 10,
+          sort_by: 'created_at',
+          sort_order: 'desc'
+        });
+        this.usuarios = (response.data || []).map((item: any) => ({
+          id: item.id.toString(),
+          nome: item.name || '',
+          email: item.email || '',
+          aplicacao: item.application?.name || '-',
+          afiliado: item.affiliate?.name || '-',
+          status: item.status || (item.affiliate?.is_active === false ? 'Bloqueado' : 'Ativo'),
+          dataCadastro: item.created_at ? new Date(item.created_at).toLocaleDateString('pt-BR') : '-',
+          ultimoAcesso: item.updated_at ? new Date(item.updated_at).toLocaleDateString('pt-BR') : '-',
+          linkApi: item.links?.api || '',
+          phone: item.phone || '',
+          document_number: item.document_number || ''
+        }));
+      } catch (e) {
+        console.error('Erro ao carregar clientes:', e);
+      } finally {
+        this.loading = false;
+      }
+    },
+
+    openEditModal(customer: Usuario) {
+      this.editingCustomer = { ...customer };
+      this.showEditModal = true;
     }
   }
 })

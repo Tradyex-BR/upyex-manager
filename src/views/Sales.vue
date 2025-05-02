@@ -10,7 +10,12 @@
       <main class="w-full max-md:w-full max-md:ml-0">
         <div class="w-full max-md:max-w-full">
           <section class=" min-h-[944px] w-full overflow-hidden max-md:max-w-full max-md:px-5">
-            <p class="text-white text-2xl font-semibold mb-6">Sales</p>
+            <div class="flex justify-between items-center mb-6">
+              <p class="text-white text-2xl font-semibold">Vendas</p>
+              <BaseButton @click="handleNewSale" class="bg-[#CF631C] cursor-pointer text-white font-bold py-2 px-4 rounded-lg transition-colors">
+                Nova Venda
+              </BaseButton>
+            </div>
             <div>
               <div v-if="loading" class="flex items-center justify-center py-10">
                 <span class="text-white text-lg">Carregando afiliados...</span>
@@ -249,6 +254,7 @@ import { useDashboardStore } from '@/stores/dashboard'
 import { managerService } from '@/services/managerService'
 import Sidebar from '@/components/layout/dashboard/Sidebar.vue'
 import TopBar from '@/components/layout/dashboard/TopBar.vue'
+import BaseButton from '@/components/common/BaseButton.vue'
 
 export default defineComponent({
   props: {
@@ -260,7 +266,8 @@ export default defineComponent({
   name: 'Sales',
   components: {
     Sidebar,
-    TopBar
+    TopBar,
+    BaseButton
   },
   setup() {
     const store = useDashboardStore()
@@ -321,7 +328,7 @@ export default defineComponent({
   },
   methods: {
     async handleSearch(term: string) {
-  console.log('Termo recebido do search:', term);
+      console.log('Termo recebido do search:', term);
       this.loading = true;
       try {
         const response = await managerService.sales.list({
@@ -337,6 +344,10 @@ export default defineComponent({
       } finally {
         this.loading = false;
       }
+    },
+    handleNewSale() {
+      // Implementar lógica para criar nova venda
+      console.log('Criar nova venda')
     },
     getStatusClass(status: string): string {
       const classes = {
