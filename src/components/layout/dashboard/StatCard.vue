@@ -1,13 +1,13 @@
 <template>
   <div
-    class="justify-between items-center bg-[#222A3F] flex min-w-60 flex-1 shrink basis-[0%] p-8 rounded-lg max-md:px-5">
+    class="justify-between items-center bg-[#222A3F] flex min-w-60 flex-1 shrink basis-[0%] p-8 rounded-lg">
     <div class="self-stretch min-w-60 w-full flex-1 shrink basis-[0%] my-auto">
-      <div class="text-white text-[32px] font-semibold leading-none">
-        {{ value }}
-      </div>
-      <div class="flex w-full flex-col items-stretch mt-[9px]">
-        <div class="font-inter text-[#B8B8B8] leading-5">
+      <div class="flex w-full flex-col gap-[9px] items-stretch">
+        <div class="font-inter text-[#B8B8B8] text-[14px] font-medium leading-[18px]">
           {{ label }}
+        </div>
+        <div class="text-white text-[24px] font-semibold leading-8">
+          {{ value }}
         </div>
       </div>
     </div>
