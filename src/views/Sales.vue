@@ -25,6 +25,7 @@
                     <th class="p-4 text-left">Status</th>
                     <th class="p-4 text-left">Método</th>
                     <th class="p-4 text-left">Data</th>
+                    <th class="p-4 text-left">Ações</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -33,9 +34,26 @@
                     <td class="p-4">{{ sale.customer?.name }}</td>
                     <td class="p-4">{{ sale.products && sale.products.length ? sale.products[0].name : '-' }}</td>
                     <td class="p-4">R$ {{ sale.products && sale.products.length ? sale.products[0].price.toFixed(2) : '-' }}</td>
-                    <td class="p-4">{{ sale.status }}</td>
+                    <td class="p-4">
+                      <span :class="getStatusClass(sale.status)">{{ sale.status }}</span>
+                    </td>
                     <td class="p-4">{{ sale.payment_method }}</td>
                     <td class="p-4">{{ new Date(sale.created_at).toLocaleDateString('pt-BR') }}</td>
+                    <td class="p-4">
+                      <div class="relative">
+                        <button class="px-3 py-1 bg-[#1A1F3C] rounded-lg hover:bg-[#2A2F4C] transition-colors"
+                          @click="toggleDropdown(sale.id)">
+                          Ações
+                        </button>
+                        <div v-if="dropdownOpen === sale.id"
+                          class="absolute right-0 mt-2 w-48 bg-[#1a1a1a] rounded-lg shadow-lg z-10">
+                          <button class="w-full text-left px-4 py-2 hover:bg-[#2A2F4C] text-green-500"
+                            @click="showSaleDetails(sale)">
+                            Visualizar detalhes
+                          </button>
+                        </div>
+                      </div>
+                    </td>
                   </tr>
                 </tbody>
               </table>
@@ -97,6 +115,132 @@
       </form>
     </div>
   </div>
+  <!-- Modal de visualização de venda -->
+  <div v-if="showDetailModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60">
+    <div class="bg-[#23263a] rounded-lg p-8 w-full max-w-4xl relative">
+      <!-- Header -->
+      <div class="flex justify-between items-center mb-8 border-b border-[#1A1F3C] pb-4">
+        <div class="flex items-center gap-4">
+          <div class="w-12 h-12 rounded-full bg-[#CF631C] flex items-center justify-center">
+            <i class="fas fa-shopping-cart text-white text-xl"></i>
+          </div>
+          <div>
+            <h2 class="text-xl font-bold text-white">Venda #{{ editingSale?.id }}</h2>
+            <p class="text-gray-400 text-sm">{{ new Date(editingSale?.created_at).toLocaleDateString('pt-BR') }}</p>
+          </div>
+        </div>
+        <button @click="showDetailModal = false" class="text-gray-400 hover:text-white transition-colors">
+          <i class="fas fa-times text-xl"></i>
+        </button>
+      </div>
+
+      <!-- Status Badge -->
+      <div class="mb-8">
+        <span :class="[
+          'px-4 py-2 rounded-full text-sm font-medium',
+          editingSale?.status === 'Aprovado' 
+            ? 'bg-green-500/20 text-green-500' 
+            : editingSale?.status === 'Pendente'
+            ? 'bg-yellow-500/20 text-yellow-500'
+            : 'bg-red-500/20 text-red-500'
+        ]">
+          <i :class="[
+            'fas mr-2',
+            editingSale?.status === 'Aprovado' ? 'fa-check-circle' : 
+            editingSale?.status === 'Pendente' ? 'fa-clock' : 'fa-times-circle'
+          ]"></i>
+          {{ editingSale?.status }}
+        </span>
+      </div>
+
+      <!-- Main Content -->
+      <div class="grid grid-cols-2 gap-8 mb-8">
+        <!-- Informações da Venda -->
+        <div class="bg-[#1a1a2a] rounded-xl p-6">
+          <h3 class="text-white text-lg font-semibold mb-6 flex items-center gap-2">
+            <i class="fas fa-info-circle text-[#CF631C]"></i>
+            Informações da Venda
+          </h3>
+          <div class="space-y-6">
+            <div class="flex items-center gap-4">
+              <div class="w-10 h-10 rounded-lg bg-[#23263a] flex items-center justify-center">
+                <i class="fas fa-user text-[#CF631C]"></i>
+              </div>
+              <div>
+                <label class="text-gray-400 text-sm">Cliente</label>
+                <p class="text-white font-medium">{{ editingSale?.customer?.name }}</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-4">
+              <div class="w-10 h-10 rounded-lg bg-[#23263a] flex items-center justify-center">
+                <i class="fas fa-credit-card text-[#CF631C]"></i>
+              </div>
+              <div>
+                <label class="text-gray-400 text-sm">Método de Pagamento</label>
+                <p class="text-white font-medium">{{ editingSale?.payment_method }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Produtos -->
+        <div class="bg-[#1a1a2a] rounded-xl p-6">
+          <h3 class="text-white text-lg font-semibold mb-6 flex items-center gap-2">
+            <i class="fas fa-box text-[#CF631C]"></i>
+            Produtos
+          </h3>
+          <div class="space-y-4">
+            <div v-for="product in editingSale?.products" :key="product.id" 
+              class="bg-[#23263a] rounded-lg p-4">
+              <div class="flex justify-between items-start">
+                <div>
+                  <p class="text-white font-medium">{{ product.name }}</p>
+                  <p class="text-gray-400 text-sm">ID: {{ product.id }}</p>
+                </div>
+                <p class="text-[#CF631C] font-bold">R$ {{ product.price.toFixed(2) }}</p>
+              </div>
+            </div>
+            <div class="border-t border-[#1A1F3C] pt-4 mt-4">
+              <div class="flex justify-between items-center">
+                <p class="text-white font-medium">Total</p>
+                <p class="text-[#CF631C] font-bold text-xl">
+                  R$ {{ editingSale?.products?.reduce((acc, curr) => acc + curr.price, 0).toFixed(2) }}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Ações -->
+      <div class="bg-[#1a1a2a] rounded-xl p-6">
+        <h3 class="text-white text-lg font-semibold mb-6 flex items-center gap-2">
+          <i class="fas fa-cogs text-[#CF631C]"></i>
+          Ações
+        </h3>
+        <div class="flex gap-4">
+          <button v-if="editingSale?.status === 'Pendente'"
+            @click="handleSaleAction(editingSale?.id, 'aprovar')" 
+            class="flex items-center gap-2 px-6 py-3 bg-green-600 hover:bg-green-700 rounded-lg text-white font-medium transition-colors">
+            <i class="fas fa-check"></i>
+            Aprovar Venda
+          </button>
+          <button v-if="editingSale?.status === 'Pendente'"
+            @click="handleSaleAction(editingSale?.id, 'rejeitar')" 
+            class="flex items-center gap-2 px-6 py-3 bg-red-600 hover:bg-red-700 rounded-lg text-white font-medium transition-colors">
+            <i class="fas fa-times"></i>
+            Rejeitar Venda
+          </button>
+          <button v-if="editingSale?.status === 'Aprovado'"
+            @click="handleSaleAction(editingSale?.id, 'estornar')" 
+            class="flex items-center gap-2 px-6 py-3 bg-yellow-600 hover:bg-yellow-700 rounded-lg text-white font-medium transition-colors">
+            <i class="fas fa-undo"></i>
+            Estornar Venda
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script lang="ts">
@@ -137,7 +281,9 @@ export default defineComponent({
         applications: []
       },
       editLoading: false,
-      editError: ''
+      editError: '',
+      showDetailModal: false,
+      editingSale: null as any
     }
   },
   async mounted() {
@@ -245,6 +391,28 @@ export default defineComponent({
         this.editError = 'Erro ao atualizar afiliado.'
       } finally {
         this.editLoading = false
+      }
+    },
+    showSaleDetails(sale: any) {
+      this.editingSale = sale
+      this.showDetailModal = true
+      this.dropdownOpen = null
+    },
+    async handleSaleAction(id: number, action: string) {
+      try {
+        switch (action) {
+          case 'aprovar':
+            // Implementar lógica de aprovação
+            break
+          case 'rejeitar':
+            // Implementar lógica de rejeição
+            break
+          case 'estornar':
+            // Implementar lógica de estorno
+            break
+        }
+      } catch (e) {
+        console.error(`Erro ao executar ação ${action}:`, e)
       }
     }
   }

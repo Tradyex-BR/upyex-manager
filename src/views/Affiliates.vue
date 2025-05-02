@@ -126,57 +126,119 @@
     </div>
   </div>
 
-  <!-- Modal de edição de afiliado -->
+  <!-- Modal de visualização/edição de afiliado -->
   <div v-if="showEditModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60">
-    <div class="bg-[#23263a] rounded-lg p-8 w-full max-w-lg relative">
-      <h2 class="text-xl font-bold mb-4 text-white">Editar Afiliado</h2>
-      <form @submit.prevent="saveAffiliateEdits">
-        <div class="mb-4">
-          <label class="block text-white mb-1">Nome</label>
-          <input v-model="editForm.name" class="w-full px-3 py-2 rounded bg-[#181a2a] text-white" required />
-        </div>
-        <div class="mb-4">
-          <label class="block text-white mb-1">E-mail</label>
-          <input v-model="editForm.email" type="email" class="w-full px-3 py-2 rounded bg-[#181a2a] text-white"
-            required />
-        </div>
-        <div class="mb-4">
-          <label class="block text-white mb-1">Código de Integração</label>
-          <input v-model="editForm.integration_code" class="w-full px-3 py-2 rounded bg-[#181a2a] text-white"
-            required />
-        </div>
-        <div class="mb-4">
-          <label class="block text-white mb-1">Ativo?</label>
-          <select v-model="editForm.is_active" class="w-full px-3 py-2 rounded bg-[#181a2a] text-white">
-            <option :value="true">Sim</option>
-            <option :value="false">Não</option>
-          </select>
-        </div>
-        <div class="mb-4">
-          <label class="block text-white mb-1">Aplicações</label>
-          <div v-for="(app, idx) in editForm.applications" :key="app.id" class="mb-2 p-2 bg-[#1a1a2a] rounded">
-            <div class="mb-1">
-              <label class="block text-xs text-gray-400">ID</label>
-              <input v-model="app.id" class="w-full px-2 py-1 rounded bg-[#23263a] text-white" readonly />
-            </div>
-            <div class="mb-1">
-              <label class="block text-xs text-gray-400">% Comissão</label>
-              <input v-model.number="app.commission_percentage" type="number" step="0.01" min="0" max="1"
-                class="w-full px-2 py-1 rounded bg-[#23263a] text-white" />
+    <div class="bg-[#23263a] rounded-lg p-8 w-full max-w-4xl relative">
+      <div class="flex justify-between items-center mb-6">
+        <h2 class="text-xl font-bold text-white">Detalhes do Afiliado</h2>
+        <button @click="showEditModal = false" class="text-gray-400 hover:text-white">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+
+      <div class="grid grid-cols-2 gap-6 mb-6">
+        <div class="bg-[#1a1a2a] rounded-lg p-4">
+          <h3 class="text-white text-lg font-semibold mb-4">Informações Básicas</h3>
+          <div class="space-y-4">
+            <div>
+              <label class="text-gray-400 text-sm">Nome</label>
+              <p class="text-white">{{ editingAffiliate?.name }}</p>
             </div>
             <div>
-              <label class="block text-xs text-gray-400">Dias Liberação</label>
-              <input v-model.number="app.commission_release_days" type="number" min="0"
-                class="w-full px-2 py-1 rounded bg-[#23263a] text-white" />
+              <label class="text-gray-400 text-sm">Email</label>
+              <p class="text-white">{{ editingAffiliate?.email }}</p>
             </div>
-            <button type="button" class="text-red-400 mt-1 text-xs underline"
-              @click="removeEditApp(idx)">Remover</button>
+            <div>
+              <label class="text-gray-400 text-sm">Código de Integração</label>
+              <p class="text-white">{{ editingAffiliate?.integration_code }}</p>
+            </div>
+            <div>
+              <label class="text-gray-400 text-sm">Status</label>
+              <span :class="editingAffiliate?.is_active ? 'px-2 py-1 rounded-full text-sm bg-green-500/20 text-green-500' : 'px-2 py-1 rounded-full text-sm bg-red-500/20 text-red-500'">
+                {{ editingAffiliate?.is_active ? 'Ativo' : 'Inativo' }}
+              </span>
+            </div>
+            <div>
+              <label class="text-gray-400 text-sm">Data de Cadastro</label>
+              <p class="text-white">{{ editingAffiliate?.created_at ? new Date(editingAffiliate.created_at).toLocaleDateString() : '-' }}</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-[#1a1a2a] rounded-lg p-4">
+          <h3 class="text-white text-lg font-semibold mb-4">Aplicações</h3>
+          <div class="overflow-x-auto">
+            <table class="w-full text-white border-collapse">
+              <thead>
+                <tr class="bg-[#23263a]">
+                  <th class="p-2 text-left">ID da Aplicação</th>
+                  <th class="p-2 text-left">% Comissão</th>
+                  <th class="p-2 text-left">Dias para Liberação</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="app in editingAffiliate?.applications" :key="app.id" class="border-b border-[#23263a]">
+                  <td class="p-2">{{ app.id }}</td>
+                  <td class="p-2">{{ (app.commission_percentage * 100).toFixed(2) }}%</td>
+                  <td class="p-2">{{ app.commission_release_days }} dias</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <form @submit.prevent="saveAffiliateEdits" class="bg-[#1a1a2a] rounded-lg p-4">
+        <h3 class="text-white text-lg font-semibold mb-4">Editar Afiliado</h3>
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-white mb-1">Nome</label>
+            <input v-model="editForm.name" class="w-full px-3 py-2 rounded bg-[#23263a] text-white" required />
+          </div>
+          <div>
+            <label class="block text-white mb-1">E-mail</label>
+            <input v-model="editForm.email" type="email" class="w-full px-3 py-2 rounded bg-[#23263a] text-white" required />
+          </div>
+          <div>
+            <label class="block text-white mb-1">Código de Integração</label>
+            <input v-model="editForm.integration_code" class="w-full px-3 py-2 rounded bg-[#23263a] text-white" required />
+          </div>
+          <div>
+            <label class="block text-white mb-1">Ativo?</label>
+            <select v-model="editForm.is_active" class="w-full px-3 py-2 rounded bg-[#23263a] text-white">
+              <option :value="true">Sim</option>
+              <option :value="false">Não</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="mt-4">
+          <label class="block text-white mb-2">Aplicações</label>
+          <div v-for="(app, idx) in editForm.applications" :key="app.id" class="mb-2 p-2 bg-[#23263a] rounded">
+            <div class="grid grid-cols-3 gap-2">
+              <div>
+                <label class="block text-xs text-gray-400">ID</label>
+                <input v-model="app.id" class="w-full px-2 py-1 rounded bg-[#1a1a2a] text-white" readonly />
+              </div>
+              <div>
+                <label class="block text-xs text-gray-400">% Comissão</label>
+                <input v-model.number="app.commission_percentage" type="number" step="0.01" min="0" max="1"
+                  class="w-full px-2 py-1 rounded bg-[#1a1a2a] text-white" />
+              </div>
+              <div>
+                <label class="block text-xs text-gray-400">Dias Liberação</label>
+                <input v-model.number="app.commission_release_days" type="number" min="0"
+                  class="w-full px-2 py-1 rounded bg-[#1a1a2a] text-white" />
+              </div>
+            </div>
+            <button type="button" class="text-red-400 mt-1 text-xs underline" @click="removeEditApp(idx)">Remover</button>
           </div>
           <button type="button" class="bg-blue-600 text-white px-2 py-1 rounded mt-2" @click="addEditApp">Adicionar
             Aplicação</button>
         </div>
+
         <div v-if="editError" class="text-red-500 mb-2">{{ editError }}</div>
-        <div class="flex justify-end gap-2">
+        <div class="flex justify-end gap-2 mt-4">
           <button type="button" class="px-4 py-2 bg-gray-500 rounded text-white" @click="showEditModal = false"
             :disabled="editLoading">Cancelar</button>
           <button type="submit" class="px-4 py-2 bg-green-600 rounded text-white" :disabled="editLoading">
