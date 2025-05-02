@@ -10,7 +10,12 @@
       <main class="w-full max-md:w-full max-md:ml-0">
         <div class="w-full max-md:max-w-full">
           <section class="min-h-[944px] w-full overflow-hidden max-md:max-w-full max-md:px-5">
-            <p class="text-white text-2xl font-semibold mb-6">Offers</p>
+            <div class="flex justify-between items-center mb-6">
+              <p class="text-white text-2xl font-semibold">Offers</p>
+              <BaseButton class="ml-2" @click="showCreateModal = true">
+                Nova Aplicação
+              </BaseButton>
+            </div>
             <div>
               <table class="w-full text-white border-collapse">
                 <thead>
@@ -52,6 +57,54 @@
       </main>
     </div>
   </div>
+
+  <!-- Modal de Criação de Aplicação -->
+  <div v-if="showCreateModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60">
+    <div class="bg-[#23263a] rounded-lg p-8 w-full max-w-2xl relative">
+      <div class="flex justify-between items-center mb-6">
+        <h2 class="text-xl font-bold text-white">Nova Aplicação</h2>
+        <button @click="showCreateModal = false" class="text-gray-400 hover:text-white transition-colors">
+          <i class="fas fa-times text-xl"></i>
+        </button>
+      </div>
+
+      <form @submit.prevent="handleCreateApplication" class="space-y-6">
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-gray-400 mb-2">Nome</label>
+            <input v-model="newApplication.name" type="text" required
+              class="w-full bg-[#1a1a2a] text-white rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#CF631C]">
+          </div>
+          <div>
+            <label class="block text-gray-400 mb-2">Descrição</label>
+            <input v-model="newApplication.description" type="text" required
+              class="w-full bg-[#1a1a2a] text-white rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#CF631C]">
+          </div>
+          <div>
+            <label class="block text-gray-400 mb-2">URL do Logo</label>
+            <input v-model="newApplication.logo_url" type="url"
+              class="w-full bg-[#1a1a2a] text-white rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#CF631C]">
+          </div>
+          <div>
+            <label class="block text-gray-400 mb-2">Link Base de Afiliado</label>
+            <input v-model="newApplication.base_affiliate_link" type="url" required
+              class="w-full bg-[#1a1a2a] text-white rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#CF631C]">
+          </div>
+        </div>
+
+        <div class="flex justify-end gap-4 mt-6">
+          <button type="button" @click="showCreateModal = false"
+            class="px-6 py-2 bg-gray-600 hover:bg-gray-700 rounded-lg text-white font-medium transition-colors">
+            Cancelar
+          </button>
+          <button type="submit"
+            class="px-6 py-2 bg-[#CF631C] hover:bg-[#E67E22] rounded-lg text-white font-medium transition-colors">
+            Criar Aplicação
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
 </template>
 
 <script lang="ts">
@@ -59,6 +112,7 @@ import { defineComponent, ref } from 'vue'
 import { useDashboardStore } from '@/stores/dashboard'
 import Sidebar from '@/components/layout/dashboard/Sidebar.vue'
 import TopBar from '@/components/layout/dashboard/TopBar.vue'
+import BaseButton from '@/components/common/BaseButton.vue'
 import { managerService } from '@/services/managerService'
 
 export default defineComponent({
@@ -71,7 +125,8 @@ export default defineComponent({
   name: 'Offers',
   components: {
     Sidebar,
-    TopBar
+    TopBar,
+    BaseButton
   },
   setup() {
     const store = useDashboardStore()
@@ -81,7 +136,14 @@ export default defineComponent({
   data() {
     return {
       offers: [] as any[],
-      loading: true
+      loading: true,
+      showCreateModal: false,
+      newApplication: {
+        name: '',
+        description: '',
+        logo_url: null,
+        base_affiliate_link: ''
+      }
     }
   },
   async mounted() {
@@ -99,7 +161,9 @@ export default defineComponent({
         const response = await managerService.applications.list({
           search: term,
           page: 1,
-          per_page: 20
+          per_page: 20,
+          sort_by: 'created_at',
+          sort_order: 'desc'
         });
         this.offers = response.data;
       } catch (e) {
@@ -112,6 +176,24 @@ export default defineComponent({
       return isActive 
         ? 'px-2 py-1 rounded-full text-sm bg-green-500/20 text-green-500'
         : 'px-2 py-1 rounded-full text-sm bg-red-500/20 text-red-500'
+    },
+    async handleCreateApplication() {
+      try {
+        await managerService.applications.create(this.newApplication);
+        
+        // Atualizar a lista de aplicações
+        await this.handleSearch('');
+        
+        this.showCreateModal = false;
+        this.newApplication = {
+          name: '',
+          description: '',
+          logo_url: null,
+          base_affiliate_link: ''
+        };
+      } catch (error) {
+        console.error('Erro ao criar aplicação:', error);
+      }
     }
   }
 })
