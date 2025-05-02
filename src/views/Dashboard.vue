@@ -7,11 +7,12 @@
       <main class="w-full max-md:w-full max-md:ml-0">
         <div class="w-full max-md:max-w-full">
           <section class="min-h-[944px] w-full overflow-hidden max-md:max-w-full max-md:px-5">
-            <TopBar @search="handleSearch" />
             <DashboardCards v-if="dashboardData" :data="dashboardData" />
             <DashboardNavigation v-model="currentView" />
             <div v-if="currentView === 'cards'" class="h-[400px]">
-              <CartesianAxes v-if="chartData.length > 0" :data="chartData" />
+              <GraphicSection title="Vendas diárias" description="Quantidade de vendas nos últimos 15 dias">
+                <CartesianAxes v-if="chartData.length > 0" :data="chartData" />
+              </GraphicSection>
             </div>
             <div v-else-if="currentView === 'list'">
               <h2 class="text-white text-2xl font-bold">Lista</h2>
@@ -33,6 +34,8 @@ import DashboardCards from "@/components/layout/dashboard/DashboardCards.vue"
 import DashboardNavigation from "@/components/layout/dashboard/DashboardNavigation.vue"
 import DashboardList from "@/components/layout/dashboard/DashboardList.vue"
 import CartesianAxes from "@/components/graphics/CartesianAxes.vue"
+import GraphicSection from "@/components/graphics/GraphicSection.vue"
+import TopBar from "@/components/layout/dashboard/TopBar.vue"
 import { managerService } from '@/services/managerService'
 
 const authStore = useAuthStore()

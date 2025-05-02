@@ -1,6 +1,6 @@
   <template>
     <!-- Adiciona cor de fundo e padding ao container -->
-    <div class="w-full h-full bg-[#2C2E3E] p-5 rounded-lg">
+    <div class="w-full h-full">
       <canvas ref="chartRef"></canvas>
     </div>
   </template>
@@ -86,7 +86,17 @@ const createOrUpdateChart = () => {
   }
 
   // Usa os dados das props se disponíveis, senão usa os dados mock
-  const chartData = props.data || mockData.value
+  // const chartData = props.data || mockData.value
+  const chartData = mockData.value
+
+  // --- Estilos Padrão ---
+const defaultTextColor = '#B8B8B8';
+const defaultFont: Partial<FontSpec> = { // Usa Partial<FontSpec> para tipagem
+  family: "'Inter', sans-serif", // Nome da fonte (coloque fallbacks)
+  size: 14,                      // Tamanho da fonte
+  lineHeight: 1.28,              // Aproximação de 18px / 14px
+  weight: 'normal'             // Peso da fonte (ajuste se necessário)
+};
 
   chartInstance = new Chart(ctx, {
     type: 'line',
@@ -112,9 +122,9 @@ const createOrUpdateChart = () => {
           }
           const gradient = ctx.createLinearGradient(0, chartArea.bottom, 0, chartArea.top);
           // Começa mais transparente/escuro em baixo
-          gradient.addColorStop(0, 'rgba(44, 46, 62, 0.3)'); // Cor do fundo com alpha ou outra cor escura
+          gradient.addColorStop(0, 'rgba(207, 99, 28, 0)'); // Cor do fundo com alpha ou outra cor escura
           // Fica mais opaco perto da linha com a cor da linha
-          gradient.addColorStop(1, 'rgba(249, 168, 37, 0.7)'); // Cor da linha com alpha
+          gradient.addColorStop(1, 'rgba(207, 99, 28, 0.7)'); // Cor da linha com alpha
           return gradient;
         },
       }]
@@ -141,7 +151,8 @@ const createOrUpdateChart = () => {
             drawTicks: false, // Não desenha pequenas marcas no eixo
           },
           ticks: {
-            color: chartTickColor, // Cor dos números (0, 250)
+            color: defaultTextColor, // Aplica a cor padrão
+            font: defaultFont,       // Aplica a fonte padrão
             padding: 10,
             // Mostra apenas alguns ticks (pode precisar de ajuste)
             // maxTicksLimit: 3, // Tenta limitar a 0, ~125, 250
@@ -196,7 +207,7 @@ const createOrUpdateChart = () => {
           display: false // Oculta o título
         },
         tooltip: {
-          enabled: false // Desabilita tooltips para corresponder à imagem estática
+          enabled: true, // Desabilita tooltips para corresponder à imagem estática
           // Se quiser habilitar e customizar:
           // mode: 'index',
           // intersect: false,
@@ -230,7 +241,4 @@ onBeforeUnmount(() => {
 
 <style scoped>
 /* Estilos adicionais se necessários */
-.bg-\[\#2C2E3E\] {
-  background-color: #2C2E3E;
-}
 </style>
