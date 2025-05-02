@@ -12,15 +12,15 @@
 
             <div v-if="currentView === 'cards'" class="flex flex-col gap-6 mt-6">
               <GraphicSection title="Vendas diárias" description="Quantidade de vendas nos últimos 15 dias" class="h-[382px]">
-                <CartesianAxes v-if="chartData.length > 0" :data="chartData" />
+                <CartesianAxes v-if="chartData.length > 0" :data="chartData.filter(item => item.status === 'graph')" />
               </GraphicSection>
 
               <div class="grid grid-cols-2 gap-8 mb-8">
-                <GraphicSection title="Vendas diárias" description="Quantidade de vendas nos últimos 15 dias" class="h-[446px]">
-                   <CartesianAxes v-if="chartData.length > 0" :data="chartData" />
+                <GraphicSection title="Status das vendas" description="Distribuição por status de pagamento" class="h-[446px]">
+                   <DoughnutChart v-if="chartData.length > 0" :data="chartData.find(item => item.status === 'by_payment_status')" />
                 </GraphicSection>
-                <GraphicSection title="Vendas diárias" description="Quantidade de vendas nos últimos 15 dias" class="h-[446px]">
-                  <CartesianAxes v-if="chartData.length > 0" :data="chartData" />
+                <GraphicSection title="Método de pagamento" description="Distribuição por método de pagamento" class="h-[446px]">
+                  <PaymentMethodCards v-if="chartData.length > 0" :data="chartData.find(item => item.status === 'by_payment_method')" />
                 </GraphicSection>
               </div>
             </div>
@@ -44,6 +44,8 @@ import DashboardCards from "@/components/layout/dashboard/DashboardCards.vue"
 import DashboardNavigation from "@/components/layout/dashboard/DashboardNavigation.vue"
 import DashboardList from "@/components/layout/dashboard/DashboardList.vue"
 import CartesianAxes from "@/components/graphics/CartesianAxes.vue"
+import DoughnutChart from "@/components/graphics/DoughnutChart.vue"
+import PaymentMethodCards from "@/components/graphics/PaymentMethodCards.vue"
 import GraphicSection from "@/components/graphics/GraphicSection.vue"
 import TopBar from "@/components/layout/dashboard/TopBar.vue"
 import { managerService } from '@/services/managerService'
@@ -106,15 +108,27 @@ async function fetchDashboardData() {
       }
     }
 
-    // Dados para o gráfico - mesmo caminho para ambos os roles
-    if (response.sales?.graph) {
-      chartData.value = response.sales.graph.map((item: any) => ({
-        date: item.date,
-        count: item.count
-      }))
-    } else {
-      chartData.value = []
-    }
+    // Dados para os gráficos
+    chartData.value = [
+      {
+        status: 'graph',
+        data: response.sales?.graph || []
+      },
+      {
+        status: 'by_payment_status',
+        data: Object.entries(response.sales?.cards?.by_status || {}).map(([key, value]) => ({
+          label: key,
+          value: value
+        }))
+      },
+      {
+        status: 'by_payment_method',
+        data: Object.entries(response.sales?.cards?.by_payment_method || {}).map(([key, value]) => ({
+          label: key,
+          value: value
+        }))
+      }
+    ]
 
     // Dados para a lista
     listData.value = [
