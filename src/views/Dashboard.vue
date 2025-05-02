@@ -6,13 +6,23 @@
     <div class="gap-5 flex max-md:flex-col max-md:items-stretch">
       <main class="w-full max-md:w-full max-md:ml-0">
         <div class="w-full max-md:max-w-full">
-          <section class="min-h-[944px] w-full overflow-hidden max-md:max-w-full max-md:px-5">
+          <section class="min-h-[944px] w-full overflow-hidden ">
             <DashboardCards v-if="dashboardData" :data="dashboardData" />
             <DashboardNavigation v-model="currentView" />
-            <div v-if="currentView === 'cards'" class="h-[400px]">
-              <GraphicSection title="Vendas diárias" description="Quantidade de vendas nos últimos 15 dias">
+
+            <div v-if="currentView === 'cards'" class="flex flex-col gap-6 mt-6">
+              <GraphicSection title="Vendas diárias" description="Quantidade de vendas nos últimos 15 dias" class="h-[382px]">
                 <CartesianAxes v-if="chartData.length > 0" :data="chartData" />
               </GraphicSection>
+
+              <div class="grid grid-cols-2 gap-8">
+                <GraphicSection title="Vendas diárias" description="Quantidade de vendas nos últimos 15 dias" class="h-[446px]">
+                   <CartesianAxes v-if="chartData.length > 0" :data="chartData" />
+                </GraphicSection>
+                <GraphicSection title="Vendas diárias" description="Quantidade de vendas nos últimos 15 dias" class="h-[446px]">
+                  <CartesianAxes v-if="chartData.length > 0" :data="chartData" />
+                </GraphicSection>
+              </div>
             </div>
             <div v-else-if="currentView === 'list'">
               <h2 class="text-white text-2xl font-bold">Lista</h2>
