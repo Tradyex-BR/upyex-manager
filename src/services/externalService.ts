@@ -15,9 +15,11 @@ export interface RegisterSalePayload {
   customer_id: string;
   type: string;
   status: string;
-  method: string;
+  payment_method: string;
   products: ProductItem[];
-  platform_fee: number;
+  platform_fee: string;
+  created_at?: string;
+  updated_at?: string;
 }
 
 export interface UpdateSalePayload {

@@ -9,7 +9,7 @@
           <section class=" min-h-[944px] w-full overflow-hidden max-md:max-w-full max-md:px-5">
             <div class="flex justify-between items-center mb-6">
               <p class="text-white text-2xl font-semibold">Vendas</p>
-              <BaseButton @click="handleNewSale" class="bg-[#CF631C] cursor-pointer text-white font-bold py-2 px-4 rounded-lg transition-colors" v-if="role === 'manager'">
+              <BaseButton @click="handleNewSale" class="bg-[#CF631C] cursor-pointer text-white font-bold py-2 px-4 rounded-lg transition-colors">
                 Nova Venda
               </BaseButton>
             </div>
@@ -258,61 +258,97 @@
 
       <form @submit.prevent="handleCreateSale" class="space-y-6">
         <div class="grid grid-cols-2 gap-6">
-          <!-- Cliente -->
+          <!-- ID da Venda -->
           <div>
-            <label class="block text-gray-400 mb-2">Cliente</label>
-            <select v-model="newSale.customer_id" required
+            <label class="block text-gray-400 mb-2">ID da Venda</label>
+            <input v-model="newSale.id" type="text" required
               class="w-full bg-[#1a1a2a] text-white rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#CF631C]">
-              <option value="">Selecione um cliente</option>
-              <option v-for="customer in customers" :key="customer.id" :value="customer.external_id">
-                {{ customer.name }}
-              </option>
+          </div>
+
+          <!-- ID do Cliente -->
+          <div>
+            <label class="block text-gray-400 mb-2">ID do Cliente</label>
+            <input v-model="newSale.customer_id" type="text" required
+              class="w-full bg-[#1a1a2a] text-white rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#CF631C]">
+          </div>
+
+          <!-- Tipo -->
+          <div>
+            <label class="block text-gray-400 mb-2">Tipo</label>
+            <select v-model="newSale.type" required
+              class="w-full bg-[#1a1a2a] text-white rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#CF631C]">
+              <option value="product">Produto</option>
+              <option value="service">Serviço</option>
+            </select>
+          </div>
+
+          <!-- Status -->
+          <div>
+            <label class="block text-gray-400 mb-2">Status</label>
+            <select v-model="newSale.status" required
+              class="w-full bg-[#1a1a2a] text-white rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#CF631C]">
+              <option value="awaiting_payment">Aguardando Pagamento</option>
+              <option value="paid">Pago</option>
+              <option value="refunded">Estornado</option>
+              <option value="cancelled">Cancelado</option>
             </select>
           </div>
 
           <!-- Método de Pagamento -->
           <div>
             <label class="block text-gray-400 mb-2">Método de Pagamento</label>
-            <select v-model="newSale.method" required
+            <select v-model="newSale.payment_method" required
               class="w-full bg-[#1a1a2a] text-white rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#CF631C]">
-              <option value="">Selecione um método</option>
-              <option value="credit_card">Cartão de Crédito</option>
               <option value="pix">PIX</option>
+              <option value="credit_card">Cartão de Crédito</option>
               <option value="bank_transfer">Transferência Bancária</option>
             </select>
           </div>
 
-          <!-- Produtos -->
-          <div class="col-span-2">
-            <label class="block text-gray-400 mb-2">Produtos</label>
-            <div class="space-y-4">
-              <div v-for="(product, index) in newSale.products" :key="index" 
-                class="flex gap-4 items-start bg-[#1a1a2a] p-4 rounded-lg">
-                <div class="flex-1">
-                  <select v-model="product.id" required
-                    class="w-full bg-[#23263a] text-white rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#CF631C]">
-                    <option value="">Selecione um produto</option>
-                    <option v-for="prod in availableProducts" :key="prod.id" :value="prod.id">
-                      {{ prod.name }} - R$ {{ prod.price.toFixed(2) }}
-                    </option>
-                  </select>
-                </div>
-                <div class="w-32">
-                  <label class="block text-gray-400 text-sm mb-1">Quantidade</label>
-                  <input v-model.number="product.amount" type="number" min="1" required
-                    class="w-full bg-[#23263a] text-white rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#CF631C]">
-                </div>
-                <button type="button" @click="removeProduct(index)" 
-                  class="text-red-500 hover:text-red-600 transition-colors p-2">
-                  <i class="fas fa-trash"></i>
-                </button>
+          <!-- Taxa da Plataforma -->
+          <div>
+            <label class="block text-gray-400 mb-2">Taxa da Plataforma</label>
+            <input v-model="newSale.platform_fee" type="text" required
+              class="w-full bg-[#1a1a2a] text-white rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#CF631C]">
+          </div>
+        </div>
+
+        <!-- Produtos -->
+        <div class="mt-6">
+          <label class="block text-gray-400 mb-2">Produtos</label>
+          <div class="space-y-4">
+            <div v-for="(product, index) in newSale.products" :key="index" 
+              class="grid grid-cols-4 gap-4 bg-[#1a1a2a] p-4 rounded-lg">
+              <div>
+                <label class="block text-gray-400 text-sm mb-1">ID do Produto</label>
+                <input v-model="product.id" type="text" required
+                  class="w-full bg-[#23263a] text-white rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#CF631C]">
               </div>
-              <button type="button" @click="addProduct" 
-                class="w-full py-2 border-2 border-dashed border-[#CF631C] text-[#CF631C] rounded-lg hover:bg-[#CF631C] hover:text-white transition-colors">
-                <i class="fas fa-plus mr-2"></i>
-                Adicionar Produto
+              <div>
+                <label class="block text-gray-400 text-sm mb-1">Nome</label>
+                <input v-model="product.name" type="text" required
+                  class="w-full bg-[#23263a] text-white rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#CF631C]">
+              </div>
+              <div>
+                <label class="block text-gray-400 text-sm mb-1">Preço</label>
+                <input v-model.number="product.price" type="number" step="0.01" required
+                  class="w-full bg-[#23263a] text-white rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#CF631C]">
+              </div>
+              <div>
+                <label class="block text-gray-400 text-sm mb-1">Quantidade</label>
+                <input v-model.number="product.amount" type="number" min="1" required
+                  class="w-full bg-[#23263a] text-white rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#CF631C]">
+              </div>
+              <button type="button" @click="removeProduct(index)" 
+                class="col-span-4 text-red-500 hover:text-red-600 transition-colors p-2 text-right">
+                <i class="fas fa-trash"></i> Remover Produto
               </button>
             </div>
+            <button type="button" @click="addProduct" 
+              class="w-full py-2 border-2 border-dashed border-[#CF631C] text-[#CF631C] rounded-lg hover:bg-[#CF631C] hover:text-white transition-colors">
+              <i class="fas fa-plus mr-2"></i>
+              Adicionar Produto
+            </button>
           </div>
         </div>
 
@@ -430,11 +466,11 @@ export default defineComponent({
       newSale: {
         id: '',
         customer_id: '',
-        type: 'sale',
+        type: 'product',
         status: 'awaiting_payment',
-        method: '',
-        products: [] as { id: string; amount: number }[],
-        platform_fee: 0
+        payment_method: 'pix',
+        products: [] as { id: string; name: string; price: number; amount: number }[],
+        platform_fee: '0.00'
       }
     }
   },
@@ -517,14 +553,20 @@ export default defineComponent({
     },
 
     handleNewSale() {
+      // Resetando o formulário com valores padrão
       this.newSale = {
         id: generateUniqueId(),
         customer_id: '',
-        type: 'sale',
+        type: 'product',
         status: 'awaiting_payment',
-        method: '',
-        products: [],
-        platform_fee: 0
+        payment_method: 'pix',
+        products: [{
+          id: '',
+          name: '',
+          price: 0,
+          amount: 1
+        }],
+        platform_fee: '0.00'
       };
       this.showCreateModal = true;
     },
@@ -532,34 +574,34 @@ export default defineComponent({
     addProduct() {
       this.newSale.products.push({
         id: '',
+        name: '',
+        price: 0,
         amount: 1
       });
     },
 
     removeProduct(index: number) {
-      this.newSale.products.splice(index, 1);
+      if (this.newSale.products.length > 1) {
+        this.newSale.products.splice(index, 1);
+      }
     },
 
     async handleCreateSale() {
       try {
+        const now = new Date().toISOString();
         const payload = {
           ...this.newSale,
-          products: this.newSale.products.map(product => {
-            const selectedProduct = this.availableProducts.find(p => p.id === product.id);
-            return {
-              id: product.id,
-              name: selectedProduct?.name || '',
-              price: selectedProduct?.price || 0,
-              amount: product.amount
-            };
-          })
+          created_at: now,
+          updated_at: now
         };
 
         await externalService.sales.register(payload);
         await this.loadSales();
         this.showCreateModal = false;
+        this.$toast.success('Venda registrada com sucesso!');
       } catch (error) {
         console.error('Erro ao criar venda:', error);
+        this.$toast.error('Erro ao registrar venda');
       }
     },
 
