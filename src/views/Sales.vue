@@ -2,9 +2,6 @@
   <div v-if="loading" class="flex w-full h-full items-center justify-center text-gray-400">
     Carregando...
   </div>
-  <div v-else-if="sales.length === 0" class="flex w-full h-full items-center justify-center text-gray-400">
-    Nenhuma venda encontrada.
-  </div>
   <div v-else class="overflow-hidden">
     <div class="gap-5 flex max-md:flex-col max-md:items-stretch">
       <main class="w-full max-md:w-full max-md:ml-0">
@@ -12,7 +9,7 @@
           <section class=" min-h-[944px] w-full overflow-hidden max-md:max-w-full max-md:px-5">
             <div class="flex justify-between items-center mb-6">
               <p class="text-white text-2xl font-semibold">Vendas</p>
-              <BaseButton @click="handleNewSale" class="bg-[#CF631C] cursor-pointer text-white font-bold py-2 px-4 rounded-lg transition-colors">
+              <BaseButton @click="handleNewSale" class="bg-[#CF631C] cursor-pointer text-white font-bold py-2 px-4 rounded-lg transition-colors" v-if="role === 'manager'">
                 Nova Venda
               </BaseButton>
             </div>
@@ -20,7 +17,7 @@
               <div v-if="loading" class="flex items-center justify-center py-10">
                 <span class="text-white text-lg">Carregando afiliados...</span>
               </div>
-              <table v-else class="w-full text-white border-collapse">
+              <table class="w-full text-white border-collapse">
                 <thead>
                   <tr class="bg-[#1A1F3C]">
                     <th class="p-4 text-left">ID</th>
@@ -34,6 +31,9 @@
                   </tr>
                 </thead>
                 <tbody>
+                  <tr v-if="sales.length === 0" class="border-b border-[#1A1F3C]">
+                    <td colspan="8" class="p-4 text-center text-gray-400">Nenhuma venda encontrada</td>
+                  </tr>
                   <tr v-for="sale in sales" :key="sale.id" class="border-b border-[#1A1F3C]">
                     <td class="p-4">{{ sale.id }}</td>
                     <td class="p-4">{{ sale.customer?.name }}</td>
@@ -514,36 +514,6 @@ export default defineComponent({
         'Estornado': 'px-2 py-1 rounded-full text-sm bg-gray-500/20 text-gray-500'
       }
       return classes[status as keyof typeof classes] || ''
-    },
-
-    async loadCustomers() {
-      try {
-        const response = await managerService.customers.list({
-          search: null,
-          page: 1,
-          per_page: 100,
-          sort_by: 'name',
-          sort_order: 'asc'
-        });
-        this.customers = response.data || [];
-      } catch (e) {
-        console.error('Erro ao carregar clientes:', e);
-      }
-    },
-
-    async loadProducts() {
-      try {
-        const response = await managerService.products.list({
-          search: null,
-          page: 1,
-          per_page: 100,
-          sort_by: 'name',
-          sort_order: 'asc'
-        });
-        this.availableProducts = response.data || [];
-      } catch (e) {
-        console.error('Erro ao carregar produtos:', e);
-      }
     },
 
     handleNewSale() {

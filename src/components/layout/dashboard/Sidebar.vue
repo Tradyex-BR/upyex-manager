@@ -97,7 +97,7 @@ export default defineComponent({
           text: 'Ofertas', 
           route: '/offers',
           icon: 'svg-ofertas',
-          visible: role == 'affiliate'
+          visible: true
         },
         { 
           text: 'Saques', 
@@ -110,7 +110,7 @@ export default defineComponent({
           text: 'Usuários', 
           route: '/customers',
           icon: 'svg-users',
-          visible: role === 'manager'
+          visible: true
         }
       ] as MenuItem[]
     }
