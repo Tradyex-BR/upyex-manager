@@ -7,7 +7,7 @@
             <!-- Título e botão sempre visíveis -->
             <div class="flex justify-between items-center mb-6">
               <p class="text-white text-2xl font-semibold">Withdrawals</p>
-              <BaseButton class="ml-2" @click="showRequestModal = true">
+              <BaseButton class="ml-2" @click="showRequestModal = true" v-if="role === 'affiliate'">
                 Novo Saque
               </BaseButton>
             </div>
@@ -125,6 +125,7 @@ export default defineComponent({
     WithdrawalSuccessModal
   },
   data() {
+    const role  = localStorage.getItem('role')
     return {
       store: useDashboardStore(),
       dropdownOpen: null as number | null,
@@ -138,7 +139,8 @@ export default defineComponent({
         per_page: 20,
         total: 0,
         links: [] as Array<any>
-      }
+      },
+      role
     }
   },
   async mounted() {

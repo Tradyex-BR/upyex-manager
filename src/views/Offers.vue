@@ -12,7 +12,7 @@
           <section class="min-h-[944px] w-full overflow-hidden max-md:max-w-full max-md:px-5">
             <div class="flex justify-between items-center mb-6">
               <p class="text-white text-2xl font-semibold">Offers</p>
-              <BaseButton class="ml-2" @click="showCreateModal = true">
+              <BaseButton class="ml-2" @click="showCreateModal = true" v-if="role === 'manager'">
                 Nova Aplicação
               </BaseButton>
             </div>
