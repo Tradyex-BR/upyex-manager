@@ -51,7 +51,7 @@
                           Ações
                         </button>
                         <div v-if="dropdownOpen === sale.id"
-                          class="absolute right-0 mt-2 w-48 bg-[#1a1a1a] rounded-lg shadow-lg z-10">
+                          class="absolute right-0 mt-2 w-48 bg-[#1a1a1a] rounded-lg shadow-lg z-50">
                           <button class="w-full text-left px-4 py-2 hover:bg-[#2A2F4C] text-green-500"
                             @click="showSaleDetails(sale)">
                             Visualizar detalhes
@@ -246,15 +246,158 @@
       </div>
     </div>
   </div>
+  <!-- Modal de Nova Venda -->
+  <div v-if="showCreateModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60">
+    <div class="bg-[#23263a] rounded-lg p-8 w-full max-w-4xl relative">
+      <div class="flex justify-between items-center mb-6">
+        <h2 class="text-xl font-bold text-white">Nova Venda</h2>
+        <button @click="showCreateModal = false" class="text-gray-400 hover:text-white transition-colors">
+          <i class="fas fa-times text-xl"></i>
+        </button>
+      </div>
+
+      <form @submit.prevent="handleCreateSale" class="space-y-6">
+        <div class="grid grid-cols-2 gap-6">
+          <!-- Cliente -->
+          <div>
+            <label class="block text-gray-400 mb-2">Cliente</label>
+            <select v-model="newSale.customer_id" required
+              class="w-full bg-[#1a1a2a] text-white rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#CF631C]">
+              <option value="">Selecione um cliente</option>
+              <option v-for="customer in customers" :key="customer.id" :value="customer.external_id">
+                {{ customer.name }}
+              </option>
+            </select>
+          </div>
+
+          <!-- Método de Pagamento -->
+          <div>
+            <label class="block text-gray-400 mb-2">Método de Pagamento</label>
+            <select v-model="newSale.method" required
+              class="w-full bg-[#1a1a2a] text-white rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#CF631C]">
+              <option value="">Selecione um método</option>
+              <option value="credit_card">Cartão de Crédito</option>
+              <option value="pix">PIX</option>
+              <option value="bank_transfer">Transferência Bancária</option>
+            </select>
+          </div>
+
+          <!-- Produtos -->
+          <div class="col-span-2">
+            <label class="block text-gray-400 mb-2">Produtos</label>
+            <div class="space-y-4">
+              <div v-for="(product, index) in newSale.products" :key="index" 
+                class="flex gap-4 items-start bg-[#1a1a2a] p-4 rounded-lg">
+                <div class="flex-1">
+                  <select v-model="product.id" required
+                    class="w-full bg-[#23263a] text-white rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#CF631C]">
+                    <option value="">Selecione um produto</option>
+                    <option v-for="prod in availableProducts" :key="prod.id" :value="prod.id">
+                      {{ prod.name }} - R$ {{ prod.price.toFixed(2) }}
+                    </option>
+                  </select>
+                </div>
+                <div class="w-32">
+                  <label class="block text-gray-400 text-sm mb-1">Quantidade</label>
+                  <input v-model.number="product.amount" type="number" min="1" required
+                    class="w-full bg-[#23263a] text-white rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#CF631C]">
+                </div>
+                <button type="button" @click="removeProduct(index)" 
+                  class="text-red-500 hover:text-red-600 transition-colors p-2">
+                  <i class="fas fa-trash"></i>
+                </button>
+              </div>
+              <button type="button" @click="addProduct" 
+                class="w-full py-2 border-2 border-dashed border-[#CF631C] text-[#CF631C] rounded-lg hover:bg-[#CF631C] hover:text-white transition-colors">
+                <i class="fas fa-plus mr-2"></i>
+                Adicionar Produto
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex justify-end gap-4 mt-6">
+          <button type="button" @click="showCreateModal = false"
+            class="px-6 py-2 bg-gray-600 hover:bg-gray-700 rounded-lg text-white font-medium transition-colors">
+            Cancelar
+          </button>
+          <button type="submit"
+            class="px-6 py-2 bg-[#CF631C] hover:bg-[#E67E22] rounded-lg text-white font-medium transition-colors">
+            Criar Venda
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal de Edição de Venda -->
+  <div v-if="showEditModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60">
+    <div class="bg-[#23263a] rounded-lg p-8 w-full max-w-4xl relative">
+      <div class="flex justify-between items-center mb-6">
+        <h2 class="text-xl font-bold text-white">Editar Venda</h2>
+        <button @click="showEditModal = false" class="text-gray-400 hover:text-white transition-colors">
+          <i class="fas fa-times text-xl"></i>
+        </button>
+      </div>
+
+      <form @submit.prevent="handleEditSale" class="space-y-6">
+        <div class="grid grid-cols-2 gap-6">
+          <!-- Status -->
+          <div>
+            <label class="block text-gray-400 mb-2">Status</label>
+            <select v-model="editingSale.status" required
+              class="w-full bg-[#1a1a2a] text-white rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#CF631C]">
+              <option value="awaiting_payment">Pendente</option>
+              <option value="approved">Aprovado</option>
+              <option value="rejected">Rejeitado</option>
+              <option value="refunded">Estornado</option>
+            </select>
+          </div>
+
+          <!-- Método de Pagamento -->
+          <div>
+            <label class="block text-gray-400 mb-2">Método de Pagamento</label>
+            <select v-model="editingSale.payment_method" required
+              class="w-full bg-[#1a1a2a] text-white rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#CF631C]">
+              <option value="credit_card">Cartão de Crédito</option>
+              <option value="pix">PIX</option>
+              <option value="bank_transfer">Transferência Bancária</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="flex justify-end gap-4 mt-6">
+          <button type="button" @click="showEditModal = false"
+            class="px-6 py-2 bg-gray-600 hover:bg-gray-700 rounded-lg text-white font-medium transition-colors">
+            Cancelar
+          </button>
+          <button type="submit"
+            class="px-6 py-2 bg-[#CF631C] hover:bg-[#E67E22] rounded-lg text-white font-medium transition-colors">
+            Salvar Alterações
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue'
 import { useDashboardStore } from '@/stores/dashboard'
 import { managerService } from '@/services/managerService'
+import { externalService } from '@/services/externalService'
 import Sidebar from '@/components/layout/dashboard/Sidebar.vue'
 import TopBar from '@/components/layout/dashboard/TopBar.vue'
 import BaseButton from '@/components/common/BaseButton.vue'
+
+// Função para gerar ID único
+function generateUniqueId(): string {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+    const r = Math.random() * 16 | 0;
+    const v = c === 'x' ? r : (r & 0x3 | 0x8);
+    return v.toString(16);
+  });
+}
 
 export default defineComponent({
   props: {
@@ -276,48 +419,29 @@ export default defineComponent({
   data() {
     return {
       sales: [] as any[],
+      customers: [] as any[],
+      availableProducts: [] as any[],
       dropdownOpen: null as number | null,
       loading: true,
+      showCreateModal: false,
       showEditModal: false,
-      editingAffiliate: null,
-      editForm: {
-        name: '',
-        email: '',
-        integration_code: '',
-        is_active: true,
-        applications: []
-      },
-      editLoading: false,
-      editError: '',
       showDetailModal: false,
-      editingSale: null as any
+      editingSale: null as any,
+      newSale: {
+        id: '',
+        customer_id: '',
+        type: 'sale',
+        status: 'awaiting_payment',
+        method: '',
+        products: [] as { id: string; amount: number }[],
+        platform_fee: 0
+      }
     }
   },
   async mounted() {
-    try {
-      const response = await managerService.sales.list({
-  search: '',
-  page: 1,
-  per_page: 20,
-  sort_by: 'name',
-  sort_order: 'asc'
-});
-      this.sales = response.data || response; // ajuste conforme o retorno real
-    } catch (e) {
-      // Trate erro se necessário
-    } finally {
-      this.loading = false;
-    }
-    // Fechar o dropdown quando clicar fora
-    document.addEventListener('click', (e) => {
-      const target = e.target as HTMLElement
-      if (!target.closest('.relative')) {
-        this.dropdownOpen = null
-      }
-    })
-  },
-  beforeUnmount() {
-    document.removeEventListener('click', () => { })
+    await this.loadSales();
+    await this.loadCustomers();
+    await this.loadProducts();
   },
   watch: {
     searchTerm(newTerm) {
@@ -327,104 +451,183 @@ export default defineComponent({
     }
   },
   methods: {
-    async handleSearch(term: string) {
-      console.log('Termo recebido do search:', term);
-      this.loading = true;
+    async loadSales() {
       try {
         const response = await managerService.sales.list({
-          search: term,
+          search: '',
           page: 1,
           per_page: 20,
-          sort_by: 'name',
-          sort_order: 'asc'
+          sort_by: 'created_at',
+          sort_order: 'desc'
         });
-        this.sales = response.data || response;
+        
+        // Ajustando o mapeamento dos dados
+        this.sales = (response.data || []).map((sale: any) => ({
+          id: sale.id,
+          type: sale.type,
+          status: this.mapStatus(sale.status),
+          payment_method: this.mapPaymentMethod(sale.payment_method),
+          products: sale.products || [],
+          platform_fee: sale.platform_fee,
+          affiliate_commission: sale.affiliate_commission,
+          created_at: sale.created_at,
+          updated_at: sale.updated_at,
+          customer: sale.customer ? {
+            id: sale.customer.id,
+            name: sale.customer.name,
+            email: sale.customer.email,
+            phone: sale.customer.phone,
+            document_number: sale.customer.document_number
+          } : null
+        }));
       } catch (e) {
-        // Trate erro se necessário
+        console.error('Erro ao carregar vendas:', e);
       } finally {
         this.loading = false;
       }
     },
-    handleNewSale() {
-      // Implementar lógica para criar nova venda
-      console.log('Criar nova venda')
+
+    mapStatus(status: string): string {
+      const statusMap: { [key: string]: string } = {
+        'awaiting_payment': 'Pendente',
+        'paid': 'Pago',
+        'refunded': 'Estornado',
+        'cancelled': 'Cancelado'
+      };
+      return statusMap[status] || status;
     },
+
+    mapPaymentMethod(method: string): string {
+      const methodMap: { [key: string]: string } = {
+        'credit_card': 'Cartão de Crédito',
+        'pix': 'PIX',
+        'bank_transfer': 'Transferência Bancária'
+      };
+      return methodMap[method] || method;
+    },
+
     getStatusClass(status: string): string {
       const classes = {
-        'Aprovado': 'px-2 py-1 rounded-full text-sm bg-green-500/20 text-green-500',
+        'Pago': 'px-2 py-1 rounded-full text-sm bg-green-500/20 text-green-500',
         'Pendente': 'px-2 py-1 rounded-full text-sm bg-yellow-500/20 text-yellow-500',
-        'Rejeitado': 'px-2 py-1 rounded-full text-sm bg-red-500/20 text-red-500'
+        'Cancelado': 'px-2 py-1 rounded-full text-sm bg-red-500/20 text-red-500',
+        'Estornado': 'px-2 py-1 rounded-full text-sm bg-gray-500/20 text-gray-500'
       }
       return classes[status as keyof typeof classes] || ''
     },
-    toggleDropdown(id: number) {
-      this.dropdownOpen = this.dropdownOpen === id ? null : id
-    },
-    async handleAction(id: number, action: string) {
-      switch (action) {
-        case 'editar': {
-          const affiliate = this.affiliates.find(a => a.id === id)
-          if (affiliate) {
-            this.editingAffiliate = affiliate
-            this.editForm = {
-              name: affiliate.name,
-              email: affiliate.email,
-              integration_code: affiliate.integration_code,
-              is_active: affiliate.is_active,
-              applications: affiliate.applications ? affiliate.applications.map(app => ({ ...app })) : []
-            }
-            this.showEditModal = true
-          }
-          break
-        }
-        case 'bloquear':
-          await this.store.blockAffiliate(id)
-          break
-        case 'excluir':
-          await this.store.deleteAffiliate(id)
-          break
-      }
-      this.dropdownOpen = null
-    },
-    async saveAffiliateEdits() {
-      if (!this.editingAffiliate) return
-      this.editLoading = true
-      this.editError = ''
+
+    async loadCustomers() {
       try {
-        // Substitua {{api_base_url}} pelo real baseURL do seu serviço
-        const url = `/manager/affiliates/${this.editingAffiliate.id}`
-        await managerService.affiliates.update(this.editingAffiliate.id, this.editForm)
-        // Atualiza localmente
-        const idx = this.affiliates.findIndex(a => a.id === this.editingAffiliate.id)
-        if (idx !== -1) this.affiliates[idx] = { ...this.editingAffiliate, ...this.editForm }
-        this.showEditModal = false
+        const response = await managerService.customers.list({
+          search: null,
+          page: 1,
+          per_page: 100,
+          sort_by: 'name',
+          sort_order: 'asc'
+        });
+        this.customers = response.data || [];
       } catch (e) {
-        this.editError = 'Erro ao atualizar afiliado.'
-      } finally {
-        this.editLoading = false
+        console.error('Erro ao carregar clientes:', e);
       }
     },
+
+    async loadProducts() {
+      try {
+        const response = await managerService.products.list({
+          search: null,
+          page: 1,
+          per_page: 100,
+          sort_by: 'name',
+          sort_order: 'asc'
+        });
+        this.availableProducts = response.data || [];
+      } catch (e) {
+        console.error('Erro ao carregar produtos:', e);
+      }
+    },
+
+    handleNewSale() {
+      this.newSale = {
+        id: generateUniqueId(),
+        customer_id: '',
+        type: 'sale',
+        status: 'awaiting_payment',
+        method: '',
+        products: [],
+        platform_fee: 0
+      };
+      this.showCreateModal = true;
+    },
+
+    addProduct() {
+      this.newSale.products.push({
+        id: '',
+        amount: 1
+      });
+    },
+
+    removeProduct(index: number) {
+      this.newSale.products.splice(index, 1);
+    },
+
+    async handleCreateSale() {
+      try {
+        const payload = {
+          ...this.newSale,
+          products: this.newSale.products.map(product => {
+            const selectedProduct = this.availableProducts.find(p => p.id === product.id);
+            return {
+              id: product.id,
+              name: selectedProduct?.name || '',
+              price: selectedProduct?.price || 0,
+              amount: product.amount
+            };
+          })
+        };
+
+        await externalService.sales.register(payload);
+        await this.loadSales();
+        this.showCreateModal = false;
+      } catch (error) {
+        console.error('Erro ao criar venda:', error);
+      }
+    },
+
+    async handleEditSale() {
+      if (!this.editingSale) return;
+
+      try {
+        const payload = {
+          status: this.editingSale.status
+        };
+
+        await externalService.sales.update(this.editingSale.id, payload);
+        await this.loadSales();
+        this.showEditModal = false;
+      } catch (error) {
+        console.error('Erro ao editar venda:', error);
+      }
+    },
+
     showSaleDetails(sale: any) {
-      this.editingSale = sale
-      this.showDetailModal = true
-      this.dropdownOpen = null
+      this.editingSale = { ...sale };
+      this.showDetailModal = true;
+      this.dropdownOpen = null;
     },
-    async handleSaleAction(id: number, action: string) {
+
+    async handleSaleAction(saleId, newStatus) {
       try {
-        switch (action) {
-          case 'aprovar':
-            // Implementar lógica de aprovação
-            break
-          case 'rejeitar':
-            // Implementar lógica de rejeição
-            break
-          case 'estornar':
-            // Implementar lógica de estorno
-            break
-        }
-      } catch (e) {
-        console.error(`Erro ao executar ação ${action}:`, e)
+        await externalService.sales.update(saleId, { status: newStatus });
+        this.$toast.success('Status atualizado com sucesso!');
+        this.dropdownOpen = null;
+        await this.loadSales();
+      } catch (error) {
+        this.$toast.error('Erro ao atualizar status: ' + error.message);
       }
+    },
+
+    toggleDropdown(saleId: string) {
+      this.dropdownOpen = this.dropdownOpen === saleId ? null : saleId;
     }
   }
 })
