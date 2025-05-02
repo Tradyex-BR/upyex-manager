@@ -95,7 +95,7 @@ export default defineComponent({
         },
         { 
           text: 'Ofertas', 
-          route: '/withdrawals',
+          route: '/offers',
           icon: 'svg-ofertas',
           visible: role == 'affiliate'
         },
