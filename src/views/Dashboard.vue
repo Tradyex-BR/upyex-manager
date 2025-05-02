@@ -10,8 +10,8 @@
             <TopBar @search="handleSearch" />
             <DashboardCards v-if="dashboardData" :data="dashboardData" />
             <DashboardNavigation v-model="currentView" />
-            <div v-if="currentView === 'cards'">
-              <h2 class="text-white text-2xl font-bold">Dashboard</h2>
+            <div v-if="currentView === 'cards'" class="h-[400px]">
+              <CartesianAxes v-if="chartData.length > 0" :data="chartData" />
             </div>
             <div v-else-if="currentView === 'list'">
               <h2 class="text-white text-2xl font-bold">Lista</h2>
@@ -32,11 +32,13 @@ import { useAuthStore } from '@/stores/auth'
 import DashboardCards from "@/components/layout/dashboard/DashboardCards.vue"
 import DashboardNavigation from "@/components/layout/dashboard/DashboardNavigation.vue"
 import DashboardList from "@/components/layout/dashboard/DashboardList.vue"
+import CartesianAxes from "@/components/graphics/CartesianAxes.vue"
 import { managerService } from '@/services/managerService'
 
 const authStore = useAuthStore()
 const checkingAuth = ref(true)
 const dashboardData = ref<any>({})
+const chartData = ref<any[]>([])
 const listData = ref<any[]>([])
 const dashboardLoading = ref(false)
 const dashboardError = ref('')
@@ -89,6 +91,16 @@ async function fetchDashboardData() {
           label: 'Próximos 7 dias',
         }
       }
+    }
+
+    // Dados para o gráfico - mesmo caminho para ambos os roles
+    if (response.sales?.graph) {
+      chartData.value = response.sales.graph.map((item: any) => ({
+        date: item.date,
+        count: item.count
+      }))
+    } else {
+      chartData.value = []
     }
 
     // Dados para a lista
