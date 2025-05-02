@@ -2,11 +2,11 @@
   <div v-if="checkingAuth" class="flex w-full h-full items-center justify-center text-gray-400">
     Carregando...
   </div>
-  <div v-else-if="authStore.isAuthenticated" class="overflow-hidden">
+  <div v-else-if="authStore.isAuthenticated">
     <div class="gap-5 flex max-md:flex-col max-md:items-stretch">
-      <main class="w-full max-md:w-full max-md:ml-0">
+      <main class="w-full">
         <div class="w-full max-md:max-w-full">
-          <section class="min-h-[944px] w-full overflow-hidden ">
+          <section class="min-h-[944px] w-full">
             <DashboardCards v-if="dashboardData" :data="dashboardData" />
             <DashboardNavigation v-model="currentView" />
 
@@ -15,7 +15,7 @@
                 <CartesianAxes v-if="chartData.length > 0" :data="chartData" />
               </GraphicSection>
 
-              <div class="grid grid-cols-2 gap-8">
+              <div class="grid grid-cols-2 gap-8 mb-8">
                 <GraphicSection title="Vendas diárias" description="Quantidade de vendas nos últimos 15 dias" class="h-[446px]">
                    <CartesianAxes v-if="chartData.length > 0" :data="chartData" />
                 </GraphicSection>

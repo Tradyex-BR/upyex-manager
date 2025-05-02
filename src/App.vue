@@ -29,15 +29,15 @@ function onSearch(term: string) {
     </div>
 
     <!-- Layout padrão para o resto da aplicação -->
-    <div v-else class="min-h-screen flex">
+    <div v-else class="h-screen flex">
       <Sidebar />
-      <div class="flex-1 flex flex-col">
+      <div class="flex-1 flex flex-col overflow-hidden">
         <TopBar @search="onSearch" />
-        <main class="flex-1 pt-[32px] pl-[32px] pr-[32px]">
-  <router-view v-slot="{ Component }">
-    <component :is="Component" :searchTerm="searchTerm" />
-  </router-view>
-</main>
+        <main class="flex-1 overflow-y-auto pt-[32px] pl-[32px] pr-[32px]">
+          <router-view v-slot="{ Component }">
+            <component :is="Component" :searchTerm="searchTerm" />
+          </router-view>
+        </main>
       </div>
     </div>
   </div>
