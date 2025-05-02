@@ -1,5 +1,5 @@
 <template>
-  <div class="grid grid-cols-1 md:grid-cols-3 gap-4 p-4">
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
     <StatCard
       v-for="(item, key) in data"
       :key="key"

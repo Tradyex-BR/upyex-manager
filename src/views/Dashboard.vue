@@ -9,6 +9,13 @@
           <section class="min-h-[944px] w-full overflow-hidden max-md:max-w-full max-md:px-5">
             <TopBar @search="handleSearch" />
             <DashboardCards v-if="dashboardData" :data="dashboardData" />
+            <DashboardNavigation v-model="currentView" />
+            <div v-if="currentView === 'cards'">
+              <h2 class="text-white text-2xl font-bold">Dashboard</h2>
+            </div>
+            <div v-else-if="currentView === 'list'">
+              <h2 class="text-white text-2xl font-bold">Lista</h2>
+            </div>
           </section>
         </div>
       </main>
@@ -23,14 +30,18 @@
 import { ref, onMounted } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import DashboardCards from "@/components/layout/dashboard/DashboardCards.vue"
+import DashboardNavigation from "@/components/layout/dashboard/DashboardNavigation.vue"
+import DashboardList from "@/components/layout/dashboard/DashboardList.vue"
 import { managerService } from '@/services/managerService'
 
 const authStore = useAuthStore()
 const checkingAuth = ref(true)
 const dashboardData = ref<any>({})
+const listData = ref<any[]>([])
 const dashboardLoading = ref(false)
 const dashboardError = ref('')
 const role = localStorage.getItem('role')
+const currentView = ref('cards')
 
 async function fetchDashboardData() {
   dashboardLoading.value = true
@@ -45,6 +56,8 @@ async function fetchDashboardData() {
     console.log('Iniciando fetch do dashboard', params)
     const response = await managerService.dashboard.getData(params)
     console.log('Resposta do dashboard:', response)
+    
+    // Dados para os cards
     if (role === 'manager') {
       dashboardData.value = {
         paid: {
@@ -77,10 +90,27 @@ async function fetchDashboardData() {
         }
       }
     }
+
+    // Dados para a lista
+    listData.value = [
+      {
+        date: '2025-04-25',
+        description: 'Venda #1234',
+        value: 'R$ 150,00',
+        status: 'paid'
+      },
+      {
+        date: '2025-04-26',
+        description: 'Venda #1235',
+        value: 'R$ 200,00',
+        status: 'pending'
+      }
+    ]
   } catch (e: any) {
     console.error('Erro ao buscar dashboard:', e)
     dashboardError.value = e?.message || 'Erro ao carregar dados do dashboard'
     dashboardData.value = {}
+    listData.value = []
   } finally {
     dashboardLoading.value = false
   }
