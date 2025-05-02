@@ -11,8 +11,8 @@
             MENU
           </p>
           <div class="self-stretch flex flex-col justify-start gap-6">
-            <div v-for="(item, index) in menuItems" :key="index">
-              <router-link v-slot="{ navigate }" :to="item.route" custom>
+            <template v-for="(item, index) in menuItems" :key="index">
+              <router-link v-slot="{ navigate }" :to="item.route" v-if="item.visible" custom>
                 <li
 :class="{
                   'bg-[rgba(207,99,28,0.16)] text-[#CF631C]': isCurrentRoute(item.route),
@@ -34,7 +34,7 @@
                   <div v-if="isCurrentRoute(item.route)" class="self-stretch flex w-6 shrink-0 h-6 my-auto" />
                 </li>
               </router-link>
-            </div>
+            </template>
           </div>
         </div>
       </nav>
@@ -66,36 +66,51 @@ export default defineComponent({
     }
 
     return {
-      isCurrentRoute
+      isCurrentRoute,
     }
   },
   data() {
+    const role = localStorage.getItem('role')
+
     return {
       menuItems: [
         { 
           text: 'Dashboard', 
           route: '/dashboard',
-          icon: 'svg-dashboard'
+          icon: 'svg-dashboard',
+          visible: true
         },
+
         { 
           text: 'Afiliados', 
           route: '/affiliates',
-          icon: 'svg-vendas'
+          icon: 'svg-vendas',
+          visible: role === 'manager'
         },
         { 
           text: 'Vendas', 
           route: '/sales',
-          icon: 'svg-ofertas'
+          icon: 'svg-ofertas',
+          visible: true
+        },
+        { 
+          text: 'Ofertas', 
+          route: '/withdrawals',
+          icon: 'svg-ofertas',
+          visible: role == 'affiliate'
         },
         { 
           text: 'Saques', 
           route: '/withdrawals',
-          icon: 'svg-saques'
+          icon: 'svg-saques',
+          visible: true
         },
+     
         { 
           text: 'Usuários', 
           route: '/customers',
-          icon: 'svg-users'
+          icon: 'svg-users',
+          visible: role === 'manager'
         }
       ] as MenuItem[]
     }

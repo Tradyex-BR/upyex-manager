@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { managerService } from '@/services/managerService'
-import { affiliateService } from '@/services/affiliateService'
+import { useRouter } from 'vue-router'
 
 interface User {
   id: number
@@ -28,57 +28,47 @@ export const useAuthStore = defineStore('auth', {
 
   actions: {
     async login(credentials: { email: string; password: string; role: 'MANAGER' | 'AFFILIATE'; fingerprint: string }) {
-  try {
-    let response
-    let token
-    let user
-    if (credentials.role === 'MANAGER') {
-      response = await managerService.auth.login({
-        email: credentials.email,
-        password: credentials.password,
-        fingerprint: credentials.fingerprint
-      })
-      token = response.auth_token
-      // Buscar dados do usuário logado
-      user = await managerService.auth.current()
-      user.role = 'MANAGER'
-    } else {
-      response = await affiliateService.auth.login({
-        email: credentials.email,
-        password: credentials.password,
-        fingerprint: credentials.fingerprint
-      })
-      token = response.auth_token
-      user = await affiliateService.auth.current()
-      user.role = 'AFFILIATE'
-    }
-    this.user = user
-    this.token = token
-    // Salvar no localStorage
-    localStorage.setItem('token', token)
-    localStorage.setItem('user', JSON.stringify(user))
-    return user
-  } catch (error) {
-    throw error
-  }
-},
+      try {
+        const response = await managerService.auth.login({
+          email: credentials.email,
+          password: credentials.password,
+          fingerprint: credentials.fingerprint,
+          role: credentials.role
+        })
+        const token = response.auth_token
+        // Buscar dados do usuário logado
+        localStorage.setItem('role', credentials.role.toLowerCase())
+        const user = await managerService.auth.current()
+        user.role = 'MANAGER'
+
+        this.user = user
+        this.token = token
+        // Salvar no localStorage
+        localStorage.setItem('token', token)
+        localStorage.setItem('user', JSON.stringify(user))
+        return user
+      } catch (error) {
+        throw error
+      }
+    },
 
     async logout() {
       try {
         // Limpar o estado
         this.user = null
         this.token = null
-        
+
         // Limpar o localStorage
         localStorage.removeItem('token')
         localStorage.removeItem('user')
-        
+        localStorage.removeItem('role')
+
         // Chamar o serviço de logout
-        if ((this.user as any)?.role === 'MANAGER') {
-  await managerService.auth.logout()
-} else if ((this.user as any)?.role === 'AFFILIATE') {
-  await affiliateService.auth.logout()
-}
+        await managerService.auth.logout()
+
+        // Redirecionar para a página de login usando window.location
+        window.location.href = '/login'
+
       } catch (error) {
         throw error
       }

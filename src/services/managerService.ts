@@ -1,10 +1,10 @@
-import api from './api';
-
+import api from './internalService';
 // Authentication interfaces
 export interface ManagerLoginCredentials {
   email: string;
   password: string;
   fingerprint?: string;
+  role: string;
 }
 export interface ManagerLoginResponse {
   auth_token: string;
@@ -138,9 +138,9 @@ export interface DashboardParams {
   end_date: string;
 }
 export interface DashboardResponse {
-  cards?: {
-    by_status?: Record<string, number>;
-    by_payment_method?: Record<string, number>;
+  cards: {
+    by_status: Record<string, number>;
+    by_payment_method: Record<string, number>;
   };
   withdrawals?: {
     by_status?: Record<string, number>;
@@ -180,7 +180,7 @@ export const managerService = {
      * Login do manager. Salva o token no localStorage.
      */
     login: async (credentials: ManagerLoginCredentials): Promise<ManagerLoginResponse> => {
-      const response = await api.post<ManagerLoginResponse>('/manager/auth', credentials);
+      const response = await api.post<ManagerLoginResponse>(credentials.role.toLowerCase()+  '/auth', credentials);
       if (response.data?.auth_token) {
         setToken(response.data.auth_token);
       }
@@ -190,82 +190,82 @@ export const managerService = {
      * Logout do manager. Remove o token do localStorage.
      */
     logout: async (): Promise<void> => {
-      await api.delete('/manager/auth');
+      await api.delete('/auth');
       removeToken();
     },
     /**
      * Retorna dados do usuário logado.
      */
     current: async (): Promise<any> => {
-      const response = await api.get('/manager/auth');
+      const response = await api.get('/auth');
       return response.data;
     },
     /**
      * Envia email para recuperação de senha.
      */
     forgotPassword: async (payload: ForgotPasswordPayload): Promise<void> => {
-      await api.request({ method: 'GET', url: '/manager/auth/password/forgot', data: payload });
+      await api.request({ method: 'GET', url: '/auth/password/forgot', data: payload });
     },
     /**
      * Reseta a senha usando token enviado por email.
      */
     resetPassword: async (payload: ResetPasswordPayload): Promise<void> => {
-      await api.post('/manager/auth/password/reset', payload);
+      await api.post('/auth/password/reset', payload);
     },
     /**
      * Troca a senha do usuário autenticado.
      */
     changePassword: async (payload: ChangePasswordPayload): Promise<void> => {
-      await api.post('/manager/auth/password/change', payload);
+      await api.post('/auth/password/change', payload);
     },
   },
 
   affiliates: {
     create: async (payload: CreateAffiliatePayload): Promise<Affiliate> => {
-      const response = await api.post<Affiliate>('/manager/affiliates', payload);
+      const response = await api.post<Affiliate>('/affiliates', payload);
       return response.data;
     },
     list: async (params: ListAffiliatesParams): Promise<ListAffiliatesResponse> => {
       const response = await api.request<ListAffiliatesResponse>({
         method: 'GET',
-        url: '/manager/affiliates',
+        url: '/affiliates',
         params,
       });
       return response.data;
     },
     get: async (id: string): Promise<Affiliate> => {
-      const response = await api.get<Affiliate>(`/manager/affiliates/${id}`);
+      const response = await api.get<Affiliate>(`/affiliates/${id}`);
       return response.data;
     },
     update: async (id: string, payload: Partial<CreateAffiliatePayload>): Promise<Affiliate> => {
-      const response = await api.post<Affiliate>(`/manager/affiliates/${id}`, payload);
+      const response = await api.post<Affiliate>(`/affiliates/${id}`, payload);
       return response.data;
     },
   },
 
   applications: {
     create: async (payload: CreateApplicationPayload): Promise<Application> => {
-      const response = await api.post<Application>('/manager/applications', payload);
+      const response = await api.post<Application>('/applications', payload);
       return response.data;
     },
     list: async (params: ListApplicationsParams): Promise<ListApplicationsResponse> => {
       const response = await api.request<ListApplicationsResponse>({
         method: 'GET',
-        url: '/manager/applications',
+        url: '/applications',
         data: params,
       });
       return response.data;
     },
     get: async (id: string): Promise<Application> => {
-      const response = await api.get<Application>(`/manager/applications/${id}`);
+      const response = await api.get<Application>(`/applications/${id}`);
       return response.data;
     },
     update: async (id: string, payload: UpdateApplicationPayload): Promise<Application> => {
-      const response = await api.post<Application>(`/manager/applications/${id}`, payload);
+      const response = await api.post<Application>(`/applications/${id}`, payload);
       return response.data;
     },
     resetSecret: async (id: string): Promise<void> => {
-      await api.post(`/manager/applications/${id}/reset-secret`);
+      await api.post(`/applications/${id}/reset-secret`);
     },
   },
 
@@ -273,7 +273,7 @@ export const managerService = {
     getData: async (payload: DashboardParams): Promise<DashboardResponse> => {
       const response = await api.request<DashboardResponse>({
         method: 'GET',
-        url: '/manager/dashboard',
+        url: '/dashboard',
         params: payload, // Envia como query params
       });
       return response.data;
@@ -287,7 +287,7 @@ export const managerService = {
     list: async (params: ListWithdrawalsParams): Promise<ListWithdrawalsResponse> => {
       const response = await api.request<ListWithdrawalsResponse>({
         method: 'GET',
-        url: '/manager/withdrawals',
+        url: '/withdrawals',
         data: params,
       });
       return response.data;
@@ -301,7 +301,7 @@ export const managerService = {
     list: async (params: ListCustomersParams): Promise<ListCustomersResponse> => {
       const response = await api.request<ListCustomersResponse>({
         method: 'GET',
-        url: '/manager/customers',
+        url: '/customers',
         data: params,
       });
       return response.data;
@@ -317,7 +317,7 @@ export const managerService = {
     list: async (params: ListSalesParams): Promise<ListSalesResponse> => {
       const response = await api.request<ListSalesResponse>({
         method: 'GET',
-        url: '/manager/sales',
+        url: '/sales',
         data: params,
       });
       return response.data;

@@ -14,7 +14,9 @@
 
      <!--  <SocialLogin /> -->
 
-      <LoginForm />
+      <div>
+        <LoginForm />
+      </div>
     </div>
 
 <!--     <div class="darker-gradient-background"></div>
