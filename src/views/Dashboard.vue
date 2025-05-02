@@ -109,6 +109,101 @@ async function fetchDashboardData() {
     }
 
     // Dados para os gráficos
+    const totalPaid = response.sales?.cards?.by_status?.paid || 0
+
+    // Primeiro, vamos agrupar os métodos de pagamento
+    const paymentMethods = Object.entries(response.sales?.cards?.by_payment_method || {})
+      .reduce((acc, [key, value]) => {
+        const lowerKey = key.toLowerCase()
+        let groupKey = 'other'
+        let groupLabel = 'Outros'
+
+        if (lowerKey.includes('credit') || lowerKey.includes('card') || lowerKey.includes('debit')) {
+          groupKey = 'card'
+          groupLabel = 'Conversão de cartão'
+        } else if (lowerKey.includes('pix')) {
+          groupKey = 'pix'
+          groupLabel = 'Conversão de pix'
+        } else if (lowerKey.includes('bank') || lowerKey.includes('transfer') || lowerKey.includes('payment_link')) {
+          groupKey = 'bank'
+          groupLabel = 'Conversão de boleto'
+        }
+
+        if (!acc[groupKey]) {
+          acc[groupKey] = {
+            label: groupLabel,
+            value: 0,
+            icon: groupKey,
+            iconColor: groupKey === 'card' ? 'text-blue-400' : 
+                      groupKey === 'pix' ? 'text-green-400' : 
+                      groupKey === 'bank' ? 'text-purple-400' : 'text-gray-400',
+            barColor: groupKey === 'card' ? 'bg-blue-500' : 
+                     groupKey === 'pix' ? 'bg-green-500' : 
+                     groupKey === 'bank' ? 'bg-purple-500' : 'bg-gray-500'
+          }
+        }
+        acc[groupKey].value += value
+        return acc
+      }, {} as Record<string, any>)
+
+    // Garante que temos todas as categorias com valores iniciais
+    const mainCategories = {
+      card: {
+        label: 'Conversão de cartão',
+        value: 0,
+        icon: 'card',
+        iconColor: 'text-blue-400',
+        barColor: 'bg-blue-500'
+      },
+      pix: {
+        label: 'Conversão de pix',
+        value: 0,
+        icon: 'pix',
+        iconColor: 'text-green-400',
+        barColor: 'bg-green-500'
+      },
+      bank: {
+        label: 'Conversão de boleto',
+        value: 0,
+        icon: 'bank',
+        iconColor: 'text-purple-400',
+        barColor: 'bg-purple-500'
+      },
+      other: {
+        label: 'Outros',
+        value: 0,
+        icon: 'other',
+        iconColor: 'text-gray-400',
+        barColor: 'bg-gray-500'
+      }
+    }
+
+    // Combina os métodos agrupados com as categorias principais
+    const finalMethods = {
+      ...mainCategories,
+      ...paymentMethods
+    }
+
+    // Ordena os métodos na ordem desejada e calcula as porcentagens
+    const orderedMethods = {
+      card: {
+        ...finalMethods.card,
+        percentage: totalPaid > 0 ? Math.round((finalMethods.card.value / totalPaid) * 100) : 0
+      },
+      pix: {
+        ...finalMethods.pix,
+        percentage: totalPaid > 0 ? Math.round((finalMethods.pix.value / totalPaid) * 100) : 0
+      },
+      bank: {
+        ...finalMethods.bank,
+        percentage: totalPaid > 0 ? Math.round((finalMethods.bank.value / totalPaid) * 100) : 0
+      },
+      other: {
+        ...finalMethods.other,
+        percentage: totalPaid > 0 ? Math.round((finalMethods.other.value / totalPaid) * 100) : 0
+      }
+    }
+
     chartData.value = [
       {
         status: 'graph',
@@ -124,11 +219,8 @@ async function fetchDashboardData() {
       {
         status: 'by_payment_method',
         data: {
-          methods: Object.entries(response.sales?.cards?.by_payment_method || {}).map(([key, value]) => ({
-            label: key,
-            value: value
-          })),
-          totalPaid: response.sales?.cards?.by_status?.paid || 0
+          methods: Object.values(orderedMethods),
+          totalPaid
         }
       }
     ].filter(item => {
