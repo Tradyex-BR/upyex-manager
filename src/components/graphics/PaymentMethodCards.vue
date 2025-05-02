@@ -1,5 +1,5 @@
 <template>
-  <div class="grid grid-cols-1 gap-4">
+  <div v-if="formattedData.length > 0" class="grid grid-cols-1 gap-4">
     <div v-for="(item, index) in formattedData" :key="index" class="bg-[#2C2E3E] rounded-lg p-4">
       <div class="flex items-center gap-2 mb-3">
         <div class="w-8 h-8 flex items-center justify-center">
@@ -14,16 +14,19 @@
       </div>
       <div class="flex items-center gap-3">
         <div class="flex-1 overflow-hidden h-2 text-xs flex rounded bg-[#1A1B26]">
-          <div :style="{ width: item.value + '%' }" 
+          <div :style="{ width: item.percentage + '%' }" 
                class="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center transition-all duration-500"
                :class="item.barColor">
           </div>
         </div>
         <span class="text-xs font-semibold text-white whitespace-nowrap">
-          {{ item.value }}%
+          {{ item.percentage }}%
         </span>
       </div>
     </div>
+  </div>
+  <div v-else class="flex items-center justify-center h-full text-gray-400">
+    Nenhum dado disponível
   </div>
 </template>
 
@@ -37,7 +40,10 @@ interface ChartDataItem {
 
 interface ChartInputData {
   status?: string
-  data: ChartDataItem[]
+  data: {
+    methods: ChartDataItem[]
+    totalPaid: number
+  }
 }
 
 const props = defineProps<{
@@ -75,9 +81,18 @@ const getIconAndColor = (label: string) => {
 }
 
 const formattedData = computed(() => {
-  return props.data.data.map(item => ({
-    ...item,
-    ...getIconAndColor(item.label)
-  }))
+  if (!props.data?.data?.methods) return []
+  
+  const totalPaid = props.data.data.totalPaid || 0
+  
+  return props.data.data.methods.map(item => {
+    const percentage = totalPaid > 0 ? Math.round((item.value / totalPaid) * 100) : 0
+    
+    return {
+      ...item,
+      percentage,
+      ...getIconAndColor(item.label)
+    }
+  })
 })
 </script> 

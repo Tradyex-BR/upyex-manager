@@ -123,12 +123,20 @@ async function fetchDashboardData() {
       },
       {
         status: 'by_payment_method',
-        data: Object.entries(response.sales?.cards?.by_payment_method || {}).map(([key, value]) => ({
-          label: key,
-          value: value
-        }))
+        data: {
+          methods: Object.entries(response.sales?.cards?.by_payment_method || {}).map(([key, value]) => ({
+            label: key,
+            value: value
+          })),
+          totalPaid: response.sales?.cards?.by_status?.paid || 0
+        }
       }
-    ]
+    ].filter(item => {
+      if (item.status === 'by_payment_method') {
+        return item.data.methods && item.data.methods.length > 0
+      }
+      return item.data && item.data.length > 0
+    })
 
     // Dados para a lista
     listData.value = [
