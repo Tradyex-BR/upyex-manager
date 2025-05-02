@@ -1,5 +1,5 @@
 <template>
-  <div class="mx-auto bg-white py-6">
+  <div class="mx-auto  py-6">
     <div class="mb-6">
       <button @click="goBack" class="flex items-center text-sm text-gray-600 hover:text-primary-600">
         <span class="mr-2">←</span>
@@ -29,7 +29,7 @@
     </div>
 
     <!-- Detalhes do cliente -->
-    <div v-else class=" p-6">
+    <div v-else class="bg-[#23263a] p-6">
       <div class="flex items-center justify-between mb-6">
         <div>
           <h2 class="text-2xl font-bold">{{ customer.name }}</h2>
@@ -126,9 +126,8 @@
         </div>
       </div>
 
-      <div class="flex justify-between border-t pt-6 mt-8">
-<!--         <button @click="goBack" class="border px-4 py-2 rounded text-gray-700 hover:bg-gray-50">Voltar</button>
- -->        <div class="flex gap-2">
+      <!-- <div class="flex justify-between border-t pt-6 mt-8">
+        <div class="flex gap-2">
           <button @click="openExternal(customer.links.api)" class="border px-4 py-2 rounded text-gray-700 hover:bg-gray-50 flex items-center gap-2">
             API <span>🔗</span>
           </button>
@@ -136,7 +135,7 @@
             Abrir no painel <span>🔗</span>
           </button>
         </div>
-      </div>
+      </div> -->
     </div>
   </div>
 </template>

@@ -10,10 +10,12 @@
       <main class="w-full max-md:w-full max-md:ml-0">
         <div class="w-full max-md:max-w-full">
           <section class=" min-h-[944px] w-full overflow-hidden max-md:max-w-full max-md:px-5">
-            <p class="text-white text-2xl font-semibold mb-6">Afiliados</p>
-            <BaseButton class="ml-2" @click="">
+            <div class="flex justify-between items-center mb-6">
+              <p class="text-white text-2xl font-semibold">Afiliados</p>
+              <BaseButton @click="handleNewAffiliate" class="bg-[#CF631C] cursor-pointer text-white font-bold py-2 px-4 rounded-lg transition-colors">
                 Novo Afiliado
               </BaseButton>
+            </div>
             <div>
               <div v-if="loading" class="flex items-center justify-center py-10">
                 <span class="text-white text-lg">Carregando afiliados...</span>
@@ -32,8 +34,7 @@
                 <tbody>
                   <tr v-for="affiliate in affiliates" :key="affiliate.id" class="border-b border-[#1A1F3C]">
                     <td class="p-4 flex items-center gap-2">
-                      <img
-                        :src="`https://ui-avatars.com/api/?name=${affiliate.name}&background=random`"
+                      <img :src="`https://ui-avatars.com/api/?name=${affiliate.name}&background=random`"
                         :alt="affiliate.name" class="w-10 h-10 rounded-full" />
                       <p class="text-white text-sm font-semibold">{{ affiliate.name }}</p>
                     </td>
@@ -48,16 +49,13 @@
                     </td>
                     <td class="p-4">
                       <div class="relative">
-                        <button
-                          class="px-3 py-1 bg-[#1A1F3C] rounded-lg hover:bg-[#2A2F4C] transition-colors"
+                        <button class="px-3 py-1 bg-[#1A1F3C] rounded-lg hover:bg-[#2A2F4C] transition-colors"
                           @click="toggleDropdown(affiliate.id)">
                           Ações
                         </button>
-                        <div
-                          v-if="dropdownOpen === affiliate.id"
+                        <div v-if="dropdownOpen === affiliate.id"
                           class="absolute right-0 mt-2 w-48 bg-[#1a1a1a] rounded-lg shadow-lg z-10">
-                          <button
-                            class="w-full text-left px-4 py-2 hover:bg-[#2A2F4C] text-green-500"
+                          <button class="w-full text-left px-4 py-2 hover:bg-[#2A2F4C] text-green-500"
                             @click="handleAction(affiliate.id, 'editar')">
                             Editar
                           </button>
@@ -73,6 +71,61 @@
       </main>
     </div>
   </div>
+
+  <!-- Modal de criação de afiliado -->
+  <div v-if="showCreateModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60">
+    <div class="bg-[#23263a] rounded-lg p-8 w-full max-w-lg relative">
+      <h2 class="text-xl font-bold mb-4 text-white">Criar Afiliado</h2>
+      <form @submit.prevent="createAffiliate">
+        <div class="mb-4">
+          <label class="block text-white mb-1">Nome</label>
+          <input v-model="createForm.name" class="w-full px-3 py-2 rounded bg-[#181a2a] text-white" required />
+        </div>
+        <div class="mb-4">
+          <label class="block text-white mb-1">E-mail</label>
+          <input v-model="createForm.email" type="email" class="w-full px-3 py-2 rounded bg-[#181a2a] text-white"
+            required />
+        </div>
+        <div class="mb-4">
+          <label class="block text-white mb-1">Código de Integração</label>
+          <input v-model="createForm.integration_code" class="w-full px-3 py-2 rounded bg-[#181a2a] text-white"
+            required />
+        </div>
+        <div class="mb-4">
+          <label class="block text-white mb-1">Aplicações</label>
+          <div v-for="(app, idx) in createForm.applications" :key="app.id" class="mb-2 p-2 bg-[#1a1a2a] rounded">
+            <div class="mb-1">
+              <label class="block text-white mb-1">ID da Aplicação</label>
+              <input v-model="app.id" class="w-full px-3 py-2 rounded bg-[#181a2a] text-white" required />
+            </div>
+            <div class="mb-1">
+              <label class="block text-white mb-1">% Comissão</label>
+              <input v-model.number="app.commission_percentage" type="number" step="0.01" min="0" max="1"
+                class="w-full px-3 py-2 rounded bg-[#181a2a] text-white" required />
+            </div>
+            <div class="mb-1">
+              <label class="block text-white mb-1">Dias para Liberação</label>
+              <input v-model.number="app.commission_release_days" type="number" min="0"
+                class="w-full px-3 py-2 rounded bg-[#181a2a] text-white" required />
+            </div>
+            <button type="button" class="text-red-400 mt-1 text-xs underline" @click="removeApp(idx)">Remover</button>
+          </div>
+          <button type="button" class="bg-blue-600 text-white px-2 py-1 rounded mt-2" @click="addApp">Adicionar
+            Aplicação</button>
+        </div>
+        <div v-if="createError" class="text-red-500 mb-2">{{ createError }}</div>
+        <div class="flex justify-end gap-2">
+          <button type="button" @click="showCreateModal = false"
+            class="px-4 py-2 bg-gray-600 text-white rounded">Cancelar</button>
+          <button type="submit" :disabled="createLoading" class="px-4 py-2 bg-green-600 text-white rounded">
+            <span v-if="createLoading">Salvando...</span>
+            <span v-else>Criar</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <!-- Modal de edição de afiliado -->
   <div v-if="showEditModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60">
     <div class="bg-[#23263a] rounded-lg p-8 w-full max-w-lg relative">
@@ -84,11 +137,13 @@
         </div>
         <div class="mb-4">
           <label class="block text-white mb-1">E-mail</label>
-          <input v-model="editForm.email" type="email" class="w-full px-3 py-2 rounded bg-[#181a2a] text-white" required />
+          <input v-model="editForm.email" type="email" class="w-full px-3 py-2 rounded bg-[#181a2a] text-white"
+            required />
         </div>
         <div class="mb-4">
           <label class="block text-white mb-1">Código de Integração</label>
-          <input v-model="editForm.integration_code" class="w-full px-3 py-2 rounded bg-[#181a2a] text-white" required />
+          <input v-model="editForm.integration_code" class="w-full px-3 py-2 rounded bg-[#181a2a] text-white"
+            required />
         </div>
         <div class="mb-4">
           <label class="block text-white mb-1">Ativo?</label>
@@ -106,17 +161,24 @@
             </div>
             <div class="mb-1">
               <label class="block text-xs text-gray-400">% Comissão</label>
-              <input v-model.number="app.commission_percentage" type="number" step="0.01" min="0" max="1" class="w-full px-2 py-1 rounded bg-[#23263a] text-white" />
+              <input v-model.number="app.commission_percentage" type="number" step="0.01" min="0" max="1"
+                class="w-full px-2 py-1 rounded bg-[#23263a] text-white" />
             </div>
             <div>
               <label class="block text-xs text-gray-400">Dias Liberação</label>
-              <input v-model.number="app.commission_release_days" type="number" min="0" class="w-full px-2 py-1 rounded bg-[#23263a] text-white" />
+              <input v-model.number="app.commission_release_days" type="number" min="0"
+                class="w-full px-2 py-1 rounded bg-[#23263a] text-white" />
             </div>
+            <button type="button" class="text-red-400 mt-1 text-xs underline"
+              @click="removeEditApp(idx)">Remover</button>
           </div>
+          <button type="button" class="bg-blue-600 text-white px-2 py-1 rounded mt-2" @click="addEditApp">Adicionar
+            Aplicação</button>
         </div>
         <div v-if="editError" class="text-red-500 mb-2">{{ editError }}</div>
         <div class="flex justify-end gap-2">
-          <button type="button" class="px-4 py-2 bg-gray-500 rounded text-white" @click="showEditModal = false" :disabled="editLoading">Cancelar</button>
+          <button type="button" class="px-4 py-2 bg-gray-500 rounded text-white" @click="showEditModal = false"
+            :disabled="editLoading">Cancelar</button>
           <button type="submit" class="px-4 py-2 bg-green-600 rounded text-white" :disabled="editLoading">
             <span v-if="editLoading">Salvando...</span>
             <span v-else>Salvar</span>
@@ -157,6 +219,7 @@ export default defineComponent({
       dropdownOpen: null as number | null,
       loading: true,
       showEditModal: false,
+      showCreateModal: false,
       editingAffiliate: null,
       editForm: {
         name: '',
@@ -165,6 +228,16 @@ export default defineComponent({
         is_active: true,
         applications: []
       },
+      createForm: {
+        name: '',
+        email: '',
+        integration_code: '',
+        applications: [
+          { id: '', commission_percentage: 0.2, commission_release_days: 7 }
+        ]
+      },
+      createLoading: false,
+      createError: '',
       editLoading: false,
       editError: ''
     }
@@ -231,6 +304,19 @@ export default defineComponent({
     toggleDropdown(id: number) {
       this.dropdownOpen = this.dropdownOpen === id ? null : id
     },
+    async handleNewAffiliate() {
+      this.editingAffiliate = null
+      this.createForm = {
+        name: '',
+        email: '',
+        integration_code: '',
+        applications: [
+          { id: '', commission_percentage: 0.2, commission_release_days: 7 }
+        ]
+      }
+      this.createError = ''
+      this.showCreateModal = true
+    },
     async handleAction(id: number, action: string) {
       switch (action) {
         case 'editar': {
@@ -272,6 +358,43 @@ export default defineComponent({
       } finally {
         this.editLoading = false
       }
+    },
+    removeEditApp(idx) {
+      this.editForm.applications.splice(idx, 1)
+    },
+    addEditApp() {
+      this.editForm.applications.push({ id: '', commission_percentage: 0.2, commission_release_days: 7 })
+    },
+    async createAffiliate() {
+      this.createLoading = true
+      this.createError = ''
+      try {
+        // Monta payload conforme esperado pelo endpoint
+        const payload = {
+          name: this.createForm.name,
+          email: this.createForm.email,
+          integration_code: this.createForm.integration_code,
+          applications: this.createForm.applications.map(app => ({
+            id: app.id,
+            commission_percentage: app.commission_percentage,
+            commission_release_days: app.commission_release_days
+          }))
+        }
+        await managerService.affiliates.create(payload)
+        // Atualiza lista de afiliados
+        await this.handleSearch('')
+        this.showCreateModal = false
+      } catch (e) {
+        this.createError = 'Erro ao criar afiliado.'
+      } finally {
+        this.createLoading = false
+      }
+    },
+    addApp() {
+      this.createForm.applications.push({ id: '', commission_percentage: 0.2, commission_release_days: 7 })
+    },
+    removeApp(idx) {
+      this.createForm.applications.splice(idx, 1)
     }
   }
 })
