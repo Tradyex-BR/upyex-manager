@@ -25,19 +25,13 @@ Chart.register(
 );
 
 // Define a interface para os dados de entrada
-interface ChartDataItem {
-  label: string
-  value: number
-}
-
 interface ChartInputData {
-  status?: string // Status geral (opcional, não usado diretamente no gráfico)
-  data: ChartDataItem[]
+  label: string;
+  value: number;
 }
 
-// Define as props
 const props = defineProps<{
-  data: ChartInputData
+  data: ChartInputData[];
 }>()
 
 const chartRef = ref<HTMLCanvasElement | null>(null)
@@ -73,8 +67,8 @@ const formatLabel = (label: string) => {
 
 // Computa os dados formatados para o gráfico
 const chartConfigData = computed(() => {
-    const labels = props.data.data.map(item => formatLabel(item.label));
-    const values = props.data.data.map(item => item.value);
+    const labels = props.data.map(item => formatLabel(item.label));
+    const values = props.data.map(item => item.value);
     
     // Calcula o total para porcentagens
     const total = values.reduce((sum, value) => sum + value, 0);
@@ -197,7 +191,7 @@ watch(() => props.data, () => {
 
 onMounted(() => {
   // Garante que os dados iniciais existam antes de criar
-  if (props.data && props.data.data) {
+  if (props.data) {
       createOrUpdateChart()
   }
 })

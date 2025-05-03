@@ -25,13 +25,13 @@ import { ptBR } from 'date-fns/locale';
 
 // Define a interface para os dados
 interface ChartData {
-  date: string
-  count: number
+  date: string;
+  count: number;
 }
 
 // Define as props
 const props = defineProps<{
-  data?: ChartData[]
+  data: ChartData[];
 }>()
 
 // Registra os componentes necessários, incluindo TimeScale e Filler
