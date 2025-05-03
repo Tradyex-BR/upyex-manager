@@ -20,44 +20,73 @@
               <table class="w-full text-white border-collapse">
                 <thead>
                   <tr class="bg-[#1A1F3C]">
-                    <th class="p-4 text-left">Token</th>
+                    <th class="p-4 text-left">Aplicação</th>
+                    <th class="p-4 text-left">Descrição</th>
                     <th class="p-4 text-left">Status</th>
-                    <th class="p-4 text-left">Link direto</th>
+                    <th class="p-4 text-left">Afiliados</th>
+                    <th class="p-4 text-left">Criado em</th>
+                    <th class="p-4 text-left">Ações</th>
                   </tr>
                 </thead>
                 <tbody>
-                  <tr v-for="offer in offers" :key="offer.id" class="border-b border-[#1A1F3C]">
+                  <tr v-for="offer in offers" :key="offer.id" class="border-b border-[#1A1F3C] hover:bg-[#2A2F4C] transition-colors">
                     <td class="p-4">
                       <div class="flex items-center gap-3">
                         <img 
-                          :src="`https://ui-avatars.com/api/?name=${offer.name}&background=random`" 
+                          :src="offer.logo_url || `https://ui-avatars.com/api/?name=${offer.name}&background=random`" 
                           :alt="offer.name" 
-                          class="w-10 h-10 rounded-full"
+                          class="w-10 h-10 rounded-full object-cover"
                         />
                         <div class="flex flex-col">
                           <span class="font-semibold">{{ offer.name }}</span>
-                          <span class="text-sm text-gray-400">${{ offer.name.toUpperCase() }}</span>
+                          <span class="text-sm text-gray-400">ID: {{ offer.id.slice(0, 8) }}...</span>
                         </div>
                       </div>
                     </td>
                     <td class="p-4">
-                      <span :class="getStatusClass(offer.is_active)">{{ offer.is_active ? 'Ativa' : 'Inativa' }}</span>
+                      <p class="text-gray-300 line-clamp-2">{{ offer.description }}</p>
+                    </td>
+                    <td class="p-4">
+                      <span :class="getStatusClass(offer.is_active)">
+                        <i :class="['fas mr-2', offer.is_active ? 'fa-check-circle' : 'fa-ban']"></i>
+                        {{ offer.is_active ? 'Ativa' : 'Inativa' }}
+                      </span>
+                    </td>
+                    <td class="p-4">
+                      <div class="flex items-center gap-2">
+                        <i class="fas fa-users text-[#CF631C]"></i>
+                        <span>{{ offer.affiliates?.length || 0 }} afiliados</span>
+                      </div>
+                    </td>
+                    <td class="p-4">
+                      <div class="flex items-center gap-2">
+                        <i class="fas fa-calendar text-[#CF631C]"></i>
+                        <span>{{ new Date(offer.created_at).toLocaleDateString('pt-BR') }}</span>
+                      </div>
                     </td>
                     <td class="p-4">
                       <div class="relative">
-                        <button class="px-3 py-1 bg-[#1A1F3C] rounded-lg hover:bg-[#2A2F4C] transition-colors"
+                        <button class="px-3 py-1 bg-[#1A1F3C] rounded-lg hover:bg-[#2A2F4C] transition-colors flex items-center gap-2"
                           @click="toggleDropdown(offer.id)">
+                          <i class="fas fa-ellipsis-v"></i>
                           Ações
                         </button>
                         <div v-if="dropdownOpen === offer.id"
-                          class="absolute right-0 mt-2 w-48 bg-[#1a1a1a] rounded-lg shadow-lg z-10">
-                          <button class="w-full text-left px-4 py-2 hover:bg-[#2A2F4C] text-green-500"
+                          class="absolute right-0 mt-2 w-48 bg-[#1a1a2a] rounded-lg shadow-lg z-10 border border-[#2A2F4C]">
+                          <button class="w-full text-left px-4 py-2 hover:bg-[#2A2F4C] text-green-500 flex items-center gap-2"
                             @click="showOfferDetails(offer)">
+                            <i class="fas fa-eye"></i>
                             Visualizar detalhes
                           </button>
-                          <button class="w-full text-left px-4 py-2 hover:bg-[#2A2F4C] text-blue-500"
+                          <button class="w-full text-left px-4 py-2 hover:bg-[#2A2F4C] text-blue-500 flex items-center gap-2"
                             @click="copyToClipboard(offer.affiliate_link)">
+                            <i class="fas fa-copy"></i>
                             Copiar link
+                          </button>
+                          <button v-if="role === 'manager'" class="w-full text-left px-4 py-2 hover:bg-[#2A2F4C] text-yellow-500 flex items-center gap-2"
+                            @click="openEditModal(offer)">
+                            <i class="fas fa-edit"></i>
+                            Editar
                           </button>
                         </div>
                       </div>
@@ -74,15 +103,15 @@
 
   <!-- Modal de Detalhes da Oferta -->
   <div v-if="showDetailsModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60">
-    <div class="bg-[#23263a] rounded-lg p-8 w-full max-w-4xl relative">
+    <div class="bg-[#23263a] rounded-lg p-8 w-full max-w-4xl relative max-h-[90vh] overflow-y-auto">
       <!-- Header -->
-      <div class="flex justify-between items-center mb-8 border-b border-[#1A1F3C] pb-4">
+      <div class="flex justify-between items-center mb-8 border-b border-[#2A2F4C] pb-4">
         <div class="flex items-center gap-4">
           <div class="w-12 h-12 rounded-full bg-[#CF631C] flex items-center justify-center">
             <i class="fas fa-box text-white text-xl"></i>
           </div>
           <div>
-            <h2 class="text-xl font-bold text-white">{{ selectedOffer?.name }}</h2>
+            <h2 class="text-2xl font-bold text-white">{{ selectedOffer?.name }}</h2>
             <p class="text-gray-400 text-sm">{{ selectedOffer?.description }}</p>
           </div>
         </div>
@@ -93,14 +122,19 @@
 
       <!-- Status Badge -->
       <div class="mb-8">
-        <span :class="getStatusClass(selectedOffer?.is_active)">
-          <i :class="['fas mr-2', selectedOffer?.is_active ? 'fa-check-circle' : 'fa-ban']"></i>
+        <span :class="[
+          'px-4 py-2 rounded-full text-sm font-medium flex items-center gap-2',
+          selectedOffer?.is_active 
+            ? 'bg-green-500/20 text-green-500' 
+            : 'bg-red-500/20 text-red-500'
+        ]">
+          <i :class="['fas', selectedOffer?.is_active ? 'fa-check-circle' : 'fa-ban']"></i>
           {{ selectedOffer?.is_active ? 'Ativa' : 'Inativa' }}
         </span>
       </div>
 
       <!-- Main Content -->
-      <div class="grid grid-cols-2 gap-8 mb-8">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
         <!-- Informações Básicas -->
         <div class="bg-[#1a1a2a] rounded-xl p-6">
           <h3 class="text-white text-lg font-semibold mb-6 flex items-center gap-2">
@@ -126,6 +160,15 @@
                 <p class="text-white font-medium">{{ selectedOffer?.description }}</p>
               </div>
             </div>
+            <div class="flex items-center gap-4">
+              <div class="w-10 h-10 rounded-lg bg-[#23263a] flex items-center justify-center">
+                <i class="fas fa-image text-[#CF631C]"></i>
+              </div>
+              <div>
+                <label class="text-gray-400 text-sm">URL do Logo</label>
+                <p class="text-white font-medium">{{ selectedOffer?.logo_url || 'Não definido' }}</p>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -136,34 +179,24 @@
             Links
           </h3>
           <div class="space-y-6">
-            <div class="flex items-center gap-4">
-              <div class="w-10 h-10 rounded-lg bg-[#23263a] flex items-center justify-center">
-                <i class="fas fa-external-link-alt text-[#CF631C]"></i>
-              </div>
-              <div class="flex-1">
-                <label class="text-gray-400 text-sm">Link de Afiliado</label>
-                <div class="flex items-center gap-2 bg-[#23263a] rounded-lg p-2">
-                  <p class="text-white font-medium truncate flex-1">{{ selectedOffer?.affiliate_link }}</p>
-                  <button @click="copyToClipboard(selectedOffer?.affiliate_link)" 
-                    class="text-[#CF631C] hover:text-[#E67E22] transition-colors p-1">
-                    <i class="fas fa-copy"></i>
-                  </button>
-                </div>
+            <div>
+              <label class="text-gray-400 text-sm mb-2 block">Link de Afiliado</label>
+              <div class="flex items-center gap-2 bg-[#23263a] rounded-lg p-3">
+                <p class="text-white font-medium break-all">{{ selectedOffer?.affiliate_link }}</p>
+                <button @click="copyToClipboard(selectedOffer?.affiliate_link)" 
+                  class="text-[#CF631C] hover:text-[#E67E22] transition-colors p-2 hover:bg-[#23263a] rounded-lg flex-shrink-0">
+                  <i class="fas fa-copy"></i>
+                </button>
               </div>
             </div>
-            <div class="flex items-center gap-4">
-              <div class="w-10 h-10 rounded-lg bg-[#23263a] flex items-center justify-center">
-                <i class="fas fa-code text-[#CF631C]"></i>
-              </div>
-              <div class="flex-1">
-                <label class="text-gray-400 text-sm">API Link</label>
-                <div class="flex items-center gap-2 bg-[#23263a] rounded-lg p-2">
-                  <p class="text-white font-medium truncate flex-1">{{ selectedOffer?.links?.api }}</p>
-                  <button @click="copyToClipboard(selectedOffer?.links?.api)" 
-                    class="text-[#CF631C] hover:text-[#E67E22] transition-colors p-1">
-                    <i class="fas fa-copy"></i>
-                  </button>
-                </div>
+            <div>
+              <label class="text-gray-400 text-sm mb-2 block">API Link</label>
+              <div class="flex items-center gap-2 bg-[#23263a] rounded-lg p-3">
+                <p class="text-white font-medium break-all">{{ selectedOffer?.links?.api }}</p>
+                <button @click="copyToClipboard(selectedOffer?.links?.api)" 
+                  class="text-[#CF631C] hover:text-[#E67E22] transition-colors p-2 hover:bg-[#23263a] rounded-lg flex-shrink-0">
+                  <i class="fas fa-copy"></i>
+                </button>
               </div>
             </div>
           </div>
@@ -197,7 +230,7 @@
       </div>
 
       <!-- Informações do Secret (apenas para manager) -->
-      <div v-if="role === 'manager'" class="bg-[#1a1a2a] rounded-xl p-6">
+      <div v-if="role === 'manager'" class="bg-[#1a1a2a] rounded-xl p-6 mt-8">
         <h3 class="text-white text-lg font-semibold mb-6 flex items-center gap-2">
           <i class="fas fa-shield-alt text-[#CF631C]"></i>
           API Secret
@@ -208,10 +241,10 @@
           </div>
           <div class="flex-1">
             <label class="text-gray-400 text-sm">Secret Key</label>
-            <div class="flex items-center gap-2 bg-[#23263a] rounded-lg p-2">
+            <div class="flex items-center gap-2 bg-[#23263a] rounded-lg p-3">
               <p class="text-white font-medium truncate flex-1">{{ selectedOffer?.api_secret }}</p>
               <button @click="copyToClipboard(selectedOffer?.api_secret)" 
-                class="text-[#CF631C] hover:text-[#E67E22] transition-colors p-1">
+                class="text-[#CF631C] hover:text-[#E67E22] transition-colors p-2 hover:bg-[#23263a] rounded-lg">
                 <i class="fas fa-copy"></i>
               </button>
             </div>
@@ -223,53 +256,97 @@
 
   <!-- Modal de Edição de Aplicação -->
   <div v-if="showEditModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60">
-    <div class="bg-[#23263a] rounded-lg p-8 w-full max-w-2xl relative">
-      <div class="flex justify-between items-center mb-6">
-        <h2 class="text-xl font-bold text-white">Editar Aplicação</h2>
+    <div class="bg-[#23263a] rounded-lg p-8 w-full max-w-2xl relative max-h-[90vh] overflow-y-auto">
+      <!-- Header -->
+      <div class="flex justify-between items-center mb-8 border-b border-[#2A2F4C] pb-4">
+        <div class="flex items-center gap-4">
+          <div class="w-12 h-12 rounded-full bg-[#CF631C] flex items-center justify-center">
+            <i class="fas fa-edit text-white text-xl"></i>
+          </div>
+          <div>
+            <h2 class="text-2xl font-bold text-white">Editar Aplicação</h2>
+            <p class="text-gray-400 text-sm">Atualize as informações da aplicação</p>
+          </div>
+        </div>
         <button @click="showEditModal = false" class="text-gray-400 hover:text-white transition-colors">
           <i class="fas fa-times text-xl"></i>
         </button>
       </div>
 
       <form @submit.prevent="handleEditApplication" class="space-y-6">
-        <div class="grid grid-cols-2 gap-4">
-          <div>
-            <label class="block text-gray-400 mb-2">Nome</label>
-            <input v-model="editingApplication.name" type="text" required
-              class="w-full bg-[#1a1a2a] text-white rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#CF631C]">
-          </div>
-          <div>
-            <label class="block text-gray-400 mb-2">Descrição</label>
-            <input v-model="editingApplication.description" type="text" required
-              class="w-full bg-[#1a1a2a] text-white rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#CF631C]">
-          </div>
-          <div>
-            <label class="block text-gray-400 mb-2">URL do Logo</label>
-            <input v-model="editingApplication.logo_url" type="url"
-              class="w-full bg-[#1a1a2a] text-white rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#CF631C]">
-          </div>
-          <div>
-            <label class="block text-gray-400 mb-2">Link Base de Afiliado</label>
-            <input v-model="editingApplication.base_affiliate_link" type="url" required
-              class="w-full bg-[#1a1a2a] text-white rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#CF631C]">
-          </div>
-          <div>
-            <label class="block text-gray-400 mb-2">Status</label>
-            <select v-model="editingApplication.is_active"
-              class="w-full bg-[#1a1a2a] text-white rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#CF631C]">
-              <option :value="true">Ativa</option>
-              <option :value="false">Inativa</option>
-            </select>
+        <!-- Informações Básicas -->
+        <div class="bg-[#1a1a2a] rounded-xl p-6">
+          <h3 class="text-white text-lg font-semibold mb-6 flex items-center gap-2">
+            <i class="fas fa-info-circle text-[#CF631C]"></i>
+            Informações Básicas
+          </h3>
+          <div class="grid grid-cols-2 gap-6">
+            <div>
+              <label class="block text-gray-400 mb-2">Nome</label>
+              <div class="relative">
+                <i class="fas fa-tag absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                <input v-model="editingApplication.name" type="text" required
+                  class="w-full bg-[#23263a] text-white rounded-lg pl-10 pr-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#CF631C]">
+              </div>
+            </div>
+            <div>
+              <label class="block text-gray-400 mb-2">Descrição</label>
+              <div class="relative">
+                <i class="fas fa-align-left absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                <input v-model="editingApplication.description" type="text" required
+                  class="w-full bg-[#23263a] text-white rounded-lg pl-10 pr-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#CF631C]">
+              </div>
+            </div>
           </div>
         </div>
 
+        <!-- Configurações -->
+        <div class="bg-[#1a1a2a] rounded-xl p-6">
+          <h3 class="text-white text-lg font-semibold mb-6 flex items-center gap-2">
+            <i class="fas fa-cogs text-[#CF631C]"></i>
+            Configurações
+          </h3>
+          <div class="grid grid-cols-2 gap-6">
+            <div>
+              <label class="block text-gray-400 mb-2">URL do Logo</label>
+              <div class="relative">
+                <i class="fas fa-image absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                <input v-model="editingApplication.logo_url" type="url"
+                  class="w-full bg-[#23263a] text-white rounded-lg pl-10 pr-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#CF631C]">
+              </div>
+            </div>
+            <div>
+              <label class="block text-gray-400 mb-2">Link Base de Afiliado</label>
+              <div class="relative">
+                <i class="fas fa-link absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                <input v-model="editingApplication.base_affiliate_link" type="url" required
+                  class="w-full bg-[#23263a] text-white rounded-lg pl-10 pr-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#CF631C]">
+              </div>
+            </div>
+            <div>
+              <label class="block text-gray-400 mb-2">Status</label>
+              <div class="relative">
+                <i class="fas fa-toggle-on absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                <select v-model="editingApplication.is_active"
+                  class="w-full bg-[#23263a] text-white rounded-lg pl-10 pr-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#CF631C]">
+                  <option :value="true">Ativa</option>
+                  <option :value="false">Inativa</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Botões de Ação -->
         <div class="flex justify-end gap-4 mt-6">
           <button type="button" @click="showEditModal = false"
-            class="px-6 py-2 bg-gray-600 hover:bg-gray-700 rounded-lg text-white font-medium transition-colors">
+            class="px-6 py-3 bg-gray-600 hover:bg-gray-700 rounded-lg text-white font-medium transition-colors flex items-center gap-2">
+            <i class="fas fa-times"></i>
             Cancelar
           </button>
           <button type="submit"
-            class="px-6 py-2 bg-[#CF631C] hover:bg-[#E67E22] rounded-lg text-white font-medium transition-colors">
+            class="px-6 py-3 bg-[#CF631C] hover:bg-[#E67E22] rounded-lg text-white font-medium transition-colors flex items-center gap-2">
+            <i class="fas fa-save"></i>
             Salvar Alterações
           </button>
         </div>

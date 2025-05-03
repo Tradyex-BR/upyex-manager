@@ -74,50 +74,100 @@
 
   <!-- Modal de criação de afiliado -->
   <div v-if="showCreateModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60">
-    <div class="bg-[#23263a] rounded-lg p-8 w-full max-w-lg relative">
-      <h2 class="text-xl font-bold mb-4 text-white">Criar Afiliado</h2>
-      <form @submit.prevent="createAffiliate">
-        <div class="mb-4">
-          <label class="block text-white mb-1">Nome</label>
-          <input v-model="createForm.name" class="w-full px-3 py-2 rounded bg-[#181a2a] text-white" required />
+    <div class="bg-[#23263a] rounded-lg p-8 w-full max-w-4xl relative max-h-[90vh] overflow-y-auto">
+      <div class="flex justify-between items-center mb-8 border-b border-[#2A2F4C] pb-4">
+        <div class="flex items-center gap-3">
+          <i class="fas fa-user-plus text-[#CF631C] text-2xl"></i>
+          <h2 class="text-2xl font-bold text-white">Criar Afiliado</h2>
         </div>
-        <div class="mb-4">
-          <label class="block text-white mb-1">E-mail</label>
-          <input v-model="createForm.email" type="email" class="w-full px-3 py-2 rounded bg-[#181a2a] text-white"
-            required />
-        </div>
-        <div class="mb-4">
-          <label class="block text-white mb-1">Código de Integração</label>
-          <input v-model="createForm.integration_code" class="w-full px-3 py-2 rounded bg-[#181a2a] text-white"
-            required />
-        </div>
-        <div class="mb-4">
-          <label class="block text-white mb-1">Aplicações</label>
-          <div v-for="(app, idx) in createForm.applications" :key="app.id" class="mb-2 p-2 bg-[#1a1a2a] rounded">
-            <div class="mb-1">
-              <label class="block text-white mb-1">ID da Aplicação</label>
-              <input v-model="app.id" class="w-full px-3 py-2 rounded bg-[#181a2a] text-white" required />
+        <button @click="showCreateModal = false" class="text-gray-400 hover:text-white transition-colors">
+          <i class="fas fa-times text-xl"></i>
+        </button>
+      </div>
+
+      <form @submit.prevent="createAffiliate" class="space-y-6">
+        <div class="grid grid-cols-2 gap-6">
+          <div class="space-y-4">
+            <div>
+              <label class="block text-white mb-2 font-medium">Nome</label>
+              <div class="relative">
+                <i class="fas fa-user absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                <input v-model="createForm.name" class="w-full pl-10 pr-3 py-2 rounded bg-[#23263a] text-white border border-[#2A2F4C] focus:border-[#CF631C] focus:outline-none transition-colors" required />
+              </div>
             </div>
-            <div class="mb-1">
-              <label class="block text-white mb-1">% Comissão</label>
-              <input v-model.number="app.commission_percentage" type="number" step="0.01" min="0" max="1"
-                class="w-full px-3 py-2 rounded bg-[#181a2a] text-white" required />
+            <div>
+              <label class="block text-white mb-2 font-medium">E-mail</label>
+              <div class="relative">
+                <i class="fas fa-envelope absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                <input v-model="createForm.email" type="email" class="w-full pl-10 pr-3 py-2 rounded bg-[#23263a] text-white border border-[#2A2F4C] focus:border-[#CF631C] focus:outline-none transition-colors" required />
+              </div>
             </div>
-            <div class="mb-1">
-              <label class="block text-white mb-1">Dias para Liberação</label>
-              <input v-model.number="app.commission_release_days" type="number" min="0"
-                class="w-full px-3 py-2 rounded bg-[#181a2a] text-white" required />
-            </div>
-            <button type="button" class="text-red-400 mt-1 text-xs underline" @click="removeApp(idx)">Remover</button>
           </div>
-          <button type="button" class="bg-blue-600 text-white px-2 py-1 rounded mt-2" @click="addApp">Adicionar
-            Aplicação</button>
+          <div class="space-y-4">
+            <div>
+              <label class="block text-white mb-2 font-medium">Código de Integração</label>
+              <div class="relative">
+                <i class="fas fa-code absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                <input v-model="createForm.integration_code" class="w-full pl-10 pr-3 py-2 rounded bg-[#23263a] text-white border border-[#2A2F4C] focus:border-[#CF631C] focus:outline-none transition-colors" required />
+              </div>
+            </div>
+          </div>
         </div>
-        <div v-if="createError" class="text-red-500 mb-2">{{ createError }}</div>
-        <div class="flex justify-end gap-2">
-          <button type="button" @click="showCreateModal = false"
-            class="px-4 py-2 bg-gray-600 text-white rounded">Cancelar</button>
-          <button type="submit" :disabled="createLoading" class="px-4 py-2 bg-green-600 text-white rounded">
+
+        <div class="mt-8">
+          <div class="flex items-center gap-3 mb-4">
+            <i class="fas fa-mobile-alt text-[#CF631C]"></i>
+            <label class="block text-white font-medium">Aplicações</label>
+          </div>
+          <div v-for="(app, idx) in createForm.applications" :key="idx" class="mb-4 p-4 bg-[#23263a] rounded-lg border border-[#2A2F4C]">
+            <div class="grid grid-cols-3 gap-4">
+              <div>
+                <label class="block text-xs text-gray-400 mb-1">ID da Aplicação</label>
+                <div class="relative">
+                  <i class="fas fa-hashtag absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                  <input v-model="app.id" class="w-full pl-10 pr-3 py-2 rounded bg-[#1a1a2a] text-white border border-[#2A2F4C] focus:border-[#CF631C] focus:outline-none transition-colors" required />
+                </div>
+              </div>
+              <div>
+                <label class="block text-xs text-gray-400 mb-1">% Comissão</label>
+                <div class="relative">
+                  <i class="fas fa-percent absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                  <input v-model.number="app.commission_percentage" type="number" step="0.01" min="0" max="1"
+                    class="w-full pl-10 pr-3 py-2 rounded bg-[#1a1a2a] text-white border border-[#2A2F4C] focus:border-[#CF631C] focus:outline-none transition-colors" required />
+                </div>
+              </div>
+              <div>
+                <label class="block text-xs text-gray-400 mb-1">Dias para Liberação</label>
+                <div class="relative">
+                  <i class="fas fa-calendar-day absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                  <input v-model.number="app.commission_release_days" type="number" min="0"
+                    class="w-full pl-10 pr-3 py-2 rounded bg-[#1a1a2a] text-white border border-[#2A2F4C] focus:border-[#CF631C] focus:outline-none transition-colors" required />
+                </div>
+              </div>
+            </div>
+            <button type="button" class="text-red-400 mt-3 text-sm hover:text-red-300 transition-colors flex items-center gap-1" @click="removeApp(idx)">
+              <i class="fas fa-trash-alt"></i>
+              Remover
+            </button>
+          </div>
+          <button type="button" class="bg-blue-600 text-white px-4 py-2 rounded-lg mt-4 hover:bg-blue-700 transition-colors flex items-center gap-2" @click="addApp">
+            <i class="fas fa-plus"></i>
+            Adicionar Aplicação
+          </button>
+        </div>
+
+        <div v-if="createError" class="mt-4 p-3 bg-red-500/20 text-red-500 rounded-lg flex items-center gap-2">
+          <i class="fas fa-exclamation-circle"></i>
+          {{ createError }}
+        </div>
+
+        <div class="flex justify-end gap-3 mt-8 pt-4 border-t border-[#2A2F4C]">
+          <button type="button" class="px-6 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors flex items-center gap-2" @click="showCreateModal = false">
+            <i class="fas fa-times"></i>
+            Cancelar
+          </button>
+          <button type="submit" class="px-6 py-2 bg-[#CF631C] text-white rounded-lg hover:bg-[#B5520A] transition-colors flex items-center gap-2" :disabled="createLoading">
+            <i class="fas fa-save"></i>
             <span v-if="createLoading">Salvando...</span>
             <span v-else>Criar</span>
           </button>
@@ -128,59 +178,83 @@
 
   <!-- Modal de visualização/edição de afiliado -->
   <div v-if="showEditModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60">
-    <div class="bg-[#23263a] rounded-lg p-8 w-full max-w-4xl relative">
-      <div class="flex justify-between items-center mb-6">
-        <h2 class="text-xl font-bold text-white">Detalhes do Afiliado</h2>
-        <button @click="showEditModal = false" class="text-gray-400 hover:text-white">
-          <i class="fas fa-times"></i>
+    <div class="bg-[#23263a] rounded-lg p-8 w-full max-w-4xl relative max-h-[90vh] overflow-y-auto">
+      <div class="flex justify-between items-center mb-8 border-b border-[#2A2F4C] pb-4">
+        <div class="flex items-center gap-3">
+          <i class="fas fa-user-edit text-[#CF631C] text-2xl"></i>
+          <h2 class="text-2xl font-bold text-white">Detalhes do Afiliado</h2>
+        </div>
+        <button @click="showEditModal = false" class="text-gray-400 hover:text-white transition-colors">
+          <i class="fas fa-times text-xl"></i>
         </button>
       </div>
 
-      <div class="grid grid-cols-2 gap-6 mb-6">
-        <div class="bg-[#1a1a2a] rounded-lg p-4">
-          <h3 class="text-white text-lg font-semibold mb-4">Informações Básicas</h3>
-          <div class="space-y-4">
-            <div>
-              <label class="text-gray-400 text-sm">Nome</label>
-              <p class="text-white">{{ editingAffiliate?.name }}</p>
+      <div class="grid grid-cols-2 gap-8 mb-8">
+        <div class="bg-[#1a1a2a] rounded-lg p-6 shadow-lg">
+          <div class="flex items-center gap-3 mb-6">
+            <i class="fas fa-info-circle text-[#CF631C]"></i>
+            <h3 class="text-white text-lg font-semibold">Informações Básicas</h3>
+          </div>
+          <div class="space-y-6">
+            <div class="flex items-center gap-3">
+              <i class="fas fa-user text-gray-400 w-5"></i>
+              <div>
+                <label class="text-gray-400 text-sm block mb-1">Nome</label>
+                <p class="text-white font-medium">{{ editingAffiliate?.name }}</p>
+              </div>
             </div>
-            <div>
-              <label class="text-gray-400 text-sm">Email</label>
-              <p class="text-white">{{ editingAffiliate?.email }}</p>
+            <div class="flex items-center gap-3">
+              <i class="fas fa-envelope text-gray-400 w-5"></i>
+              <div>
+                <label class="text-gray-400 text-sm block mb-1">Email</label>
+                <p class="text-white font-medium">{{ editingAffiliate?.email }}</p>
+              </div>
             </div>
-            <div>
-              <label class="text-gray-400 text-sm">Código de Integração</label>
-              <p class="text-white">{{ editingAffiliate?.integration_code }}</p>
+            <div class="flex items-center gap-3">
+              <i class="fas fa-code text-gray-400 w-5"></i>
+              <div>
+                <label class="text-gray-400 text-sm block mb-1">Código de Integração</label>
+                <p class="text-white font-medium">{{ editingAffiliate?.integration_code }}</p>
+              </div>
             </div>
-            <div>
-              <label class="text-gray-400 text-sm">Status</label>
-              <span :class="editingAffiliate?.is_active ? 'px-2 py-1 rounded-full text-sm bg-green-500/20 text-green-500' : 'px-2 py-1 rounded-full text-sm bg-red-500/20 text-red-500'">
-                {{ editingAffiliate?.is_active ? 'Ativo' : 'Inativo' }}
-              </span>
+            <div class="flex items-center gap-3">
+              <i class="fas fa-toggle-on text-gray-400 w-5"></i>
+              <div>
+                <label class="text-gray-400 text-sm block mb-1">Status</label>
+                <span :class="editingAffiliate?.is_active ? 'px-3 py-1 rounded-full text-sm bg-green-500/20 text-green-500 font-medium' : 'px-3 py-1 rounded-full text-sm bg-red-500/20 text-red-500 font-medium'">
+                  {{ editingAffiliate?.is_active ? 'Ativo' : 'Inativo' }}
+                </span>
+              </div>
             </div>
-            <div>
-              <label class="text-gray-400 text-sm">Data de Cadastro</label>
-              <p class="text-white">{{ editingAffiliate?.created_at ? new Date(editingAffiliate.created_at).toLocaleDateString() : '-' }}</p>
+            <div class="flex items-center gap-3">
+              <i class="fas fa-calendar text-gray-400 w-5"></i>
+              <div>
+                <label class="text-gray-400 text-sm block mb-1">Data de Cadastro</label>
+                <p class="text-white font-medium">{{ editingAffiliate?.created_at ? new Date(editingAffiliate.created_at).toLocaleDateString() : '-' }}</p>
+              </div>
             </div>
           </div>
         </div>
 
-        <div class="bg-[#1a1a2a] rounded-lg p-4">
-          <h3 class="text-white text-lg font-semibold mb-4">Aplicações</h3>
+        <div class="bg-[#1a1a2a] rounded-lg p-6 shadow-lg">
+          <div class="flex items-center gap-3 mb-6">
+            <i class="fas fa-mobile-alt text-[#CF631C]"></i>
+            <h3 class="text-white text-lg font-semibold">Aplicações</h3>
+          </div>
           <div class="overflow-x-auto">
             <table class="w-full text-white border-collapse">
               <thead>
                 <tr class="bg-[#23263a]">
-                  <th class="p-2 text-left">ID da Aplicação</th>
-                  <th class="p-2 text-left">% Comissão</th>
-                  <th class="p-2 text-left">Dias para Liberação</th>
+                  <th class="p-3 text-left text-sm font-medium">ID da Aplicação</th>
+                  <th class="p-3 text-left text-sm font-medium">% Comissão</th>
+                  <th class="p-3 text-left text-sm font-medium">Dias para Liberação</th>
                 </tr>
               </thead>
               <tbody>
-                <tr v-for="app in editingAffiliate?.applications" :key="app.id" class="border-b border-[#23263a]">
-                  <td class="p-2">{{ app.id }}</td>
-                  <td class="p-2">{{ (app.commission_percentage * 100).toFixed(2) }}%</td>
-                  <td class="p-2">{{ app.commission_release_days }} dias</td>
+                <tr v-for="app in editingAffiliate?.applications" :key="app.id" class="border-b border-[#23263a] hover:bg-[#23263a]/50 transition-colors">
+                  <td class="p-3">{{ app.id }}</td>
+                  <td class="p-3">{{ (app.commission_percentage * 100).toFixed(2) }}%</td>
+                  <td class="p-3">{{ app.commission_release_days }} dias</td>
                 </tr>
               </tbody>
             </table>
@@ -188,60 +262,103 @@
         </div>
       </div>
 
-      <form @submit.prevent="saveAffiliateEdits" class="bg-[#1a1a2a] rounded-lg p-4">
-        <h3 class="text-white text-lg font-semibold mb-4">Editar Afiliado</h3>
-        <div class="grid grid-cols-2 gap-4">
-          <div>
-            <label class="block text-white mb-1">Nome</label>
-            <input v-model="editForm.name" class="w-full px-3 py-2 rounded bg-[#23263a] text-white" required />
-          </div>
-          <div>
-            <label class="block text-white mb-1">E-mail</label>
-            <input v-model="editForm.email" type="email" class="w-full px-3 py-2 rounded bg-[#23263a] text-white" required />
-          </div>
-          <div>
-            <label class="block text-white mb-1">Código de Integração</label>
-            <input v-model="editForm.integration_code" class="w-full px-3 py-2 rounded bg-[#23263a] text-white" required />
-          </div>
-          <div>
-            <label class="block text-white mb-1">Ativo?</label>
-            <select v-model="editForm.is_active" class="w-full px-3 py-2 rounded bg-[#23263a] text-white">
-              <option :value="true">Sim</option>
-              <option :value="false">Não</option>
-            </select>
-          </div>
+      <form @submit.prevent="saveAffiliateEdits" class="bg-[#1a1a2a] rounded-lg p-6 shadow-lg">
+        <div class="flex items-center gap-3 mb-6">
+          <i class="fas fa-edit text-[#CF631C]"></i>
+          <h3 class="text-white text-lg font-semibold">Editar Afiliado</h3>
         </div>
-
-        <div class="mt-4">
-          <label class="block text-white mb-2">Aplicações</label>
-          <div v-for="(app, idx) in editForm.applications" :key="app.id" class="mb-2 p-2 bg-[#23263a] rounded">
-            <div class="grid grid-cols-3 gap-2">
-              <div>
-                <label class="block text-xs text-gray-400">ID</label>
-                <input v-model="app.id" class="w-full px-2 py-1 rounded bg-[#1a1a2a] text-white" readonly />
-              </div>
-              <div>
-                <label class="block text-xs text-gray-400">% Comissão</label>
-                <input v-model.number="app.commission_percentage" type="number" step="0.01" min="0" max="1"
-                  class="w-full px-2 py-1 rounded bg-[#1a1a2a] text-white" />
-              </div>
-              <div>
-                <label class="block text-xs text-gray-400">Dias Liberação</label>
-                <input v-model.number="app.commission_release_days" type="number" min="0"
-                  class="w-full px-2 py-1 rounded bg-[#1a1a2a] text-white" />
+        <div class="grid grid-cols-2 gap-6">
+          <div class="space-y-4">
+            <div>
+              <label class="block text-white mb-2 font-medium">Nome</label>
+              <div class="relative">
+                <i class="fas fa-user absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                <input v-model="editForm.name" class="w-full pl-10 pr-3 py-2 rounded bg-[#23263a] text-white border border-[#2A2F4C] focus:border-[#CF631C] focus:outline-none transition-colors" required />
               </div>
             </div>
-            <button type="button" class="text-red-400 mt-1 text-xs underline" @click="removeEditApp(idx)">Remover</button>
+            <div>
+              <label class="block text-white mb-2 font-medium">E-mail</label>
+              <div class="relative">
+                <i class="fas fa-envelope absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                <input v-model="editForm.email" type="email" class="w-full pl-10 pr-3 py-2 rounded bg-[#23263a] text-white border border-[#2A2F4C] focus:border-[#CF631C] focus:outline-none transition-colors" required />
+              </div>
+            </div>
           </div>
-          <button type="button" class="bg-blue-600 text-white px-2 py-1 rounded mt-2" @click="addEditApp">Adicionar
-            Aplicação</button>
+          <div class="space-y-4">
+            <div>
+              <label class="block text-white mb-2 font-medium">Código de Integração</label>
+              <div class="relative">
+                <i class="fas fa-code absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                <input v-model="editForm.integration_code" class="w-full pl-10 pr-3 py-2 rounded bg-[#23263a] text-white border border-[#2A2F4C] focus:border-[#CF631C] focus:outline-none transition-colors" required />
+              </div>
+            </div>
+            <div>
+              <label class="block text-white mb-2 font-medium">Status</label>
+              <div class="relative">
+                <i class="fas fa-toggle-on absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                <select v-model="editForm.is_active" class="w-full pl-10 pr-3 py-2 rounded bg-[#23263a] text-white border border-[#2A2F4C] focus:border-[#CF631C] focus:outline-none transition-colors">
+                  <option :value="true">Ativo</option>
+                  <option :value="false">Inativo</option>
+                </select>
+              </div>
+            </div>
+          </div>
         </div>
 
-        <div v-if="editError" class="text-red-500 mb-2">{{ editError }}</div>
-        <div class="flex justify-end gap-2 mt-4">
-          <button type="button" class="px-4 py-2 bg-gray-500 rounded text-white" @click="showEditModal = false"
-            :disabled="editLoading">Cancelar</button>
-          <button type="submit" class="px-4 py-2 bg-green-600 rounded text-white" :disabled="editLoading">
+        <div class="mt-8">
+          <div class="flex items-center gap-3 mb-4">
+            <i class="fas fa-mobile-alt text-[#CF631C]"></i>
+            <label class="block text-white font-medium">Aplicações</label>
+          </div>
+          <div v-for="(app, idx) in editForm.applications" :key="app.id" class="mb-4 p-4 bg-[#23263a] rounded-lg border border-[#2A2F4C]">
+            <div class="grid grid-cols-3 gap-4">
+              <div>
+                <label class="block text-xs text-gray-400 mb-1">ID</label>
+                <div class="relative">
+                  <i class="fas fa-hashtag absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                  <input v-model="app.id" class="w-full pl-10 pr-3 py-2 rounded bg-[#1a1a2a] text-white border border-[#2A2F4C] focus:border-[#CF631C] focus:outline-none transition-colors" readonly />
+                </div>
+              </div>
+              <div>
+                <label class="block text-xs text-gray-400 mb-1">% Comissão</label>
+                <div class="relative">
+                  <i class="fas fa-percent absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                  <input v-model.number="app.commission_percentage" type="number" step="0.01" min="0" max="1"
+                    class="w-full pl-10 pr-3 py-2 rounded bg-[#1a1a2a] text-white border border-[#2A2F4C] focus:border-[#CF631C] focus:outline-none transition-colors" />
+                </div>
+              </div>
+              <div>
+                <label class="block text-xs text-gray-400 mb-1">Dias Liberação</label>
+                <div class="relative">
+                  <i class="fas fa-calendar-day absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                  <input v-model.number="app.commission_release_days" type="number" min="0"
+                    class="w-full pl-10 pr-3 py-2 rounded bg-[#1a1a2a] text-white border border-[#2A2F4C] focus:border-[#CF631C] focus:outline-none transition-colors" />
+                </div>
+              </div>
+            </div>
+            <button type="button" class="text-red-400 mt-3 text-sm hover:text-red-300 transition-colors flex items-center gap-1" @click="removeEditApp(idx)">
+              <i class="fas fa-trash-alt"></i>
+              Remover
+            </button>
+          </div>
+          <button type="button" class="bg-blue-600 text-white px-4 py-2 rounded-lg mt-4 hover:bg-blue-700 transition-colors flex items-center gap-2" @click="addEditApp">
+            <i class="fas fa-plus"></i>
+            Adicionar Aplicação
+          </button>
+        </div>
+
+        <div v-if="editError" class="mt-4 p-3 bg-red-500/20 text-red-500 rounded-lg flex items-center gap-2">
+          <i class="fas fa-exclamation-circle"></i>
+          {{ editError }}
+        </div>
+        
+        <div class="flex justify-end gap-3 mt-8 pt-4 border-t border-[#2A2F4C]">
+          <button type="button" class="px-6 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors flex items-center gap-2" @click="showEditModal = false" :disabled="editLoading">
+            <i class="fas fa-times"></i>
+            Cancelar
+          </button>
+          <button type="submit" class="px-6 py-2 bg-[#CF631C] text-white rounded-lg hover:bg-[#B5520A] transition-colors flex items-center gap-2" :disabled="editLoading">
+            <i class="fas fa-save"></i>
             <span v-if="editLoading">Salvando...</span>
             <span v-else>Salvar</span>
           </button>
@@ -258,6 +375,37 @@ import { managerService } from '@/services/managerService'
 import Sidebar from '@/components/layout/dashboard/Sidebar.vue'
 import TopBar from '@/components/layout/dashboard/TopBar.vue'
 import BaseButton from '@/components/common/BaseButton.vue'
+
+interface Application {
+  id: string;
+  commission_percentage: number;
+  commission_release_days: number;
+}
+
+interface Affiliate {
+  id: string;
+  name: string;
+  email: string;
+  integration_code: string;
+  is_active: boolean;
+  created_at: string;
+  applications: Application[];
+}
+
+interface EditForm {
+  name: string;
+  email: string;
+  integration_code: string;
+  is_active: boolean;
+  applications: Application[];
+}
+
+interface CreateForm {
+  name: string;
+  email: string;
+  integration_code: string;
+  applications: Application[];
+}
 
 export default defineComponent({
   props: {
@@ -277,19 +425,19 @@ export default defineComponent({
   },
   data() {
     return {
-      affiliates: [] as any[],
-      dropdownOpen: null as number | null,
+      affiliates: [] as Affiliate[],
+      dropdownOpen: null as string | null,
       loading: true,
       showEditModal: false,
       showCreateModal: false,
-      editingAffiliate: null,
+      editingAffiliate: null as Affiliate | null,
       editForm: {
         name: '',
         email: '',
         integration_code: '',
         is_active: true,
         applications: []
-      },
+      } as EditForm,
       createForm: {
         name: '',
         email: '',
@@ -297,7 +445,7 @@ export default defineComponent({
         applications: [
           { id: '', commission_percentage: 0.2, commission_release_days: 7 }
         ]
-      },
+      } as CreateForm,
       createLoading: false,
       createError: '',
       editLoading: false,
@@ -313,7 +461,7 @@ export default defineComponent({
         sort_by: 'name',
         sort_order: 'asc'
       });
-      this.affiliates = response.data || response; // ajuste conforme o retorno real
+      this.affiliates = (response.data || response) as Affiliate[];
     } catch (e) {
       // Trate erro se necessário
     } finally {
@@ -348,7 +496,7 @@ export default defineComponent({
           sort_by: 'name',
           sort_order: 'asc'
         });
-        this.affiliates = response.data || response;
+        this.affiliates = (response.data || response) as Affiliate[];
       } catch (e) {
         // Trate erro se necessário
       } finally {
@@ -363,7 +511,7 @@ export default defineComponent({
       }
       return classes[status as keyof typeof classes] || ''
     },
-    toggleDropdown(id: number) {
+    toggleDropdown(id: string) {
       this.dropdownOpen = this.dropdownOpen === id ? null : id
     },
     async handleNewAffiliate() {
@@ -379,7 +527,7 @@ export default defineComponent({
       this.createError = ''
       this.showCreateModal = true
     },
-    async handleAction(id: number, action: string) {
+    async handleAction(id: string, action: string) {
       switch (action) {
         case 'editar': {
           const affiliate = this.affiliates.find(a => a.id === id)
@@ -410,10 +558,11 @@ export default defineComponent({
       this.editLoading = true
       this.editError = ''
       try {
-        const url = `/manager/affiliates/${this.editingAffiliate.id}`
         await managerService.affiliates.update(this.editingAffiliate.id, this.editForm)
-        const idx = this.affiliates.findIndex(a => a.id === this.editingAffiliate.id)
-        if (idx !== -1) this.affiliates[idx] = { ...this.editingAffiliate, ...this.editForm }
+        const idx = this.affiliates.findIndex(a => a.id === this.editingAffiliate?.id)
+        if (idx !== -1 && this.editingAffiliate) {
+          this.affiliates[idx] = { ...this.editingAffiliate, ...this.editForm }
+        }
         this.showEditModal = false
       } catch (e) {
         this.editError = 'Erro ao atualizar afiliado.'
@@ -421,7 +570,7 @@ export default defineComponent({
         this.editLoading = false
       }
     },
-    removeEditApp(idx) {
+    removeEditApp(idx: number) {
       this.editForm.applications.splice(idx, 1)
     },
     addEditApp() {
@@ -431,7 +580,6 @@ export default defineComponent({
       this.createLoading = true
       this.createError = ''
       try {
-        // Monta payload conforme esperado pelo endpoint
         const payload = {
           name: this.createForm.name,
           email: this.createForm.email,
@@ -443,7 +591,6 @@ export default defineComponent({
           }))
         }
         await managerService.affiliates.create(payload)
-        // Atualiza lista de afiliados
         await this.handleSearch('')
         this.showCreateModal = false
       } catch (e) {
@@ -455,7 +602,7 @@ export default defineComponent({
     addApp() {
       this.createForm.applications.push({ id: '', commission_percentage: 0.2, commission_release_days: 7 })
     },
-    removeApp(idx) {
+    removeApp(idx: number) {
       this.createForm.applications.splice(idx, 1)
     }
   }
