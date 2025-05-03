@@ -1,6 +1,6 @@
 <template>
   <div
-    class="justify-between items-center bg-[#222A3F] flex min-w-60 flex-1 shrink basis-[0%] p-8 rounded-lg"
+    class="justify-between items-center bg-[#222A3F] flex min-w-60 flex-1 shrink basis-[0%] p-8 rounded-lg h-full"
     :class="{ 'border border-[#2C3652]': border }">
     <div class="self-stretch min-w-60 w-full flex-1 shrink basis-[0%] my-auto">
       <div class="flex w-full flex-col gap-[9px] items-stretch">

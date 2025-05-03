@@ -1,6 +1,6 @@
   <template>
     <!-- Adiciona cor de fundo e padding ao container -->
-    <div class="w-full h-full">
+    <div class="w-full h-[240px]">
       <canvas ref="chartRef"></canvas>
     </div>
   </template>

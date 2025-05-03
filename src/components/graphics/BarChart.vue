@@ -141,10 +141,8 @@ onBeforeUnmount(() => {
 <style scoped>
 .chart-container {
   width: 100%;
-  height: 300px;
-  min-height: 250px;
+  height: 240px;
   /* background-color: #202A3B; */
-  padding: 15px;
   border-radius: 4px;
   box-sizing: border-box;
 }

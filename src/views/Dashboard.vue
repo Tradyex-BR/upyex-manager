@@ -12,7 +12,7 @@
 
             <div v-if="currentView === 'cards'" class="flex flex-col gap-6 mt-6">
               <GraphicSection title="Vendas diárias" description="Quantidade de vendas nos últimos 15 dias"
-                class="h-[382px]">
+                class="min-h-[382px]">
                 <CartesianAxes v-if="chartData.length > 0" :data="chartData.filter(item => item.status === 'graph')" />
               </GraphicSection>
 
@@ -38,11 +38,11 @@
             <div v-else-if="currentView === 'list'">
               <div class="flex flex-row gap-6" v-if="role === 'manager'">
                 <GraphicSection title="Análise de clientes" description="Detalhes sobre base de clientes"
-                  class="w-[352px] h-[446px] mt-6">
-                  <DashboardCards v-if="customersData" :data="customersData" border vertical />
+                  class="max-w-[352px] max-h-[382px] mt-6 flex flex-col">
+                  <DashboardCards v-if="customersData" :data="customersData" border vertical class="flex-1 max-h-[116px]" gap=8 />
                 </GraphicSection>
                 <GraphicSection title="Status dos saques" description="Distribuição dos status por saque"
-                  class="w-full h-[446px] mt-6">
+                  class="w-full h-[382px] mt-6">
                   <BarChart v-if="withdrawalsData" :data="withdrawalsData" />
                 </GraphicSection>
               </div>
