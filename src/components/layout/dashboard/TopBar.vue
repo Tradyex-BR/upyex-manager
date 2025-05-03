@@ -15,7 +15,7 @@
 />
       </div>
       <div
-        class="font-inter text-[14px] leading-5 self-stretch flex min-w-60 items-center gap-[30px] text-white my-auto">
+        class="font-inter cursor-not-allowed text-[14px] leading-5 self-stretch flex min-w-60 items-center gap-[30px] text-white my-auto">
         <img
           src="https://cdn.builder.io/api/v1/image/assets/7f72b52c1e064ab59dcec351fcad2273/af02ba544c49dcfe6925b9408f10a84e26e396f2?placeholderIfAbsent=true"
           class="aspect-[2.44] object-contain w-[83px] self-stretch shrink-0" alt="Notifications" />
@@ -47,10 +47,10 @@ fill-rule="evenodd" clip-rule="evenodd"
           </div>
 
           <!-- Dropdown Menu -->
-          <div v-if="isDropdownOpen" class="absolute right-0 mt-2 w-48 bg-[#222A3F] rounded-md shadow-lg z-50">
+          <div v-if="isDropdownOpen" class="absolute right-0 mt-5 w-48 bg-[#222A3F] rounded-md shadow-lg z-50">
             
             <button class="w-full h-[48px] flex items-center gap-[10px] text-left p-3 text-sm text-gray-700 border-none bg-transparent" @click="handleLogout">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <!-- <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <g clip-path="url(#clip0_1147_3686)">
                   <path
 d="M19.0711 5.07108L4.92894 19.2132M4.92892 5.07108L19.0711 19.2132" stroke="#B8B8B8"
@@ -61,7 +61,7 @@ d="M19.0711 5.07108L4.92894 19.2132M4.92892 5.07108L19.0711 19.2132" stroke="#B8
                     <rect width="24" height="24" fill="white" />
                   </clipPath>
                 </defs>
-              </svg>
+              </svg> -->
               <span class="text-[#B8B8B8]">Sair</span>
             </button>
           </div>
