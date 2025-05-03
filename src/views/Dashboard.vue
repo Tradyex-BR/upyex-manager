@@ -1,6 +1,6 @@
 <template>
-  <div v-if="checkingAuth" class="flex w-full h-full items-center justify-center text-gray-400">
-    Carregando...
+  <div v-if="checkingAuth || dashboardLoading" class="flex w-full h-full items-center justify-center">
+    <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
   </div>
   <div v-else-if="authStore.isAuthenticated">
     <div class="gap-5 flex max-md:flex-col max-md:items-stretch">
@@ -80,7 +80,7 @@ const chartData = ref<any[]>([])
 const customersData = ref<any>({})
 const withdrawalsData = ref<any>({})
 const listData = ref<any[]>([])
-const dashboardLoading = ref(false)
+const dashboardLoading = ref(true)
 const dashboardError = ref('')
 const role = localStorage.getItem('role')
 const currentView = ref('cards')

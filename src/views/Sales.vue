@@ -1,6 +1,6 @@
 <template>
   <div v-if="loading" class="flex w-full h-full items-center justify-center text-gray-400">
-    Carregando...
+    <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
   </div>
   <div v-else class="overflow-hidden">
     <div class="gap-5 flex max-md:flex-col max-md:items-stretch">

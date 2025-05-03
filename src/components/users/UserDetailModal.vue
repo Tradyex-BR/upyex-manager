@@ -5,7 +5,9 @@
         &times;
       </button>
       <h2 class="text-xl font-bold mb-4 text-white">Detalhes do Usuário</h2>
-      <div v-if="loading" class="text-gray-300">Carregando...</div>
+      <div v-if="loading" class="flex items-center justify-center">
+        <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+      </div>
       <div v-else-if="error" class="text-red-400">Erro ao carregar dados.</div>
       <div v-else-if="user">
         <dl class="grid grid-cols-2 gap-x-4 gap-y-2 text-sm text-white">
