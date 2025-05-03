@@ -75,19 +75,26 @@ const formatLabel = (label: string) => {
 const chartConfigData = computed(() => {
     const labels = props.data.data.map(item => formatLabel(item.label));
     const values = props.data.data.map(item => item.value);
+    
+    // Calcula o total para porcentagens
+    const total = values.reduce((sum, value) => sum + value, 0);
+    const percentages = total > 0 // <-- CONDIÇÃO CHAVE
+        ? values.map(value => Math.round((value / total) * 100)) // <-- Cálculo normal
+        : values.map(() => 0); // <-- Fallback para 0% quando total é zero
+
     // Garante que temos cores suficientes, repetindo se necessário
     const backgroundColors = values.map((_, index) => chartColors[index % chartColors.length]);
 
     return {
         labels,
         datasets: [{
-            label: 'Status', // Label do dataset (pode aparecer no tooltip se ativado)
-            data: values,
+            label: 'Status',
+            data: percentages,
             backgroundColor: backgroundColors,
-            borderWidth: 0, // Remove borda padrão
-            spacing: 2,     // Adiciona um pequeno espaço entre segmentos
-            hoverOffset: 4, // Efeito ao passar o mouse (se tooltips/hover ativados)
-            hoverBorderColor: '#2C2E3E' // Cor da borda no hover (cor do fundo)
+            borderWidth: 0,
+            spacing: 2,
+            hoverOffset: 4,
+            hoverBorderColor: '#2C2E3E'
         }]
     };
 });

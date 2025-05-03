@@ -227,7 +227,7 @@ async function fetchDashboardData() {
       if (item.status === 'by_payment_method') {
         return item.data.methods && item.data.methods.length > 0
       }
-      return item.data && item.data.length > 0
+      return item.data && Array.isArray(item.data) && item.data.length > 0
     })
 
     // Dados para a lista

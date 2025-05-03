@@ -56,8 +56,8 @@ const props = defineProps<{
 const formattedData = computed(() => {
   if (!props.data?.data?.methods) return []
   
-  const totalPaid = props.data.data.totalPaid || 0
-  
+  const totalPaid = props.data.data.totalPaid || 0  
+
   return props.data.data.methods.map(item => ({
     ...item,
     percentage: totalPaid > 0 ? Math.round((item.value / totalPaid) * 100) : 0

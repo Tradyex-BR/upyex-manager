@@ -50,22 +50,8 @@ Chart.register(
 const chartRef = ref<HTMLCanvasElement | null>(null)
 let chartInstance: Chart | null = null
 
-// Dados de exemplo (usado apenas se não houver dados passados via props)
-const mockData = ref<ChartData[]>([
-  { date: '2024-04-24 00:00:00', count: 0 },
-  { date: '2024-04-24 06:00:00', count: 50 },
-  { date: '2024-04-24 12:00:00', count: 120 },
-  { date: '2024-04-24 18:00:00', count: 80 },
-  { date: '2024-04-25 00:00:00', count: 100 },
-  { date: '2024-04-25 06:00:00', count: 180 },
-  { date: '2024-04-25 12:00:00', count: 150 },
-  { date: '2024-04-25 18:00:00', count: 230 },
-  { date: '2024-04-25 20:00:00', count: 245 },
-  { date: '2024-04-25 22:00:00', count: 220 },
-  { date: '2024-04-26 00:00:00', count: 225 },
-  { date: '2024-04-26 06:00:00', count: 230 },
-  { date: '2024-04-26 12:00:00', count: 228 }
-])
+// Removendo os dados mockados que estavam causando o problema
+// const mockData = ref<ChartData[]>([...])
 
 // Cores baseadas na imagem
 const chartLineColor = '#F9A825'; // Laranja
@@ -85,9 +71,8 @@ const createOrUpdateChart = () => {
     chartInstance = null
   }
 
-  // Usa os dados das props se disponíveis, senão usa os dados mock
-  // const chartData = props.data || mockData.value
-  const chartData = mockData.value
+  // Usa APENAS os dados das props
+  const chartData = props.data || []
 
   // --- Estilos Padrão ---
 const defaultTextColor = '#B8B8B8';
@@ -140,63 +125,57 @@ const defaultFont: Partial<FontSpec> = { // Usa Partial<FontSpec> para tipagem
         // Eixo Y
         y: {
           beginAtZero: true,
-          max: 250, // Define o máximo como na imagem
+           suggestedMax: 250, // Mudando de max para suggestedMax
           grid: {
-            drawBorder: false, // Remove a linha do eixo Y
-            // display: false, // Descomente para remover completamente as linhas de grade Y
-            drawOnChartArea: true, // Mantem as linhas de grade (se houver) apenas na área do gráfico
-            color: chartGridColor, // Cor suave para linhas de grade (se visíveis)
+            drawBorder: false,
+            drawOnChartArea: true,
+            color: chartGridColor,
             lineWidth: 1,
-            borderDash: [3, 3], // Linhas tracejadas (opcional)
-            drawTicks: false, // Não desenha pequenas marcas no eixo
+            borderDash: [3, 3],
+            drawTicks: false,
           },
           ticks: {
-            color: defaultTextColor, // Aplica a cor padrão
-            font: defaultFont,       // Aplica a fonte padrão
+            color: defaultTextColor,
+            font: defaultFont,
             padding: 10,
-            // Mostra apenas alguns ticks (pode precisar de ajuste)
-            // maxTicksLimit: 3, // Tenta limitar a 0, ~125, 250
-            // Ou define explicitamente os valores que você quer mostrar:
             callback: function (value, index, ticks) {
-              // Mostra apenas 0 e 250 (ou o valor máximo real se for diferente)
-              if (value === 0 || value === 250) {
+              // Mostra apenas 0 e o valor máximo
+              if (value === 0 || value === this.getLabelForValue(this.max)) {
                 return value.toString();
               }
-              return ''; // Oculta outros labels
+              return '';
             },
-            stepSize: 125 // Ajuda a posicionar o 250 se o max for 250
+            stepSize: 125
           }
         },
         // Eixo X - Usando TimeScale
         x: {
-          type: 'time', // Define o tipo de escala
+          type: 'time',
           time: {
-            unit: 'day', // Agrupa os dados por dia para os rótulos
-            // Formato que aparece no eixo
+            unit: 'day',
             displayFormats: {
-              day: 'dd/MM' // Formato dia/mês
+              day: 'dd/MM'
             },
-            // Adapta o locale para ptBR (afeta nomes de meses/dias se usados)
             adapters: {
               date: {
                 locale: ptBR
               }
             },
-            // Formato para o tooltip (se habilitado)
-            tooltipFormat: 'dd/MM/yyyy HH:mm'
+            tooltipFormat: 'dd/MM/yyyy'
           },
           grid: {
-            display: false, // Remove linhas de grade verticais
-            drawBorder: false, // Remove a linha do eixo X
+            display: false,
+            drawBorder: false,
           },
           ticks: {
-            color: chartTickColor, // Cor das datas
+            color: chartTickColor,
             padding: 10,
-            maxRotation: 0, // Evita rotação das datas
+            maxRotation: 0,
             minRotation: 0,
-            // Pode ser necessário ajustar source: 'auto' ou 'labels' ou 'data'
-            // source: 'auto',
-          }
+            source: 'data'
+          },
+          min: props.data?.[0]?.date,
+          max: props.data?.[props.data.length - 1]?.date
         }
       },
       plugins: {
