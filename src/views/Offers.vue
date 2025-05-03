@@ -84,7 +84,7 @@
                             Copiar link
                           </button>
                           <button v-if="role === 'manager'" class="w-full text-left px-4 py-2 hover:bg-[#2A2F4C] text-yellow-500 flex items-center gap-2"
-                            @click="openEditModal(offer)">
+                            @click="navigateToEdit(offer)">
                             <i class="fas fa-edit"></i>
                             Editar
                           </button>
@@ -221,11 +221,6 @@
             <i class="fas fa-key"></i>
             Resetar Secret
           </button>
-          <button v-if="role === 'manager'" @click="openEditModal(selectedOffer)" 
-            class="flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 rounded-lg text-white font-medium transition-colors">
-            <i class="fas fa-edit"></i>
-            Editar Aplicação
-          </button>
         </div>
       </div>
 
@@ -251,106 +246,6 @@
           </div>
         </div>
       </div>
-    </div>
-  </div>
-
-  <!-- Modal de Edição de Aplicação -->
-  <div v-if="showEditModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60">
-    <div class="bg-[#23263a] rounded-lg p-8 w-full max-w-2xl relative max-h-[90vh] overflow-y-auto">
-      <!-- Header -->
-      <div class="flex justify-between items-center mb-8 border-b border-[#2A2F4C] pb-4">
-        <div class="flex items-center gap-4">
-          <div class="w-12 h-12 rounded-full bg-[#CF631C] flex items-center justify-center">
-            <i class="fas fa-edit text-white text-xl"></i>
-          </div>
-          <div>
-            <h2 class="text-2xl font-bold text-white">Editar Aplicação</h2>
-            <p class="text-gray-400 text-sm">Atualize as informações da aplicação</p>
-          </div>
-        </div>
-        <button @click="showEditModal = false" class="text-gray-400 hover:text-white transition-colors">
-          <i class="fas fa-times text-xl"></i>
-        </button>
-      </div>
-
-      <form @submit.prevent="handleEditApplication" class="space-y-6">
-        <!-- Informações Básicas -->
-        <div class="bg-[#1a1a2a] rounded-xl p-6">
-          <h3 class="text-white text-lg font-semibold mb-6 flex items-center gap-2">
-            <i class="fas fa-info-circle text-[#CF631C]"></i>
-            Informações Básicas
-          </h3>
-          <div class="grid grid-cols-2 gap-6">
-            <div>
-              <label class="block text-gray-400 mb-2">Nome</label>
-              <div class="relative">
-                <i class="fas fa-tag absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
-                <input v-model="editingApplication.name" type="text" required
-                  class="w-full bg-[#23263a] text-white rounded-lg pl-10 pr-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#CF631C]">
-              </div>
-            </div>
-            <div>
-              <label class="block text-gray-400 mb-2">Descrição</label>
-              <div class="relative">
-                <i class="fas fa-align-left absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
-                <input v-model="editingApplication.description" type="text" required
-                  class="w-full bg-[#23263a] text-white rounded-lg pl-10 pr-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#CF631C]">
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Configurações -->
-        <div class="bg-[#1a1a2a] rounded-xl p-6">
-          <h3 class="text-white text-lg font-semibold mb-6 flex items-center gap-2">
-            <i class="fas fa-cogs text-[#CF631C]"></i>
-            Configurações
-          </h3>
-          <div class="grid grid-cols-2 gap-6">
-            <div>
-              <label class="block text-gray-400 mb-2">URL do Logo</label>
-              <div class="relative">
-                <i class="fas fa-image absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
-                <input v-model="editingApplication.logo_url" type="url"
-                  class="w-full bg-[#23263a] text-white rounded-lg pl-10 pr-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#CF631C]">
-              </div>
-            </div>
-            <div>
-              <label class="block text-gray-400 mb-2">Link Base de Afiliado</label>
-              <div class="relative">
-                <i class="fas fa-link absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
-                <input v-model="editingApplication.base_affiliate_link" type="url" required
-                  class="w-full bg-[#23263a] text-white rounded-lg pl-10 pr-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#CF631C]">
-              </div>
-            </div>
-            <div>
-              <label class="block text-gray-400 mb-2">Status</label>
-              <div class="relative">
-                <i class="fas fa-toggle-on absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
-                <select v-model="editingApplication.is_active"
-                  class="w-full bg-[#23263a] text-white rounded-lg pl-10 pr-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#CF631C]">
-                  <option :value="true">Ativa</option>
-                  <option :value="false">Inativa</option>
-                </select>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Botões de Ação -->
-        <div class="flex justify-end gap-4 mt-6">
-          <button type="button" @click="showEditModal = false"
-            class="px-6 py-3 bg-gray-600 hover:bg-gray-700 rounded-lg text-white font-medium transition-colors flex items-center gap-2">
-            <i class="fas fa-times"></i>
-            Cancelar
-          </button>
-          <button type="submit"
-            class="px-6 py-3 bg-[#CF631C] hover:bg-[#E67E22] rounded-lg text-white font-medium transition-colors flex items-center gap-2">
-            <i class="fas fa-save"></i>
-            Salvar Alterações
-          </button>
-        </div>
-      </form>
     </div>
   </div>
 
@@ -410,6 +305,7 @@ import Sidebar from '@/components/layout/dashboard/Sidebar.vue'
 import TopBar from '@/components/layout/dashboard/TopBar.vue'
 import BaseButton from '@/components/common/BaseButton.vue'
 import { managerService } from '@/services/managerService'
+import { useRouter } from 'vue-router'
 
 export default defineComponent({
   props: {
@@ -427,7 +323,8 @@ export default defineComponent({
   setup() {
     const store = useDashboardStore()
     const loading = ref(true)
-    return { store, loading }
+    const router = useRouter()
+    return { store, loading, router }
   },
   data() {
     return {
@@ -435,16 +332,8 @@ export default defineComponent({
       loading: true,
       showCreateModal: false,
       showDetailsModal: false,
-      showEditModal: false,
       dropdownOpen: null as string | null,
       selectedOffer: null as any,
-      editingApplication: {
-        name: '',
-        description: '',
-        logo_url: null,
-        base_affiliate_link: '',
-        is_active: true
-      },
       newApplication: {
         name: '',
         description: '',
@@ -488,10 +377,7 @@ export default defineComponent({
     async handleCreateApplication() {
       try {
         await managerService.applications.create(this.newApplication);
-        
-        // Atualizar a lista de aplicações
         await this.handleSearch('');
-        
         this.showCreateModal = false;
         this.newApplication = {
           name: '',
@@ -545,26 +431,8 @@ export default defineComponent({
         this.$toast.error('Erro ao executar ação');
       }
     },
-    openEditModal(offer: any) {
-      this.editingApplication = {
-        name: offer.name,
-        description: offer.description,
-        logo_url: offer.logo_url,
-        base_affiliate_link: offer.base_affiliate_link,
-        is_active: offer.is_active
-      };
-      this.showEditModal = true;
-    },
-    async handleEditApplication() {
-      try {
-        await managerService.applications.update(this.selectedOffer.id, this.editingApplication);
-        this.$toast.success('Aplicação atualizada com sucesso!');
-        await this.loadOffers();
-        this.showEditModal = false;
-      } catch (error) {
-        console.error('Erro ao editar aplicação:', error);
-        this.$toast.error('Erro ao editar aplicação');
-      }
+    navigateToEdit(offer: any) {
+      this.router.push(`/offers/${offer.id}/edit`);
     },
     async loadOffers() {
       await this.handleSearch('');

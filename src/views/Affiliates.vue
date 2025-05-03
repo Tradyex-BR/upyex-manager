@@ -12,7 +12,7 @@
           <section class=" min-h-[944px] w-full overflow-hidden max-md:max-w-full max-md:px-5">
             <div class="flex justify-between items-center mb-6">
               <p class="text-white text-2xl font-semibold">Afiliados</p>
-              <BaseButton @click="handleNewAffiliate" class="bg-[#CF631C] cursor-pointer text-white font-bold py-2 px-4 rounded-lg transition-colors">
+              <BaseButton @click="openCreateModal" class="bg-[#CF631C] cursor-pointer text-white font-bold py-2 px-4 rounded-lg transition-colors">
                 Novo Afiliado
               </BaseButton>
             </div>
@@ -56,9 +56,10 @@
                         <div v-if="dropdownOpen === affiliate.id"
                           class="absolute right-0 mt-2 w-48 bg-[#1a1a1a] rounded-lg shadow-lg z-10">
                           <button class="w-full text-left px-4 py-2 hover:bg-[#2A2F4C] text-green-500"
-                            @click="handleAction(affiliate.id, 'editar')">
+                            @click="navigateToEdit(affiliate)">
                             Editar
                           </button>
+                       
                         </div>
                       </div>
                     </td>
@@ -85,7 +86,7 @@
         </button>
       </div>
 
-      <form @submit.prevent="createAffiliate" class="space-y-6">
+      <form @submit.prevent="handleCreate" class="space-y-6">
         <div class="grid grid-cols-2 gap-6">
           <div class="space-y-4">
             <div>
@@ -175,201 +176,11 @@
       </form>
     </div>
   </div>
-
-  <!-- Modal de visualização/edição de afiliado -->
-  <div v-if="showEditModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60">
-    <div class="bg-[#23263a] rounded-lg p-8 w-full max-w-4xl relative max-h-[90vh] overflow-y-auto">
-      <div class="flex justify-between items-center mb-8 border-b border-[#2A2F4C] pb-4">
-        <div class="flex items-center gap-3">
-          <i class="fas fa-user-edit text-[#CF631C] text-2xl"></i>
-          <h2 class="text-2xl font-bold text-white">Detalhes do Afiliado</h2>
-        </div>
-        <button @click="showEditModal = false" class="text-gray-400 hover:text-white transition-colors">
-          <i class="fas fa-times text-xl"></i>
-        </button>
-      </div>
-
-      <div class="grid grid-cols-2 gap-8 mb-8">
-        <div class="bg-[#1a1a2a] rounded-lg p-6 shadow-lg">
-          <div class="flex items-center gap-3 mb-6">
-            <i class="fas fa-info-circle text-[#CF631C]"></i>
-            <h3 class="text-white text-lg font-semibold">Informações Básicas</h3>
-          </div>
-          <div class="space-y-6">
-            <div class="flex items-center gap-3">
-              <i class="fas fa-user text-gray-400 w-5"></i>
-              <div>
-                <label class="text-gray-400 text-sm block mb-1">Nome</label>
-                <p class="text-white font-medium">{{ editingAffiliate?.name }}</p>
-              </div>
-            </div>
-            <div class="flex items-center gap-3">
-              <i class="fas fa-envelope text-gray-400 w-5"></i>
-              <div>
-                <label class="text-gray-400 text-sm block mb-1">Email</label>
-                <p class="text-white font-medium">{{ editingAffiliate?.email }}</p>
-              </div>
-            </div>
-            <div class="flex items-center gap-3">
-              <i class="fas fa-code text-gray-400 w-5"></i>
-              <div>
-                <label class="text-gray-400 text-sm block mb-1">Código de Integração</label>
-                <p class="text-white font-medium">{{ editingAffiliate?.integration_code }}</p>
-              </div>
-            </div>
-            <div class="flex items-center gap-3">
-              <i class="fas fa-toggle-on text-gray-400 w-5"></i>
-              <div>
-                <label class="text-gray-400 text-sm block mb-1">Status</label>
-                <span :class="editingAffiliate?.is_active ? 'px-3 py-1 rounded-full text-sm bg-green-500/20 text-green-500 font-medium' : 'px-3 py-1 rounded-full text-sm bg-red-500/20 text-red-500 font-medium'">
-                  {{ editingAffiliate?.is_active ? 'Ativo' : 'Inativo' }}
-                </span>
-              </div>
-            </div>
-            <div class="flex items-center gap-3">
-              <i class="fas fa-calendar text-gray-400 w-5"></i>
-              <div>
-                <label class="text-gray-400 text-sm block mb-1">Data de Cadastro</label>
-                <p class="text-white font-medium">{{ editingAffiliate?.created_at ? new Date(editingAffiliate.created_at).toLocaleDateString() : '-' }}</p>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="bg-[#1a1a2a] rounded-lg p-6 shadow-lg">
-          <div class="flex items-center gap-3 mb-6">
-            <i class="fas fa-mobile-alt text-[#CF631C]"></i>
-            <h3 class="text-white text-lg font-semibold">Aplicações</h3>
-          </div>
-          <div class="overflow-x-auto">
-            <table class="w-full text-white border-collapse">
-              <thead>
-                <tr class="bg-[#23263a]">
-                  <th class="p-3 text-left text-sm font-medium">ID da Aplicação</th>
-                  <th class="p-3 text-left text-sm font-medium">% Comissão</th>
-                  <th class="p-3 text-left text-sm font-medium">Dias para Liberação</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-for="app in editingAffiliate?.applications" :key="app.id" class="border-b border-[#23263a] hover:bg-[#23263a]/50 transition-colors">
-                  <td class="p-3">{{ app.id }}</td>
-                  <td class="p-3">{{ (app.commission_percentage * 100).toFixed(2) }}%</td>
-                  <td class="p-3">{{ app.commission_release_days }} dias</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-
-      <form @submit.prevent="saveAffiliateEdits" class="bg-[#1a1a2a] rounded-lg p-6 shadow-lg">
-        <div class="flex items-center gap-3 mb-6">
-          <i class="fas fa-edit text-[#CF631C]"></i>
-          <h3 class="text-white text-lg font-semibold">Editar Afiliado</h3>
-        </div>
-        <div class="grid grid-cols-2 gap-6">
-          <div class="space-y-4">
-            <div>
-              <label class="block text-white mb-2 font-medium">Nome</label>
-              <div class="relative">
-                <i class="fas fa-user absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
-                <input v-model="editForm.name" class="w-full pl-10 pr-3 py-2 rounded bg-[#23263a] text-white border border-[#2A2F4C] focus:border-[#CF631C] focus:outline-none transition-colors" required />
-              </div>
-            </div>
-            <div>
-              <label class="block text-white mb-2 font-medium">E-mail</label>
-              <div class="relative">
-                <i class="fas fa-envelope absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
-                <input v-model="editForm.email" type="email" class="w-full pl-10 pr-3 py-2 rounded bg-[#23263a] text-white border border-[#2A2F4C] focus:border-[#CF631C] focus:outline-none transition-colors" required />
-              </div>
-            </div>
-          </div>
-          <div class="space-y-4">
-            <div>
-              <label class="block text-white mb-2 font-medium">Código de Integração</label>
-              <div class="relative">
-                <i class="fas fa-code absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
-                <input v-model="editForm.integration_code" class="w-full pl-10 pr-3 py-2 rounded bg-[#23263a] text-white border border-[#2A2F4C] focus:border-[#CF631C] focus:outline-none transition-colors" required />
-              </div>
-            </div>
-            <div>
-              <label class="block text-white mb-2 font-medium">Status</label>
-              <div class="relative">
-                <i class="fas fa-toggle-on absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
-                <select v-model="editForm.is_active" class="w-full pl-10 pr-3 py-2 rounded bg-[#23263a] text-white border border-[#2A2F4C] focus:border-[#CF631C] focus:outline-none transition-colors">
-                  <option :value="true">Ativo</option>
-                  <option :value="false">Inativo</option>
-                </select>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="mt-8">
-          <div class="flex items-center gap-3 mb-4">
-            <i class="fas fa-mobile-alt text-[#CF631C]"></i>
-            <label class="block text-white font-medium">Aplicações</label>
-          </div>
-          <div v-for="(app, idx) in editForm.applications" :key="app.id" class="mb-4 p-4 bg-[#23263a] rounded-lg border border-[#2A2F4C]">
-            <div class="grid grid-cols-3 gap-4">
-              <div>
-                <label class="block text-xs text-gray-400 mb-1">ID</label>
-                <div class="relative">
-                  <i class="fas fa-hashtag absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
-                  <input v-model="app.id" class="w-full pl-10 pr-3 py-2 rounded bg-[#1a1a2a] text-white border border-[#2A2F4C] focus:border-[#CF631C] focus:outline-none transition-colors" readonly />
-                </div>
-              </div>
-              <div>
-                <label class="block text-xs text-gray-400 mb-1">% Comissão</label>
-                <div class="relative">
-                  <i class="fas fa-percent absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
-                  <input v-model.number="app.commission_percentage" type="number" step="0.01" min="0" max="1"
-                    class="w-full pl-10 pr-3 py-2 rounded bg-[#1a1a2a] text-white border border-[#2A2F4C] focus:border-[#CF631C] focus:outline-none transition-colors" />
-                </div>
-              </div>
-              <div>
-                <label class="block text-xs text-gray-400 mb-1">Dias Liberação</label>
-                <div class="relative">
-                  <i class="fas fa-calendar-day absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
-                  <input v-model.number="app.commission_release_days" type="number" min="0"
-                    class="w-full pl-10 pr-3 py-2 rounded bg-[#1a1a2a] text-white border border-[#2A2F4C] focus:border-[#CF631C] focus:outline-none transition-colors" />
-                </div>
-              </div>
-            </div>
-            <button type="button" class="text-red-400 mt-3 text-sm hover:text-red-300 transition-colors flex items-center gap-1" @click="removeEditApp(idx)">
-              <i class="fas fa-trash-alt"></i>
-              Remover
-            </button>
-          </div>
-          <button type="button" class="bg-blue-600 text-white px-4 py-2 rounded-lg mt-4 hover:bg-blue-700 transition-colors flex items-center gap-2" @click="addEditApp">
-            <i class="fas fa-plus"></i>
-            Adicionar Aplicação
-          </button>
-        </div>
-
-        <div v-if="editError" class="mt-4 p-3 bg-red-500/20 text-red-500 rounded-lg flex items-center gap-2">
-          <i class="fas fa-exclamation-circle"></i>
-          {{ editError }}
-        </div>
-        
-        <div class="flex justify-end gap-3 mt-8 pt-4 border-t border-[#2A2F4C]">
-          <button type="button" class="px-6 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors flex items-center gap-2" @click="showEditModal = false" :disabled="editLoading">
-            <i class="fas fa-times"></i>
-            Cancelar
-          </button>
-          <button type="submit" class="px-6 py-2 bg-[#CF631C] text-white rounded-lg hover:bg-[#B5520A] transition-colors flex items-center gap-2" :disabled="editLoading">
-            <i class="fas fa-save"></i>
-            <span v-if="editLoading">Salvando...</span>
-            <span v-else>Salvar</span>
-          </button>
-        </div>
-      </form>
-    </div>
-  </div>
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue'
+import { defineComponent, ref, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import { useDashboardStore } from '@/stores/dashboard'
 import { managerService } from '@/services/managerService'
 import Sidebar from '@/components/layout/dashboard/Sidebar.vue'
@@ -421,73 +232,33 @@ export default defineComponent({
   },
   setup() {
     const store = useDashboardStore()
-    return { store }
-  },
-  data() {
-    return {
-      affiliates: [] as Affiliate[],
-      dropdownOpen: null as string | null,
-      loading: true,
-      showEditModal: false,
-      showCreateModal: false,
-      editingAffiliate: null as Affiliate | null,
-      editForm: {
-        name: '',
-        email: '',
-        integration_code: '',
-        is_active: true,
-        applications: []
-      } as EditForm,
-      createForm: {
-        name: '',
-        email: '',
-        integration_code: '',
-        applications: [
-          { id: '', commission_percentage: 0.2, commission_release_days: 7 }
-        ]
-      } as CreateForm,
-      createLoading: false,
-      createError: '',
-      editLoading: false,
-      editError: ''
-    }
-  },
-  async mounted() {
-    try {
-      const response = await managerService.affiliates.list({
-        search: '',
-        page: 1,
-        per_page: 20,
-        sort_by: 'name',
-        sort_order: 'asc'
-      });
-      this.affiliates = (response.data || response) as Affiliate[];
-    } catch (e) {
-      // Trate erro se necessário
-    } finally {
-      this.loading = false;
-    }
-    // Fechar o dropdown quando clicar fora
-    document.addEventListener('click', (e) => {
-      const target = e.target as HTMLElement
-      if (!target.closest('.relative')) {
-        this.dropdownOpen = null
-      }
-    })
-  },
-  beforeUnmount() {
-    document.removeEventListener('click', () => { })
-  },
-  watch: {
-    searchTerm(newTerm) {
-      if (newTerm) {
-        this.handleSearch(newTerm)
+    const router = useRouter()
+    const loading = ref(true)
+    const affiliates = ref([])
+    const showCreateModal = ref(false)
+    const showDetailsModal = ref(false)
+    const selectedAffiliate = ref(null)
+    const searchQuery = ref('')
+
+    const loadAffiliates = async () => {
+      try {
+        const response = await managerService.affiliates.list({
+          search: '',
+          page: 1,
+          per_page: 20,
+          sort_by: 'name',
+          sort_order: 'asc'
+        });
+        affiliates.value = (response.data || response) as Affiliate[];
+      } catch (e) {
+        // Trate erro se necessário
+      } finally {
+        loading.value = false;
       }
     }
-  },
-  methods: {
-    async handleSearch(term: string) {
-      this.loading = true;
+
+    const handleSearch = async (term: string) => {
+      loading.value = true;
       try {
         const response = await managerService.affiliates.list({
           search: term,
@@ -496,27 +267,17 @@ export default defineComponent({
           sort_by: 'name',
           sort_order: 'asc'
         });
-        this.affiliates = (response.data || response) as Affiliate[];
+        affiliates.value = (response.data || response) as Affiliate[];
       } catch (e) {
         // Trate erro se necessário
       } finally {
-        this.loading = false;
+        loading.value = false;
       }
-    },
-    getStatusClass(status: string): string {
-      const classes = {
-        'Aprovado': 'px-2 py-1 rounded-full text-sm bg-green-500/20 text-green-500',
-        'Pendente': 'px-2 py-1 rounded-full text-sm bg-yellow-500/20 text-yellow-500',
-        'Rejeitado': 'px-2 py-1 rounded-full text-sm bg-red-500/20 text-red-500'
-      }
-      return classes[status as keyof typeof classes] || ''
-    },
-    toggleDropdown(id: string) {
-      this.dropdownOpen = this.dropdownOpen === id ? null : id
-    },
-    async handleNewAffiliate() {
-      this.editingAffiliate = null
-      this.createForm = {
+    }
+
+    const openCreateModal = () => {
+      selectedAffiliate.value = null
+      createForm.value = {
         name: '',
         email: '',
         integration_code: '',
@@ -524,86 +285,184 @@ export default defineComponent({
           { id: '', commission_percentage: 0.2, commission_release_days: 7 }
         ]
       }
-      this.createError = ''
-      this.showCreateModal = true
-    },
-    async handleAction(id: string, action: string) {
-      switch (action) {
-        case 'editar': {
-          const affiliate = this.affiliates.find(a => a.id === id)
-          if (affiliate) {
-            this.editingAffiliate = affiliate
-            this.editForm = {
-              name: affiliate.name,
-              email: affiliate.email,
-              integration_code: affiliate.integration_code,
-              is_active: affiliate.is_active,
-              applications: affiliate.applications ? affiliate.applications.map(app => ({ ...app })) : []
-            }
-            this.showEditModal = true
-          }
-          break
-        }
-        case 'bloquear':
-          await this.store.blockAffiliate(id)
-          break
-        case 'excluir':
-          await this.store.deleteAffiliate(id)
-          break
-      }
-      this.dropdownOpen = null
-    },
-    async saveAffiliateEdits() {
-      if (!this.editingAffiliate) return
-      this.editLoading = true
-      this.editError = ''
-      try {
-        await managerService.affiliates.update(this.editingAffiliate.id, this.editForm)
-        const idx = this.affiliates.findIndex(a => a.id === this.editingAffiliate?.id)
-        if (idx !== -1 && this.editingAffiliate) {
-          this.affiliates[idx] = { ...this.editingAffiliate, ...this.editForm }
-        }
-        this.showEditModal = false
-      } catch (e) {
-        this.editError = 'Erro ao atualizar afiliado.'
-      } finally {
-        this.editLoading = false
-      }
-    },
-    removeEditApp(idx: number) {
-      this.editForm.applications.splice(idx, 1)
-    },
-    addEditApp() {
-      this.editForm.applications.push({ id: '', commission_percentage: 0.2, commission_release_days: 7 })
-    },
-    async createAffiliate() {
-      this.createLoading = true
-      this.createError = ''
+      createError.value = ''
+      showCreateModal.value = true
+    }
+
+    const closeCreateModal = () => {
+      showCreateModal.value = false
+    }
+
+    const openDetailsModal = (affiliate: Affiliate) => {
+      selectedAffiliate.value = affiliate
+      showDetailsModal.value = true
+    }
+
+    const closeDetailsModal = () => {
+      showDetailsModal.value = false
+    }
+
+    const navigateToEdit = (affiliate: Affiliate) => {
+      router.push(`/affiliates/${affiliate.id}/edit`)
+    }
+
+    const handleCreate = async () => {
+      createLoading.value = true
+      createError.value = ''
       try {
         const payload = {
-          name: this.createForm.name,
-          email: this.createForm.email,
-          integration_code: this.createForm.integration_code,
-          applications: this.createForm.applications.map(app => ({
+          name: createForm.value.name,
+          email: createForm.value.email,
+          integration_code: createForm.value.integration_code,
+          applications: createForm.value.applications.map(app => ({
             id: app.id,
             commission_percentage: app.commission_percentage,
             commission_release_days: app.commission_release_days
           }))
         }
         await managerService.affiliates.create(payload)
-        await this.handleSearch('')
-        this.showCreateModal = false
+        await handleSearch('')
+        closeCreateModal()
       } catch (e) {
-        this.createError = 'Erro ao criar afiliado.'
+        createError.value = 'Erro ao criar afiliado.'
       } finally {
-        this.createLoading = false
+        createLoading.value = false
       }
-    },
-    addApp() {
-      this.createForm.applications.push({ id: '', commission_percentage: 0.2, commission_release_days: 7 })
-    },
-    removeApp(idx: number) {
-      this.createForm.applications.splice(idx, 1)
+    }
+
+    const handleToggleStatus = async (id: string, is_active: boolean) => {
+      await store.blockAffiliate(id)
+    }
+
+    const handleResetSecret = () => {
+      // Implemente a lógica para resetar o segredo do afiliado
+    }
+
+    const handleEditApplications = () => {
+      // Implemente a lógica para editar as aplicações do afiliado
+    }
+
+    const dropdownOpen = ref<string | null>(null)
+
+    const toggleDropdown = (id: string) => {
+      dropdownOpen.value = dropdownOpen.value === id ? null : id
+    }
+
+    const handleAction = async (id: string, action: string) => {
+      switch (action) {
+        case 'editar': {
+          const affiliate = affiliates.value.find(a => a.id === id)
+          if (affiliate) {
+            selectedAffiliate.value = affiliate
+            editForm.value = {
+              name: affiliate.name,
+              email: affiliate.email,
+              integration_code: affiliate.integration_code,
+              is_active: affiliate.is_active,
+              applications: affiliate.applications ? affiliate.applications.map(app => ({ ...app })) : []
+            }
+            openDetailsModal(affiliate)
+          }
+          break
+        }
+        case 'bloquear':
+          await handleToggleStatus(id, false)
+          break
+        case 'excluir':
+          await store.deleteAffiliate(id)
+          break
+      }
+      dropdownOpen.value = null
+    }
+
+    const createLoading = ref(false)
+    const createError = ref('')
+    const editLoading = ref(false)
+    const editError = ref('')
+    const editForm = ref({
+      name: '',
+      email: '',
+      integration_code: '',
+      is_active: true,
+      applications: []
+    } as EditForm)
+    const createForm = ref({
+      name: '',
+      email: '',
+      integration_code: '',
+      applications: [
+        { id: '', commission_percentage: 0.2, commission_release_days: 7 }
+      ]
+    } as CreateForm)
+
+    const removeApp = (idx: number) => {
+      createForm.value.applications.splice(idx, 1)
+    }
+
+    const addApp = () => {
+      createForm.value.applications.push({ id: '', commission_percentage: 0.2, commission_release_days: 7 })
+    }
+
+    const saveAffiliateEdits = async () => {
+      if (!selectedAffiliate.value) return
+      editLoading.value = true
+      editError.value = ''
+      try {
+        await managerService.affiliates.update(selectedAffiliate.value.id, editForm.value)
+        const idx = affiliates.value.findIndex(a => a.id === selectedAffiliate.value?.id)
+        if (idx !== -1 && selectedAffiliate.value) {
+          affiliates.value[idx] = { ...selectedAffiliate.value, ...editForm.value }
+        }
+        closeDetailsModal()
+      } catch (e) {
+        editError.value = 'Erro ao atualizar afiliado.'
+      } finally {
+        editLoading.value = false
+      }
+    }
+
+    const removeEditApp = (idx: number) => {
+      editForm.value.applications.splice(idx, 1)
+    }
+
+    const addEditApp = () => {
+      editForm.value.applications.push({ id: '', commission_percentage: 0.2, commission_release_days: 7 })
+    }
+
+    onMounted(loadAffiliates)
+
+    return {
+      loading,
+      affiliates,
+      showCreateModal,
+      showDetailsModal,
+      selectedAffiliate,
+      searchQuery,
+      loadAffiliates,
+      handleSearch,
+      openCreateModal,
+      closeCreateModal,
+      openDetailsModal,
+      closeDetailsModal,
+      navigateToEdit,
+      handleCreate,
+      handleToggleStatus,
+      handleResetSecret,
+      handleEditApplications,
+      dropdownOpen,
+      toggleDropdown,
+      handleAction,
+      createLoading,
+      createError,
+      editLoading,
+      editError,
+      editForm,
+      createForm,
+      removeApp,
+      addApp,
+      saveAffiliateEdits,
+      removeEditApp,
+      addEditApp
     }
   }
 })

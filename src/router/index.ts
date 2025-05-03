@@ -1,7 +1,16 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
+import { RouteRecordRaw } from 'vue-router'
+import Offers from '@/views/Offers.vue'
+import EditOffer from '@/views/offers/EditOffer.vue'
+import Home from '@/views/Home.vue'
+import Login from '@/views/Login.vue'
+import Sales from '@/views/Sales.vue'
+import Affiliates from '@/views/Affiliates.vue'
+import EditAffiliate from '@/views/affiliates/EditAffiliate.vue'
+import EditCustomer from '@/views/customers/EditCustomer.vue'
 
-const routes = [
+const routes: Array<RouteRecordRaw> = [
   {
     path: '/',
     redirect: '/dashboard'
@@ -56,9 +65,19 @@ const routes = [
   },
   {
     path: '/offers',
-    name: 'Offers',
-    component: () => import('../views/Offers.vue'),
-    meta: { requiresAuth: true }
+    name: 'offers',
+    component: Offers,
+    meta: {
+      requiresAuth: true
+    }
+  },
+  {
+    path: '/offers/:id/edit',
+    name: 'edit-offer',
+    component: EditOffer,
+    meta: {
+      requiresAuth: true
+    }
   },
   {
     path: '/withdrawals',
@@ -76,6 +95,18 @@ const routes = [
     path: '/customers/:id',
     name: 'CustomerDetail',
     component: () => import('../views/CustomerDetail.vue'),
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/customers/:id/edit',
+    name: 'edit-customer',
+    component: EditCustomer,
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/affiliates/:id/edit',
+    name: 'edit-affiliate',
+    component: EditAffiliate,
     meta: { requiresAuth: true }
   },
   {

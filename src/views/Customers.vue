@@ -53,6 +53,10 @@
                             @click="goToCustomerDetail(usuario.id)">
                             Visualizar detalhes
                           </button>
+                          <button class="w-full text-left px-4 py-2 hover:bg-[#2A2F4C] text-green-500"
+                            @click="navigateToEdit(usuario)">
+                            Editar
+                          </button>
                         </div>
                       </div>
                     </td>
@@ -194,11 +198,6 @@
             <i class="fas fa-key"></i>
             Resetar Senha
           </button>
-          <button @click="openEditModal(editingCustomer)" 
-            class="flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 rounded-lg text-white font-medium transition-colors">
-            <i class="fas fa-edit"></i>
-            Editar Cliente
-          </button>
         </div>
       </div>
     </div>
@@ -256,54 +255,6 @@
       </form>
     </div>
   </div>
-
-  <!-- Modal de Edição de Cliente -->
-  <div v-if="showEditModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60">
-    <div class="bg-[#23263a] rounded-lg p-8 w-full max-w-2xl relative">
-      <div class="flex justify-between items-center mb-6">
-        <h2 class="text-xl font-bold text-white">Editar Cliente</h2>
-        <button @click="showEditModal = false" class="text-gray-400 hover:text-white transition-colors">
-          <i class="fas fa-times text-xl"></i>
-        </button>
-      </div>
-
-      <form @submit.prevent="handleEditCustomer" class="space-y-6">
-        <div class="grid grid-cols-2 gap-4">
-          <div>
-            <label class="block text-gray-400 mb-2">Nome</label>
-            <input v-model="editingCustomer.name" type="text" required
-              class="w-full bg-[#1a1a2a] text-white rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#CF631C]">
-          </div>
-          <div>
-            <label class="block text-gray-400 mb-2">Email</label>
-            <input v-model="editingCustomer.email" type="email" required
-              class="w-full bg-[#1a1a2a] text-white rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#CF631C]">
-          </div>
-          <div>
-            <label class="block text-gray-400 mb-2">Telefone</label>
-            <input v-model="editingCustomer.phone" type="tel" required
-              class="w-full bg-[#1a1a2a] text-white rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#CF631C]">
-          </div>
-          <div>
-            <label class="block text-gray-400 mb-2">CPF/CNPJ</label>
-            <input v-model="editingCustomer.document_number" type="text"
-              class="w-full bg-[#1a1a2a] text-white rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#CF631C]">
-          </div>
-        </div>
-
-        <div class="flex justify-end gap-4 mt-6">
-          <button type="button" @click="showEditModal = false"
-            class="px-6 py-2 bg-gray-600 hover:bg-gray-700 rounded-lg text-white font-medium transition-colors">
-            Cancelar
-          </button>
-          <button type="submit"
-            class="px-6 py-2 bg-[#CF631C] hover:bg-[#E67E22] rounded-lg text-white font-medium transition-colors">
-            Salvar Alterações
-          </button>
-        </div>
-      </form>
-    </div>
-  </div>
 </template>
 
 <script lang="ts">
@@ -313,6 +264,7 @@ import TopBar from '@/components/layout/dashboard/TopBar.vue'
 import BaseButton from '@/components/common/BaseButton.vue'
 import { managerService } from '@/services/managerService';
 import { externalService } from '@/services/externalService';
+import { useRouter } from 'vue-router'
 
 // Função para gerar ID único
 function generateUniqueId(): string {
@@ -344,6 +296,17 @@ export default defineComponent({
     TopBar,
     BaseButton
   },
+  setup() {
+    const router = useRouter()
+
+    const navigateToEdit = (customer: Usuario) => {
+      router.push(`/customers/${customer.id}/edit`)
+    }
+
+    return {
+      navigateToEdit
+    }
+  },
   data() {
     return {
       usuarios: [] as Usuario[],
@@ -351,7 +314,6 @@ export default defineComponent({
       loading: true,
       showDetailModal: false,
       showCreateModal: false,
-      showEditModal: false,
       editingCustomer: null as Usuario | null,
       newCustomer: {
         id: '',
@@ -462,28 +424,6 @@ export default defineComponent({
       }
     },
 
-    async handleEditCustomer() {
-      if (!this.editingCustomer) return;
-
-      try {
-        const payload = {
-          name: this.editingCustomer.nome,
-          email: this.editingCustomer.email,
-          phone: this.editingCustomer.phone || '',
-          document_number: this.editingCustomer.document_number || ''
-        };
-
-        await externalService.customers.update(this.editingCustomer.id, payload);
-        
-        // Atualizar a lista de clientes
-        await this.loadCustomers();
-        
-        this.showEditModal = false;
-      } catch (error) {
-        console.error('Erro ao editar cliente:', error);
-      }
-    },
-
     async loadCustomers() {
       this.loading = true;
       try {
@@ -513,11 +453,6 @@ export default defineComponent({
         this.loading = false;
       }
     },
-
-    openEditModal(customer: Usuario) {
-      this.editingCustomer = { ...customer };
-      this.showEditModal = true;
-    }
   }
 })
 </script>
