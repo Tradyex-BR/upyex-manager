@@ -30,7 +30,7 @@
               </div>
             </div>
             <div v-else-if="currentView === 'list'">
-              <h2 class="text-white text-2xl font-bold">Lista</h2>
+              <DashboardList :data="listData" />
             </div>
           </section>
         </div>

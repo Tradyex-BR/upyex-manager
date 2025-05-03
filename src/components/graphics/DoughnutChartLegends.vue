@@ -20,7 +20,7 @@ interface ChartDataItem {
 }
 
 interface ChartInputData {
-  status?: string // Status geral (opcional, não usado diretamente no gráfico)
+  status?: string
   data: ChartDataItem[]
 }
 
@@ -29,26 +29,14 @@ const props = defineProps<{
   data: ChartInputData
 }>()
 
-const chartRef = ref<HTMLCanvasElement | null>(null)
-let chartInstance: Chart | null = null
-
-  // --- Estilos Padrão ---
-  const defaultTextColor = '#B8B8B8';
-const defaultFont: Partial<FontSpec> = { // Usa Partial<FontSpec> para tipagem
-  family: "'Inter', sans-serif", // Nome da fonte (coloque fallbacks)
-  size: 14,                      // Tamanho da fonte
-  lineHeight: 1.28,              // Aproximação de 18px / 14px
-  weight: 'normal'             // Peso da fonte (ajuste se necessário)
-};
-
-// Cores baseadas na imagem de referência (Ajuste conforme necessário)
+// Cores baseadas na imagem de referência
 const chartColors = [
   '#A0522D', // Marrom Escuro (Aguardando Pagamento)
   '#CD853F', // Laranja/Marrom Médio (Pago)
   '#DAA520', // Amarelo Ouro/Marrom Claro (Reembolsado)
   '#F5DEB3', // Bege Claro (Cancelado)
   '#FFF8DC'  // Bege Muito Claro (Falha)
-];
+]
 
 const getItemColor = (label: string) => {
   const index = props.data.data.findIndex(item => item.label === label)
@@ -78,21 +66,18 @@ const translateLabel = (label: string): string => {
 
 // Observa mudanças nos dados das props para atualizar
 watch(() => props.data, () => {
-  createOrUpdateChart();
+  // No need to call createOrUpdateChart here, as the legend component doesn't need to update the chart
 }, { deep: true })
 
 onMounted(() => {
   // Garante que os dados iniciais existam antes de criar
   if (props.data && props.data.data) {
-      createOrUpdateChart()
+    // No need to call createOrUpdateChart here, as the legend component doesn't need to update the chart
   }
 })
 
 onBeforeUnmount(() => {
-  if (chartInstance) {
-    chartInstance.destroy()
-    chartInstance = null
-  }
+  // No need to destroy any chart instance, as the legend component doesn't manage any chart
 })
 </script>
 
