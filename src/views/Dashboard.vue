@@ -11,26 +11,41 @@
             <DashboardNavigation v-model="currentView" />
 
             <div v-if="currentView === 'cards'" class="flex flex-col gap-6 mt-6">
-              <GraphicSection title="Vendas diárias" description="Quantidade de vendas nos últimos 15 dias" class="h-[382px]">
+              <GraphicSection title="Vendas diárias" description="Quantidade de vendas nos últimos 15 dias"
+                class="h-[382px]">
                 <CartesianAxes v-if="chartData.length > 0" :data="chartData.filter(item => item.status === 'graph')" />
               </GraphicSection>
 
-              <div class="grid grid-cols-2 gap-8 mb-8">
-                <GraphicSection title="Status das vendas" description="Distribuição por status de pagamento" class="h-[446px]">
+              <div class="grid grid-cols-2 gap-6 mb-8">
+                <GraphicSection title="Status das vendas" description="Distribuição por status de pagamento"
+                  class="h-[446px]">
                   <div class="flex gap-8 h-full justify-center items-center">
-                    <DoughnutChart v-if="chartData.length > 0" :data="chartData.find(item => item.status === 'by_payment_status')" />
+                    <DoughnutChart v-if="chartData.length > 0"
+                      :data="chartData.find(item => item.status === 'by_payment_status')" />
                     <div class="flex flex-col gap-4">
-                      <DoughnutChartLegends v-if="chartData.length > 0" :data="chartData.find(item => item.status === 'by_payment_status')" />
+                      <DoughnutChartLegends v-if="chartData.length > 0"
+                        :data="chartData.find(item => item.status === 'by_payment_status')" />
                     </div>
                   </div>
                 </GraphicSection>
-                <GraphicSection title="Método de pagamento" description="Distribuição por método de pagamento" class="h-[446px]">
-                  <PaymentMethodCards v-if="chartData.length > 0" :data="chartData.find(item => item.status === 'by_payment_method')" />
+                <GraphicSection title="Método de pagamento" description="Distribuição por método de pagamento"
+                  class="h-[446px]">
+                  <PaymentMethodCards v-if="chartData.length > 0"
+                    :data="chartData.find(item => item.status === 'by_payment_method')" />
                 </GraphicSection>
               </div>
             </div>
             <div v-else-if="currentView === 'list'">
-              <DashboardList :data="listData" />
+              <div class="flex flex-row gap-6">
+                <GraphicSection title="Análise de clientes" description="Detalhes sobre base de clientes"
+                  class="w-[352px] h-[446px] mt-6">
+                  <DashboardCards v-if="customersData" :data="customersData" border vertical />
+                </GraphicSection>
+                <GraphicSection title="Status dos saques" description="Distribuição dos status por saque"
+                  class="w-full h-[446px] mt-6">
+                  <BarChart v-if="withdrawalsData" :data="withdrawalsData" />
+                </GraphicSection>
+              </div>
             </div>
           </section>
         </div>
@@ -43,23 +58,24 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import DashboardCards from "@/components/layout/dashboard/DashboardCards.vue"
 import DashboardNavigation from "@/components/layout/dashboard/DashboardNavigation.vue"
-import DashboardList from "@/components/layout/dashboard/DashboardList.vue"
 import CartesianAxes from "@/components/graphics/CartesianAxes.vue"
 import DoughnutChart from "@/components/graphics/DoughnutChart.vue"
 import DoughnutChartLegends from "@/components/graphics/DoughnutChartLegends.vue"
 import PaymentMethodCards from "@/components/graphics/PaymentMethodCards.vue"
 import GraphicSection from "@/components/graphics/GraphicSection.vue"
-import TopBar from "@/components/layout/dashboard/TopBar.vue"
 import { managerService } from '@/services/managerService'
+import BarChart from "@/components/graphics/BarChart.vue"
 
 const authStore = useAuthStore()
 const checkingAuth = ref(true)
 const dashboardData = ref<any>({})
 const chartData = ref<any[]>([])
+const customersData = ref<any>({})
+const withdrawalsData = ref<any>({})
 const listData = ref<any[]>([])
 const dashboardLoading = ref(false)
 const dashboardError = ref('')
@@ -76,10 +92,21 @@ async function fetchDashboardData() {
       start_date,
       end_date,
     }
-    console.log('Iniciando fetch do dashboard', params)
     const response = await managerService.dashboard.getData(params)
-    console.log('Resposta do dashboard:', response)
-    
+    // Mock data para teste
+    withdrawalsData.value = {
+      data: [
+        { label: 'Solicitado', value: response.withdrawals?.by_status?.requested || 0 },
+        { label: 'Aprovado', value: response.withdrawals?.by_status?.approved || 0 },
+        { label: 'Rejeitado', value: response.withdrawals?.by_status?.rejected || 0 },
+        { label: 'Em Processamento', value: response.withdrawals?.by_status?.processing || 0 },
+        { label: 'Concluído', value: response.withdrawals?.by_status?.processed || 0 },
+        { label: 'Cancelado', value: response.withdrawals?.by_status?.cancelled || 0 },
+        { label: 'Falha', value: response.withdrawals?.by_status?.failed || 0 }
+      ]
+    }
+    customersData.value = response.customers || { total: 0, new: 0 }
+
     // Dados para os cards
     if (role === 'manager') {
       dashboardData.value = {
@@ -140,12 +167,12 @@ async function fetchDashboardData() {
             label: groupLabel,
             value: 0,
             icon: groupKey,
-            iconColor: groupKey === 'card' ? 'text-blue-400' : 
-                      groupKey === 'pix' ? 'text-green-400' : 
-                      groupKey === 'bank' ? 'text-purple-400' : 'text-gray-400',
-            barColor: groupKey === 'card' ? 'bg-blue-500' : 
-                     groupKey === 'pix' ? 'bg-green-500' : 
-                     groupKey === 'bank' ? 'bg-purple-500' : 'bg-gray-500'
+            iconColor: groupKey === 'card' ? 'text-blue-400' :
+              groupKey === 'pix' ? 'text-green-400' :
+                groupKey === 'bank' ? 'text-purple-400' : 'text-gray-400',
+            barColor: groupKey === 'card' ? 'bg-blue-500' :
+              groupKey === 'pix' ? 'bg-green-500' :
+                groupKey === 'bank' ? 'bg-purple-500' : 'bg-gray-500'
           }
         }
         acc[groupKey].value += value
