@@ -39,7 +39,7 @@
               <div class="flex flex-row gap-6" v-if="role === 'manager'">
                 <GraphicSection title="Análise de clientes" description="Detalhes sobre base de clientes"
                   class="max-w-[352px] max-h-[382px] mt-6 flex flex-col">
-                  <DashboardCards v-if="customersData" :data="customersData" border vertical class="flex-1 max-h-[116px]" gap=8 />
+                  <DashboardCards v-if="customersData" :data="customersData" border vertical class="flex-1 max-h-[116px]" :gap="8" />
                 </GraphicSection>
                 <GraphicSection title="Status dos saques" description="Distribuição dos status por saque"
                   class="w-full h-[382px] mt-6">
@@ -61,7 +61,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, watch } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import DashboardCards from "@/components/layout/dashboard/DashboardCards.vue"
 import DashboardNavigation from "@/components/layout/dashboard/DashboardNavigation.vue"
@@ -70,243 +70,25 @@ import DoughnutChart from "@/components/graphics/DoughnutChart.vue"
 import DoughnutChartLegends from "@/components/graphics/DoughnutChartLegends.vue"
 import PaymentMethodCards from "@/components/graphics/PaymentMethodCards.vue"
 import GraphicSection from "@/components/graphics/GraphicSection.vue"
-import { managerService } from '@/services/managerService'
 import BarChart from "@/components/graphics/BarChart.vue"
+import { useDashboard } from '@/composables/useDashboard'
 
 const authStore = useAuthStore()
 const checkingAuth = ref(true)
-const dashboardData = ref<any>({})
-const chartData = ref<any[]>([])
-const customersData = ref<any>({})
-const withdrawalsData = ref<any>({})
-const listData = ref<any[]>([])
-const dashboardLoading = ref(true)
-const dashboardError = ref('')
-const role = localStorage.getItem('role')
 const currentView = ref('cards')
 
-async function fetchDashboardData() {
-  dashboardLoading.value = true
-  dashboardError.value = ''
-  try {
-    const start_date = "2025-04-25"
-    const end_date = "2025-04-29"
-    const params = {
-      start_date,
-      end_date,
-    }
-    const response = await managerService.dashboard.getData(params)
-    // Mock data para teste
-    withdrawalsData.value = {
-      data: [
-        { label: 'Solicitado', value: response.withdrawals?.by_status?.requested || 0 },
-        { label: 'Aprovado', value: response.withdrawals?.by_status?.approved || 0 },
-        { label: 'Rejeitado', value: response.withdrawals?.by_status?.rejected || 0 },
-        { label: 'Em Processamento', value: response.withdrawals?.by_status?.processing || 0 },
-        { label: 'Concluído', value: response.withdrawals?.by_status?.processed || 0 },
-        { label: 'Cancelado', value: response.withdrawals?.by_status?.cancelled || 0 },
-        { label: 'Falha', value: response.withdrawals?.by_status?.failed || 0 }
-      ]
-    }
-    customersData.value = response.customers || { total: 0, new: 0 }
-
-    // Dados para os cards
-    if (role === 'manager') {
-      dashboardData.value = {
-        paid: {
-          value: response.sales.cards.by_status.paid.toString(),
-          label: 'Vendas Pagas',
-        },
-        customers: {
-          value: response.customers.total.toString(),
-          label: 'Total de Clientes',
-        },
-        withdrawals: {
-          value: Object.values(response.withdrawals.by_status).reduce((a, b) => a + b, 0).toString(),
-          label: 'Total de Saques',
-        }
-      }
-    } else {
-      const balance = response.data?.balance || {}
-      dashboardData.value = {
-        paid: {
-          value: `R$ ${(balance.current_balance || 0).toFixed(2)}`,
-          label: 'Saldo Atual',
-        },
-        customers: {
-          value: `R$ ${(balance.future_balance || 0).toFixed(2)}`,
-          label: 'Saldo Futuro',
-        },
-        withdrawals: {
-          value: `R$ ${(balance.next_7_days || 0).toFixed(2)}`,
-          label: 'Próximos 7 dias',
-        }
-      }
-    }
-
-    // Dados para os gráficos
-    const totalPaid = response.sales?.cards?.by_status?.paid || 0
-
-    // Primeiro, vamos agrupar os métodos de pagamento
-    const paymentMethods = Object.entries(response.sales?.cards?.by_payment_method || {})
-      .reduce((acc, [key, value]) => {
-        const lowerKey = key.toLowerCase()
-        let groupKey = 'other'
-        let groupLabel = 'Outros'
-
-        if (lowerKey.includes('credit') || lowerKey.includes('card') || lowerKey.includes('debit')) {
-          groupKey = 'card'
-          groupLabel = 'Conversão de cartão'
-        } else if (lowerKey.includes('pix')) {
-          groupKey = 'pix'
-          groupLabel = 'Conversão de pix'
-        } else if (lowerKey.includes('bank') || lowerKey.includes('transfer') || lowerKey.includes('payment_link')) {
-          groupKey = 'bank'
-          groupLabel = 'Conversão de boleto'
-        }
-
-        if (!acc[groupKey]) {
-          acc[groupKey] = {
-            label: groupLabel,
-            value: 0,
-            icon: groupKey,
-            iconColor: groupKey === 'card' ? 'text-blue-400' :
-              groupKey === 'pix' ? 'text-green-400' :
-                groupKey === 'bank' ? 'text-purple-400' : 'text-gray-400',
-            barColor: groupKey === 'card' ? 'bg-blue-500' :
-              groupKey === 'pix' ? 'bg-green-500' :
-                groupKey === 'bank' ? 'bg-purple-500' : 'bg-gray-500'
-          }
-        }
-        acc[groupKey].value += value
-        return acc
-      }, {} as Record<string, any>)
-
-    // Garante que temos todas as categorias com valores iniciais
-    const mainCategories = {
-      card: {
-        label: 'Conversão de cartão',
-        value: 0,
-        icon: 'card',
-        iconColor: 'text-blue-400',
-        barColor: 'bg-blue-500'
-      },
-      pix: {
-        label: 'Conversão de pix',
-        value: 0,
-        icon: 'pix',
-        iconColor: 'text-green-400',
-        barColor: 'bg-green-500'
-      },
-      bank: {
-        label: 'Conversão de boleto',
-        value: 0,
-        icon: 'bank',
-        iconColor: 'text-purple-400',
-        barColor: 'bg-purple-500'
-      },
-      other: {
-        label: 'Outros',
-        value: 0,
-        icon: 'other',
-        iconColor: 'text-gray-400',
-        barColor: 'bg-gray-500'
-      }
-    }
-
-    // Combina os métodos agrupados com as categorias principais
-    const finalMethods = {
-      ...mainCategories,
-      ...paymentMethods
-    }
-
-    // Ordena os métodos na ordem desejada e calcula as porcentagens
-    const orderedMethods = {
-      card: {
-        ...finalMethods.card,
-        percentage: totalPaid > 0 ? Math.round((finalMethods.card.value / totalPaid) * 100) : 0
-      },
-      pix: {
-        ...finalMethods.pix,
-        percentage: totalPaid > 0 ? Math.round((finalMethods.pix.value / totalPaid) * 100) : 0
-      },
-      bank: {
-        ...finalMethods.bank,
-        percentage: totalPaid > 0 ? Math.round((finalMethods.bank.value / totalPaid) * 100) : 0
-      },
-      other: {
-        ...finalMethods.other,
-        percentage: totalPaid > 0 ? Math.round((finalMethods.other.value / totalPaid) * 100) : 0
-      }
-    }
-
-    chartData.value = [
-      {
-        status: 'graph',
-        data: response.sales?.graph || []
-      },
-      {
-        status: 'by_payment_status',
-        data: Object.entries(response.sales?.cards?.by_status || {}).map(([key, value]) => ({
-          label: key,
-          value: value
-        }))
-      },
-      {
-        status: 'by_payment_method',
-        data: {
-          methods: Object.values(orderedMethods),
-          totalPaid
-        }
-      }
-    ].filter(item => {
-      if (item.status === 'by_payment_method') {
-        return item.data.methods && item.data.methods.length > 0
-      }
-      return item.data && Array.isArray(item.data) && item.data.length > 0
-    })
-
-    // Dados para a lista
-    listData.value = [
-      {
-        date: '2025-04-25',
-        description: 'Venda #1234',
-        value: 'R$ 150,00',
-        status: 'paid'
-      },
-      {
-        date: '2025-04-26',
-        description: 'Venda #1235',
-        value: 'R$ 200,00',
-        status: 'pending'
-      }
-    ]
-  } catch (e: any) {
-    console.error('Erro ao buscar dashboard:', e)
-    dashboardError.value = e?.message || 'Erro ao carregar dados do dashboard'
-    dashboardData.value = {}
-    listData.value = []
-  } finally {
-    dashboardLoading.value = false
-  }
-}
-
-async function handleSearch(term: string) {
-  dashboardLoading.value = true
-  dashboardError.value = ''
-  try {
-    const params = {
-      search: term
-    }
-    const response = await managerService.dashboard.getData(params)
-    dashboardData.value = response
-  } catch (e: any) {
-    dashboardError.value = e?.message || 'Erro ao carregar dados do dashboard'
-    dashboardData.value = {}
-  } finally {
-    dashboardLoading.value = false
-  }
-}
+const {
+  dashboardData,
+  chartData,
+  customersData,
+  withdrawalsData,
+  listData,
+  dashboardLoading,
+  dashboardError,
+  role,
+  fetchDashboardData,
+  handleSearch
+} = useDashboard()
 
 onMounted(async () => {
   await authStore.checkAuth()
