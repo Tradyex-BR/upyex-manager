@@ -67,6 +67,10 @@ const chartLineColor = '#F9A825'; // Laranja
 const chartGridColor = '#F9A825'; // Cor suave para ticks
 const chartTickColor = '#B8B8B8'; // Cinza claro para os rótulos dos eixos
 
+const axisFontFamily = 'Lato, sans-serif'
+const axisFontSize = 14
+const axisLabelColor = '#B8B8B8'
+
 // Função para criar ou atualizar o gráfico
 const createOrUpdateChart = () => {
   if (!chartRef.value) return
@@ -81,7 +85,7 @@ const createOrUpdateChart = () => {
   }
 
   // Usa APENAS os dados das props
-  const chartData = props.data || []
+  const chartData = mockData.value
 
   // --- Estilos Padrão ---
 const defaultTextColor = '#B8B8B8';
@@ -148,8 +152,13 @@ const defaultFont: Partial<FontSpec> = { // Usa Partial<FontSpec> para tipagem
             drawTicks: false,
           },
           ticks: {
-            color: defaultTextColor,
-            font: defaultFont,
+            color: axisLabelColor,
+            font: {
+              family: axisFontFamily,
+              size: axisFontSize,
+              lineHeight: 1.28,
+              weight: 'normal'
+            },
             padding: 10,
             maxTicksLimit: 2,
             callback: function (value) {
@@ -183,7 +192,13 @@ const defaultFont: Partial<FontSpec> = { // Usa Partial<FontSpec> para tipagem
             color: '#2C3652'
           },
           ticks: {
-            color: chartTickColor,
+            color: axisLabelColor,
+            font: {
+              family: axisFontFamily,
+              size: axisFontSize,
+              lineHeight: 1.28,
+              weight: 'normal'
+            },
             padding: 10,
             maxRotation: 0,
             minRotation: 0,

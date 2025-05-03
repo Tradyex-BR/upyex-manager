@@ -31,14 +31,32 @@ const barColor = '#CF631C'
 const labelColor = '#B8B8B8' // Cor para os textos dos labels (ex: cinza claro)
 const axisLineColor = '#2C3652' // Cor para as linhas dos eixos (ex: cinza mais escuro)
 const axisFontFamily = 'Lato, sans-serif'
+const axisFontSize = 14
+const axisLabelColor = '#B8B8B8'
+
+// Mock de dados para visualização local
+const mockBarData = {
+  data: [
+    { label: 'Seg', value: 120 },
+    { label: 'Ter', value: 180 },
+    { label: 'Qua', value: 150 },
+    { label: 'Qui', value: 200 },
+    { label: 'Sex', value: 220 },
+    { label: 'Sáb', value: 190 },
+    { label: 'Dom', value: 160 }
+  ]
+}
 
 const createOrUpdateChart = () => {
-  if (!chartCanvas.value || !props.data || !props.data.data) return
+  if (!chartCanvas.value) return
 
-  const labels = props.data.data.map(item => item.label)
-  const values = props.data.data.map(item => item.value)
+  // Usa o mock se não houver prop
+  const chartInput = mockBarData
 
-  console.log("DATA:", props.data.data)
+  const labels = chartInput.data.map(item => item.label)
+  const values = chartInput.data.map(item => item.value)
+
+  console.log("DATA:", chartInput.data)
 
   const chartData = {
     labels: labels,
@@ -75,14 +93,14 @@ const createOrUpdateChart = () => {
             display: false,
           },
           ticks: {
-            color: labelColor, // <--- Usar a cor do label aqui
+            color: axisLabelColor,
             padding: 10,
             stepSize: 250,
             font: {
-              size: 12,
+              size: axisFontSize,
               weight: 'normal',
               family: axisFontFamily,
-              lineHeight: '24px',
+              lineHeight: '18px',
             }
           },
           border: {
@@ -96,12 +114,13 @@ const createOrUpdateChart = () => {
             display: false,
           },
           ticks: {
-            color: labelColor, // <--- Usar a cor do label aqui
+            color: axisLabelColor,
             padding: 10,
             font: {
-              size: 11,
+              size: axisFontSize,
               weight: 'normal',
-              family: axisFontFamily
+              family: axisFontFamily,
+              lineHeight: '18px',
             }
           },
           border: {
