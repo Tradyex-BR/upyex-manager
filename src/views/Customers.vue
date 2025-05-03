@@ -22,8 +22,6 @@
                   <tr class="bg-[#1A1F3C]">
                     <th class="p-4 text-left">Nome</th>
                     <th class="p-4 text-left">Email</th>
-                    <th class="p-4 text-left">Aplicação</th>
-                    <th class="p-4 text-left">Afiliado</th>
                     <th class="p-4 text-left">Status</th>
                     <th class="p-4 text-left">Data de cadastro</th>
                     <th class="p-4 text-left">Último acesso</th>
@@ -34,8 +32,6 @@
                   <tr v-for="usuario in usuarios" :key="usuario.id" class="border-b border-[#1A1F3C]">
                     <td class="p-4">{{ usuario.nome }}</td>
                     <td class="p-4">{{ usuario.email }}</td>
-                    <td class="p-4">{{ usuario.aplicacao }}</td>
-                    <td class="p-4">{{ usuario.afiliado }}</td>
                     <td class="p-4">
                       <span :class="getStatusClass(usuario.status)">{{ usuario.status }}</span>
                     </td>
@@ -49,13 +45,25 @@
                         </button>
                         <div v-if="dropdownOpen === usuario.id"
                           class="absolute right-0 mt-2 w-48 bg-[#1a1a1a] rounded-lg shadow-lg z-10">
-                          <button class="w-full text-left px-4 py-2 hover:bg-[#2A2F4C] text-green-500"
-                            @click="goToCustomerDetail(usuario.id)">
-                            Visualizar detalhes
+                          <button class="w-full text-left px-4 py-2 hover:bg-[#2A2F4C] text-yellow-500"
+                            @click="handleCustomerAction(usuario.id, 'bloquear')">
+                            <i class="fas fa-ban mr-2"></i>
+                            {{ usuario.status === 'Ativo' ? 'Bloquear' : 'Desbloquear' }}
                           </button>
-                          <button class="w-full text-left px-4 py-2 hover:bg-[#2A2F4C] text-green-500"
-                            @click="navigateToEdit(usuario)">
-                            Editar
+                          <button class="w-full text-left px-4 py-2 hover:bg-[#2A2F4C] text-blue-500"
+                            @click="handleCustomerAction(usuario.id, 'editar_permissao')">
+                            <i class="fas fa-key mr-2"></i>
+                            Editar Permissão
+                          </button>
+                          <button class="w-full text-left px-4 py-2 hover:bg-[#2A2F4C] text-orange-500"
+                            @click="handleCustomerAction(usuario.id, 'resetar_senha')">
+                            <i class="fas fa-key mr-2"></i>
+                            Resetar Senha
+                          </button>
+                          <button class="w-full text-left px-4 py-2 hover:bg-[#2A2F4C] text-red-500"
+                            @click="handleCustomerAction(usuario.id, 'excluir')">
+                            <i class="fas fa-trash-alt mr-2"></i>
+                            Excluir
                           </button>
                         </div>
                       </div>
@@ -205,50 +213,117 @@
 
   <!-- Modal de Criação de Cliente -->
   <div v-if="showCreateModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60">
-    <div class="bg-[#23263a] rounded-lg p-8 w-full max-w-2xl relative">
-      <div class="flex justify-between items-center mb-6">
-        <h2 class="text-xl font-bold text-white">Novo Cliente</h2>
+    <div class="bg-[#23263a] rounded-lg p-8 w-full max-w-4xl relative max-h-[90vh] overflow-y-auto">
+      <!-- Header -->
+      <div class="flex justify-between items-center mb-8 border-b border-[#2A2F4C] pb-4">
+        <div class="flex items-center gap-3">
+          <div class="w-12 h-12 rounded-full bg-[#CF631C]/20 flex items-center justify-center">
+            <i class="fas fa-user-plus text-[#CF631C] text-2xl"></i>
+          </div>
+          <div>
+            <h2 class="text-2xl font-bold text-white">Novo Cliente</h2>
+            <p class="text-gray-400 text-sm">Preencha os dados do novo cliente</p>
+          </div>
+        </div>
         <button @click="showCreateModal = false" class="text-gray-400 hover:text-white transition-colors">
           <i class="fas fa-times text-xl"></i>
         </button>
       </div>
 
-      <form @submit.prevent="handleCreateCustomer" class="space-y-6">
-        <div class="grid grid-cols-2 gap-4">
-          <div>
-            <label class="block text-gray-400 mb-2">Nome</label>
-            <input v-model="newCustomer.name" type="text" required
-              class="w-full bg-[#1a1a2a] text-white rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#CF631C]">
-          </div>
-          <div>
-            <label class="block text-gray-400 mb-2">Email</label>
-            <input v-model="newCustomer.email" type="email" required
-              class="w-full bg-[#1a1a2a] text-white rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#CF631C]">
-          </div>
-          <div>
-            <label class="block text-gray-400 mb-2">Telefone</label>
-            <input v-model="newCustomer.phone" type="tel" required
-              class="w-full bg-[#1a1a2a] text-white rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#CF631C]">
-          </div>
-          <div>
-            <label class="block text-gray-400 mb-2">CPF/CNPJ</label>
-            <input v-model="newCustomer.document_number" type="text"
-              class="w-full bg-[#1a1a2a] text-white rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#CF631C]">
-          </div>
-          <div>
-            <label class="block text-gray-400 mb-2">Código do Afiliado</label>
-            <input v-model="newCustomer.affiliate_code" type="text" required
-              class="w-full bg-[#1a1a2a] text-white rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#CF631C]">
+      <form @submit.prevent="handleCreateCustomer" class="space-y-8">
+        <!-- Informações Básicas -->
+        <div class="bg-[#1a1a2a] rounded-xl p-6">
+          <h3 class="text-white text-lg font-semibold mb-6 flex items-center gap-2">
+            <i class="fas fa-user text-[#CF631C]"></i>
+            Informações Básicas
+          </h3>
+          <div class="grid grid-cols-2 gap-6">
+            <div>
+              <label class="block text-gray-400 mb-2 font-medium">Nome</label>
+              <div class="relative">
+                <i class="fas fa-user absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                <input v-model="newCustomer.name" 
+                  type="text" 
+                  required
+                  placeholder="Nome completo do cliente"
+                  class="w-full pl-10 pr-3 py-2.5 rounded-lg bg-[#23263a] text-white border border-[#2A2F4C] focus:border-[#CF631C] focus:outline-none transition-colors">
+              </div>
+            </div>
+            <div>
+              <label class="block text-gray-400 mb-2 font-medium">Email</label>
+              <div class="relative">
+                <i class="fas fa-envelope absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                <input v-model="newCustomer.email" 
+                  type="email" 
+                  required
+                  placeholder="email@exemplo.com"
+                  class="w-full pl-10 pr-3 py-2.5 rounded-lg bg-[#23263a] text-white border border-[#2A2F4C] focus:border-[#CF631C] focus:outline-none transition-colors">
+              </div>
+            </div>
           </div>
         </div>
 
-        <div class="flex justify-end gap-4 mt-6">
-          <button type="button" @click="showCreateModal = false"
-            class="px-6 py-2 bg-gray-600 hover:bg-gray-700 rounded-lg text-white font-medium transition-colors">
+        <!-- Informações de Contato -->
+        <div class="bg-[#1a1a2a] rounded-xl p-6">
+          <h3 class="text-white text-lg font-semibold mb-6 flex items-center gap-2">
+            <i class="fas fa-phone text-[#CF631C]"></i>
+            Informações de Contato
+          </h3>
+          <div class="grid grid-cols-2 gap-6">
+            <div>
+              <label class="block text-gray-400 mb-2 font-medium">Telefone</label>
+              <div class="relative">
+                <i class="fas fa-phone absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                <input v-model="newCustomer.phone" 
+                  type="tel" 
+                  required
+                  placeholder="(00) 00000-0000"
+                  class="w-full pl-10 pr-3 py-2.5 rounded-lg bg-[#23263a] text-white border border-[#2A2F4C] focus:border-[#CF631C] focus:outline-none transition-colors">
+              </div>
+            </div>
+            <div>
+              <label class="block text-gray-400 mb-2 font-medium">CPF/CNPJ</label>
+              <div class="relative">
+                <i class="fas fa-id-card absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                <input v-model="newCustomer.document_number" 
+                  type="text"
+                  placeholder="000.000.000-00"
+                  class="w-full pl-10 pr-3 py-2.5 rounded-lg bg-[#23263a] text-white border border-[#2A2F4C] focus:border-[#CF631C] focus:outline-none transition-colors">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Informações de Afiliado -->
+        <div class="bg-[#1a1a2a] rounded-xl p-6">
+          <h3 class="text-white text-lg font-semibold mb-6 flex items-center gap-2">
+            <i class="fas fa-handshake text-[#CF631C]"></i>
+            Informações de Afiliado
+          </h3>
+          <div>
+            <label class="block text-gray-400 mb-2 font-medium">Código do Afiliado</label>
+            <div class="relative">
+              <i class="fas fa-hashtag absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+              <input v-model="newCustomer.affiliate_code" 
+                type="text" 
+                required
+                placeholder="Código único do afiliado"
+                class="w-full pl-10 pr-3 py-2.5 rounded-lg bg-[#23263a] text-white border border-[#2A2F4C] focus:border-[#CF631C] focus:outline-none transition-colors">
+            </div>
+          </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="flex justify-end gap-4 pt-6 border-t border-[#2A2F4C]">
+          <button type="button" 
+            class="px-6 py-2.5 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors flex items-center gap-2" 
+            @click="showCreateModal = false">
+            <i class="fas fa-times"></i>
             Cancelar
           </button>
-          <button type="submit"
-            class="px-6 py-2 bg-[#CF631C] hover:bg-[#E67E22] rounded-lg text-white font-medium transition-colors">
+          <button type="submit" 
+            class="px-6 py-2.5 bg-[#CF631C] text-white rounded-lg hover:bg-[#B5520A] transition-colors flex items-center gap-2">
+            <i class="fas fa-save"></i>
             Criar Cliente
           </button>
         </div>
@@ -336,17 +411,17 @@ export default defineComponent({
         sort_order: 'desc'
       });
       this.usuarios = (response.data || []).map((item: any) => ({
-        id: item.id.toString(),
+        id: item.id,
         nome: item.name || '',
         email: item.email || '',
-        aplicacao: item.application?.name || '-',
-        afiliado: item.affiliate?.name || '-',
-        status: item.status || (item.affiliate?.is_active === false ? 'Bloqueado' : 'Ativo'),
+        status: item.application?.is_active ? 'Ativo' : 'Inativo',
         dataCadastro: item.created_at ? new Date(item.created_at).toLocaleDateString('pt-BR') : '-',
         ultimoAcesso: item.updated_at ? new Date(item.updated_at).toLocaleDateString('pt-BR') : '-',
         linkApi: item.links?.api || '',
         phone: item.phone || '',
-        document_number: item.document_number || ''
+        document_number: item.document_number || '',
+        application: item.application || null,
+        affiliate: item.affiliate || null
       }));
     } catch (e) {
       console.error('Erro ao carregar clientes:', e)
@@ -373,10 +448,20 @@ export default defineComponent({
       try {
         switch (action) {
           case 'bloquear':
-            // Implementar lógica de bloqueio/desbloqueio
+            await managerService.customers.toggleStatus(id);
+            await this.loadCustomers();
+            break;
+          case 'editar_permissao':
+            // Implementar lógica de edição de permissão
             break;
           case 'resetar_senha':
-            // Implementar lógica de reset de senha
+            await managerService.customers.resetPassword(id);
+            break;
+          case 'excluir':
+            if (confirm('Tem certeza que deseja excluir este cliente?')) {
+              await managerService.customers.delete(id);
+              await this.loadCustomers();
+            }
             break;
         }
       } catch (e) {
@@ -435,17 +520,17 @@ export default defineComponent({
           sort_order: 'desc'
         });
         this.usuarios = (response.data || []).map((item: any) => ({
-          id: item.id.toString(),
+          id: item.id,
           nome: item.name || '',
           email: item.email || '',
-          aplicacao: item.application?.name || '-',
-          afiliado: item.affiliate?.name || '-',
-          status: item.status || (item.affiliate?.is_active === false ? 'Bloqueado' : 'Ativo'),
+          status: item.application?.is_active ? 'Ativo' : 'Inativo',
           dataCadastro: item.created_at ? new Date(item.created_at).toLocaleDateString('pt-BR') : '-',
           ultimoAcesso: item.updated_at ? new Date(item.updated_at).toLocaleDateString('pt-BR') : '-',
           linkApi: item.links?.api || '',
           phone: item.phone || '',
-          document_number: item.document_number || ''
+          document_number: item.document_number || '',
+          application: item.application || null,
+          affiliate: item.affiliate || null
         }));
       } catch (e) {
         console.error('Erro ao carregar clientes:', e);

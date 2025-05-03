@@ -22,10 +22,14 @@
         <div class="relative">
           <div class="self-stretch flex items-stretch gap-[10px] my-auto cursor-pointer" @click="toggleDropdown">
             <div class="flex items-center gap-[15px]">
-              <p
-                class="font-inter text-[#FFF] text-[14px] leading-[18px] grow my-auto truncate overflow-hidden whitespace-nowrap">
-                {{ authStore.currentUser?.name || 'Usuário' }}
-              </p>
+              <div class="flex items-center gap-1">
+                  <p
+                    class="font-inter text-[#FFF] text-[14px] leading-[18px] grow my-auto truncate overflow-hidden whitespace-nowrap">
+                    {{ authStore.currentUser?.name || 'Usuário' }}
+                  </p>
+
+              </div>
+
               <div v-if="authStore.currentUser?.avatar_path">
                 <img
                   :src="authStore.currentUser?.avatar_path"

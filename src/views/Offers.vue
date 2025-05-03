@@ -11,86 +11,89 @@
         <div class="w-full max-md:max-w-full">
           <section class="min-h-[944px] w-full overflow-hidden max-md:max-w-full max-md:px-5">
             <div class="flex justify-between items-center mb-6">
-              <p class="text-white text-2xl font-semibold">Offers</p>
-              <BaseButton class="ml-2" @click="showCreateModal = true" v-if="role === 'manager'">
-                Nova Aplicação
+              <p class="text-white text-2xl font-semibold">Ofertas</p>
+              <BaseButton class="ml-2" @click="handleGenerateLink">
+                Gerar link genérico
               </BaseButton>
             </div>
             <div>
               <table class="w-full text-white border-collapse">
                 <thead>
                   <tr class="bg-[#1A1F3C]">
-                    <th class="p-4 text-left">Aplicação</th>
-                    <th class="p-4 text-left">Descrição</th>
-                    <th class="p-4 text-left">Status</th>
-                    <th class="p-4 text-left">Afiliados</th>
-                    <th class="p-4 text-left">Criado em</th>
-                    <th class="p-4 text-left">Ações</th>
+                    <template v-if="role === 'manager'">
+                      <th class="p-4 text-left">Nome</th>
+                      <th class="p-4 text-left">ID de Afiliado</th>
+                      <th class="p-4 text-left">Data de Cadastro</th>
+                      <th class="p-4 text-left">Status</th>
+                    </template>
+                    <template v-else>
+                      <th class="p-4 text-left">Nome</th>
+                      <th class="p-4 text-left">Status</th>
+                      <th class="p-4 text-left">Link direto</th>
+                    </template>
                   </tr>
                 </thead>
                 <tbody>
                   <tr v-for="offer in offers" :key="offer.id" class="border-b border-[#1A1F3C] hover:bg-[#2A2F4C] transition-colors">
-                    <td class="p-4">
-                      <div class="flex items-center gap-3">
-                        <img 
-                          :src="offer.logo_url || `https://ui-avatars.com/api/?name=${offer.name}&background=random`" 
-                          :alt="offer.name" 
-                          class="w-10 h-10 rounded-full object-cover"
-                        />
-                        <div class="flex flex-col">
-                          <span class="font-semibold">{{ offer.name }}</span>
-                          <span class="text-sm text-gray-400">ID: {{ offer.id.slice(0, 8) }}...</span>
+                    <template v-if="role === 'manager'">
+                      <td class="p-4">
+                        <div class="flex items-center gap-3">
+                          <img 
+                            :src="offer.logo_url || `https://ui-avatars.com/api/?name=${offer.name}&background=random`" 
+                            :alt="offer.name" 
+                            class="w-10 h-10 rounded-full object-cover"
+                          />
+                          <div class="flex flex-col">
+                            <span class="font-semibold">{{ offer.name }}</span>
+                          </div>
                         </div>
-                      </div>
-                    </td>
-                    <td class="p-4">
-                      <p class="text-gray-300 line-clamp-2">{{ offer.description }}</p>
-                    </td>
-                    <td class="p-4">
-                      <span :class="getStatusClass(offer.is_active)">
-                        <i :class="['fas mr-2', offer.is_active ? 'fa-check-circle' : 'fa-ban']"></i>
-                        {{ offer.is_active ? 'Ativa' : 'Inativa' }}
-                      </span>
-                    </td>
-                    <td class="p-4">
-                      <div class="flex items-center gap-2">
-                        <i class="fas fa-users text-[#CF631C]"></i>
-                        <span>{{ offer.affiliates?.length || 0 }} afiliados</span>
-                      </div>
-                    </td>
-                    <td class="p-4">
-                      <div class="flex items-center gap-2">
-                        <i class="fas fa-calendar text-[#CF631C]"></i>
-                        <span>{{ new Date(offer.created_at).toLocaleDateString('pt-BR') }}</span>
-                      </div>
-                    </td>
-                    <td class="p-4">
-                      <div class="relative">
-                        <button class="px-3 py-1 bg-[#1A1F3C] rounded-lg hover:bg-[#2A2F4C] transition-colors flex items-center gap-2"
-                          @click="toggleDropdown(offer.id)">
-                          <i class="fas fa-ellipsis-v"></i>
-                          Ações
-                        </button>
-                        <div v-if="dropdownOpen === offer.id"
-                          class="absolute right-0 mt-2 w-48 bg-[#1a1a2a] rounded-lg shadow-lg z-10 border border-[#2A2F4C]">
-                          <button class="w-full text-left px-4 py-2 hover:bg-[#2A2F4C] text-green-500 flex items-center gap-2"
-                            @click="showOfferDetails(offer)">
-                            <i class="fas fa-eye"></i>
-                            Visualizar detalhes
-                          </button>
-                          <button class="w-full text-left px-4 py-2 hover:bg-[#2A2F4C] text-blue-500 flex items-center gap-2"
-                            @click="copyToClipboard(offer.affiliate_link)">
+                      </td>
+                      <td class="p-4">
+                        <span class="text-sm text-gray-400">{{ offer.id }}</span>
+                      </td>
+                      <td class="p-4">
+                        <div class="flex items-center gap-2">
+                          <i class="fas fa-calendar text-[#CF631C]"></i>
+                          <span>{{ new Date(offer.created_at).toLocaleDateString('pt-BR') }}</span>
+                        </div>
+                      </td>
+                      <td class="p-4">
+                        <span :class="getStatusClass(offer.is_active)">
+                          <i :class="['fas mr-2', offer.is_active ? 'fa-check-circle' : 'fa-ban']"></i>
+                          {{ offer.is_active ? 'Ativa' : 'Inativa' }}
+                        </span>
+                      </td>
+                    </template>
+                    <template v-else>
+                      <td class="p-4">
+                        <div class="flex items-center gap-3">
+                          <img 
+                            :src="offer.logo_url || `https://ui-avatars.com/api/?name=${offer.name}&background=random`" 
+                            :alt="offer.name" 
+                            class="w-10 h-10 rounded-full object-cover"
+                          />
+                          <div class="flex flex-col">
+                            <span class="font-semibold">{{ offer.name }}</span>
+                            <span class="text-sm text-gray-400">{{ offer.description }}</span>
+                          </div>
+                        </div>
+                      </td>
+                      <td class="p-4">
+                        <span :class="getStatusClass(offer.is_active)">
+                          <i :class="['fas mr-2', offer.is_active ? 'fa-check-circle' : 'fa-ban']"></i>
+                          {{ offer.is_active ? 'Ativa' : 'Inativa' }}
+                        </span>
+                      </td>
+                      <td class="p-4">
+                        <div class="flex items-center gap-2">
+                          <span class="text-sm text-gray-400 truncate max-w-[200px]">{{ offer.affiliate_link }}</span>
+                          <button @click="copyToClipboard(offer.affiliate_link)" 
+                            class="text-[#CF631C] hover:text-[#E67E22] transition-colors p-2 hover:bg-[#23263a] rounded-lg">
                             <i class="fas fa-copy"></i>
-                            Copiar link
-                          </button>
-                          <button v-if="role === 'manager'" class="w-full text-left px-4 py-2 hover:bg-[#2A2F4C] text-yellow-500 flex items-center gap-2"
-                            @click="navigateToEdit(offer)">
-                            <i class="fas fa-edit"></i>
-                            Editar
                           </button>
                         </div>
-                      </div>
-                    </td>
+                      </td>
+                    </template>
                   </tr>
                 </tbody>
               </table>
@@ -253,13 +256,13 @@
   <div v-if="showCreateModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60">
     <div class="bg-[#23263a] rounded-lg p-8 w-full max-w-2xl relative">
       <div class="flex justify-between items-center mb-6">
-        <h2 class="text-xl font-bold text-white">Nova Aplicação</h2>
+        <h2 class="text-xl font-bold text-white">{{ role === 'manager' ? 'Nova Aplicação' : 'Gerar Link Genérico' }}</h2>
         <button @click="showCreateModal = false" class="text-gray-400 hover:text-white transition-colors">
           <i class="fas fa-times text-xl"></i>
         </button>
       </div>
 
-      <form @submit.prevent="handleCreateApplication" class="space-y-6">
+      <form v-if="role === 'manager'" @submit.prevent="handleCreateApplication" class="space-y-6">
         <div class="grid grid-cols-2 gap-4">
           <div>
             <label class="block text-gray-400 mb-2">Nome</label>
@@ -294,6 +297,35 @@
           </button>
         </div>
       </form>
+
+      <!-- Conteúdo para afiliados -->
+      <div v-else class="space-y-6">
+        <div class="bg-[#1a1a2a] rounded-xl p-6">
+          <h3 class="text-white text-lg font-semibold mb-6 flex items-center gap-2">
+            <i class="fas fa-link text-[#CF631C]"></i>
+            Link Genérico
+          </h3>
+          <div class="space-y-4">
+            <div>
+              <label class="text-gray-400 text-sm mb-2 block">Seu link de afiliado</label>
+              <div class="flex items-center gap-2 bg-[#23263a] rounded-lg p-3">
+                <p class="text-white font-medium break-all">{{ genericLink }}</p>
+                <button @click="copyToClipboard(genericLink)" 
+                  class="text-[#CF631C] hover:text-[#E67E22] transition-colors p-2 hover:bg-[#23263a] rounded-lg flex-shrink-0">
+                  <i class="fas fa-copy"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex justify-end">
+          <button @click="showCreateModal = false"
+            class="px-6 py-2 bg-gray-600 hover:bg-gray-700 rounded-lg text-white font-medium transition-colors">
+            Fechar
+          </button>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -340,7 +372,8 @@ export default defineComponent({
         logo_url: null,
         base_affiliate_link: ''
       },
-      role: localStorage.getItem('role') || ''
+      role: localStorage.getItem('role') || '',
+      genericLink: ''
     }
   },
   async mounted() {
@@ -436,6 +469,15 @@ export default defineComponent({
     },
     async loadOffers() {
       await this.handleSearch('');
+    },
+    handleGenerateLink() {
+      if (this.role === 'manager') {
+        this.showCreateModal = true;
+      } else {
+        // Gera um link genérico para afiliados
+        this.genericLink = `${window.location.origin}/affiliate/${localStorage.getItem('user_id')}`;
+        this.showCreateModal = true;
+      }
     }
   }
 })

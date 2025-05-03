@@ -32,11 +32,16 @@
                   <thead>
                     <tr class="bg-[#1A1F3C]">
                       <th class="p-4 text-left">Data</th>
-                      <th class="p-4 text-left">Valor</th>
-                      <th class="p-4 text-left">Destino</th>
+                      <th class="p-4 text-left">Valor BRL</th>
+                      <th class="p-4 text-left">Destino (Chave Pix)</th>
                       <th class="p-4 text-left">Tipo</th>
                       <th class="p-4 text-left">Status</th>
-                      <th class="p-4 text-left">Ações</th>
+                      <template v-if="role === 'manager'">
+                        <th class="p-4 text-left">Ações</th>
+                      </template>
+                      <template v-else>
+                        <th class="p-4 text-left">Link</th>
+                      </template>
                     </tr>
                   </thead>
                   <tbody>
@@ -48,34 +53,43 @@
                       <td class="p-4">
                         <span :class="getStatusClass(withdrawal.status)">{{ withdrawal.status }}</span>
                       </td>
-                      <td class="p-4">
-                        <div class="relative">
-                          <a v-if="withdrawal.link" :href="withdrawal.link" target="_blank" class="text-blue-400 underline mr-2">Detalhes</a>
-                          <button 
-                            class="px-3 py-1 bg-[#1A1F3C] rounded-lg hover:bg-[#2A2F4C] transition-colors"
-                            @click="toggleDropdown(withdrawal.id)"
-                          >
-                            Ações
-                          </button>
-                          <div 
-                            v-if="dropdownOpen === withdrawal.id"
-                            class="absolute right-0 mt-2 w-48 bg-[#1a1a1a] rounded-lg shadow-lg z-10"
-                          >
+                      <template v-if="role === 'manager'">
+                        <td class="p-4">
+                          <div class="relative">
                             <button 
-                              class="w-full text-left px-4 py-2 hover:bg-[#2A2F4C] text-green-500"
-                              @click="aprovar(withdrawal.id)"
+                              class="px-3 py-1 bg-[#1A1F3C] rounded-lg hover:bg-[#2A2F4C] transition-colors"
+                              @click="toggleDropdown(withdrawal.id)"
                             >
-                              Aprovar
+                              Ações
                             </button>
-                            <button 
-                              class="w-full text-left px-4 py-2 hover:bg-[#2A2F4C] text-red-500"
-                              @click="rejeitar(withdrawal.id)"
+                            <div 
+                              v-if="dropdownOpen === withdrawal.id"
+                              class="absolute right-0 mt-2 w-48 bg-[#1a1a1a] rounded-lg shadow-lg z-10"
                             >
-                              Rejeitar
-                            </button>
+                              <button 
+                                class="w-full text-left px-4 py-2 hover:bg-[#2A2F4C] text-green-500"
+                                @click="aprovar(withdrawal.id)"
+                              >
+                                Aprovar
+                              </button>
+                              <button 
+                                class="w-full text-left px-4 py-2 hover:bg-[#2A2F4C] text-red-500"
+                                @click="rejeitar(withdrawal.id)"
+                              >
+                                Rejeitar
+                              </button>
+                            </div>
                           </div>
-                        </div>
-                      </td>
+                        </td>
+                      </template>
+                      <template v-else>
+                        <td class="p-4">
+                          <a v-if="withdrawal.link" :href="withdrawal.link" target="_blank" class="text-blue-400 hover:text-blue-300 transition-colors">
+                            <i class="fas fa-external-link-alt mr-1"></i>
+                            Ver detalhes
+                          </a>
+                        </td>
+                      </template>
                     </tr>
                   </tbody>
                 </table>
@@ -174,8 +188,8 @@ export default defineComponent({
           date: item.created_at ? new Date(item.created_at).toLocaleString('pt-BR') : '',
           valueBRL: Number(item.amount).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }),
           destination: item.destination,
-          type: item.method,
-          status: item.status,
+          type: item.method === 'pix' ? 'PIX' : item.method === 'crypto' ? 'Criptomoeda' : item.method,
+          status: this.translateStatus(item.status),
           link: item.links?.frontend || ''
         }));
 
@@ -249,6 +263,17 @@ export default defineComponent({
       this.pagination.current_page = page;
       this.loading = true;
       await this.loadWithdrawals();
+    },
+    translateStatus(status: string): string {
+      const statusMap: { [key: string]: string } = {
+        'requested': 'Solicitado',
+        'approved': 'Aprovado',
+        'rejected': 'Rejeitado',
+        'processing': 'Processando',
+        'processed': 'Processado',
+        'cancelled': 'Cancelado'
+      };
+      return statusMap[status] || status;
     }
   }
 })
