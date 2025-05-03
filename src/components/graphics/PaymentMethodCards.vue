@@ -1,5 +1,5 @@
 <template>
-  <div v-if="formattedData.length > 0" class="grid grid-cols-1 gap-2">
+  <div v-if="formattedData.length > 0" class="grid grid-cols-2 gap-2">
     <div v-for="(item, index) in formattedData" :key="index" class="h-[70px] bg-transparent rounded-lg border border-[#2C3652] p-3">
       <div class="flex items-center gap-3 mb-3">
         <div class="w-[46px] h-[46px] rounded-full flex items-center justify-center"  style="background-color: rgba(4, 13, 37, 0.16)">

@@ -58,10 +58,10 @@
                   <GraphicSection title="Status das vendas" description="Distribuição por status de pagamento"
                     class="h-[446px]">
                     <div class="flex gap-8 h-full justify-center items-center">
-                      <template v-if="getChartData('by_payment_status')?.length && getChartData('by_payment_status')?.some(item => item.count > 0)">
-                        <DoughnutChart :data="getChartData('by_payment_status')" />
+                      <template v-if="paymentStatus.length > 0">
+                        <DoughnutChart :data="paymentStatus" />
                         <div class="flex flex-col gap-4">
-                          <DoughnutChartLegends :data="getChartData('by_payment_status')" />
+                          <DoughnutChartLegends :data="{ data: paymentStatus }" />
                         </div>
                       </template>
                       <template v-else>
@@ -72,8 +72,8 @@
 
                   <GraphicSection title="Método de pagamento" description="Distribuição por método de pagamento"
                     class="h-[446px]">
-                    <template v-if="getChartData('by_payment_method')?.methods?.length">
-                      <PaymentMethodCards :data="getChartData('by_payment_method')" />
+                    <template v-if="paymentMethods.data?.methods?.length > 0" >
+                        <PaymentMethodCards :data="paymentMethods"/>
                     </template>
                     <template v-else>
                       <EmptyState message="Não há dados de métodos de pagamento disponíveis" />
@@ -176,9 +176,63 @@ const dashboardData = ref<Record<string, { value: string; label: string }> | nul
 const withdrawalsData = ref<{ data: Array<{ label: string; value: number }> } | null>(null)
 const customersData = ref<{ total: number } | null>(null)
 const chartData = ref<Array<{ status: string; data: Array<{ date: string; count: number }> }>>([])
-const paymentMethods = ref<Array<{ label: string; value: number; icon: string; iconColor: string; barColor: string; percentage?: number }>>([])
+const paymentMethods = ref<{ data: { methods: Array<{ label: string; value: number; percentage: number; icon: string; iconColor: string; barColor: string }>; totalPaid: string } }>({ data: { methods: [], totalPaid: '0' } })
 const paymentStatus = ref<Array<{ label: string; value: number }>>([])
 const listData = ref<Array<{ date: string; description: string; value: string; status: string }>>([])
+
+// Dados mockados para desenvolvimento
+const mockData = {
+  sales: {
+    cards: {
+      by_status: {
+        awaiting_payment: 15,
+        paid: 45,
+        refunded: 5,
+        cancelled: 8,
+        failed: 2
+      },
+      by_payment_method: {
+        bank_transfer: 12,
+        credit_card: 35,
+        debit_card: 18,
+        payment_link: 8,
+        pix: 27
+      }
+    },
+    graph: [
+      { date: '2025-04-01', count: 12 },
+      { date: '2025-04-02', count: 15 },
+      { date: '2025-04-03', count: 8 },
+      { date: '2025-04-04', count: 20 },
+      { date: '2025-04-05', count: 25 },
+      { date: '2025-04-06', count: 18 },
+      { date: '2025-04-07', count: 22 },
+      { date: '2025-04-08', count: 30 },
+      { date: '2025-04-09', count: 28 },
+      { date: '2025-04-10', count: 35 },
+      { date: '2025-04-11', count: 32 },
+      { date: '2025-04-12', count: 40 },
+      { date: '2025-04-13', count: 38 },
+      { date: '2025-04-14', count: 45 },
+      { date: '2025-04-15', count: 42 }
+    ]
+  },
+  withdrawals: {
+    by_status: {
+      requested: 8,
+      approved: 12,
+      rejected: 3,
+      processing: 5,
+      processed: 15,
+      cancelled: 2,
+      failed: 1
+    }
+  },
+  customers: {
+    total: 150,
+    new: 25
+  }
+}
 
 // Data utils
 const {
@@ -194,7 +248,13 @@ const isManager = computed(() => localStorage.getItem('role') === 'manager')
 // Data getters - facilita o acesso aos dados com tratamento de erros
 const getChartData = (status: string) => {
   const found = chartData.value.find(item => item.status === status)
-  return found ? found.data : null
+  if (!found) return null
+
+  if (status === 'graph') {
+    return found.data
+  }
+
+  return found.data.data
 }
 
 // Navigation
@@ -217,7 +277,8 @@ async function fetchDashboardData() {
       search: searchQuery.value
     }
 
-    const response = await managerService.dashboard.getData(params)
+    // Usa dados mockados para desenvolvimento
+    const response = mockData
     
     // Processa os dados usando o composable
     dashboardData.value = processDashboardCards(response, isManager.value)
@@ -232,39 +293,76 @@ async function fetchDashboardData() {
           date: item.date,
           count: item.count
         })) || []
-      },
-      {
-        status: 'by_payment_status',
-        data: Object.entries(response.sales?.cards?.by_status || {}).map(([label, value]) => ({
-          date: label,
-          count: value as number
-        }))
-      },
-      {
-        status: 'by_payment_method',
-        data: Object.entries(response.sales?.cards?.by_payment_method || {}).map(([label, value]) => ({
-          date: label,
-          count: value as number
-        }))
       }
     ]
 
-    paymentMethods.value = processPaymentMethods(response.sales?.cards?.by_payment_method || {}, response.sales?.cards?.by_status?.paid || 0)
-    paymentStatus.value = processPaymentStatus(response.sales?.cards?.by_status || {})
+    // Processa os dados de status de pagamento
+    paymentStatus.value = Object.entries(response.sales?.cards?.by_status || {}).map(([label, value]) => ({
+      label: label === 'awaiting_payment' ? 'Aguardando Pagamento' :
+             label === 'paid' ? 'Pago' :
+             label === 'refunded' ? 'Reembolsado' :
+             label === 'cancelled' ? 'Cancelado' :
+             label === 'failed' ? 'Falha' : label,
+      value: value as number
+    }))
 
-    // Dados para a lista de transações
+    // Processa os dados de métodos de pagamento
+    const totalPaid = response.sales?.cards?.by_status?.paid || 0
+    paymentMethods.value = {
+      data: {
+        methods: Object.entries(response.sales?.cards?.by_payment_method || {}).map(([label, value]) => ({
+          label: label === 'credit_card' ? 'Cartão de Crédito' :
+                 label === 'debit_card' ? 'Cartão de Débito' :
+                 label === 'pix' ? 'PIX' :
+                 label === 'bank_transfer' ? 'Transferência Bancária' :
+                 label === 'payment_link' ? 'Link de Pagamento' : label,
+          value: value as number,
+          percentage: totalPaid > 0 ? Math.round((value as number / totalPaid) * 100) : 0,
+          icon: label.includes('credit') || label.includes('debit') ? 'card' :
+                label.includes('pix') ? 'pix' :
+                label.includes('bank') || label.includes('payment_link') ? 'bank' : 'other',
+          iconColor: label.includes('credit') || label.includes('debit') ? 'text-blue-400' :
+                    label.includes('pix') ? 'text-green-400' :
+                    label.includes('bank') || label.includes('payment_link') ? 'text-purple-400' : 'text-gray-400',
+          barColor: label.includes('credit') || label.includes('debit') ? 'bg-blue-500' :
+                   label.includes('pix') ? 'bg-green-500' :
+                   label.includes('bank') || label.includes('payment_link') ? 'bg-purple-500' : 'bg-gray-500'
+        })),
+        totalPaid: totalPaid
+      }
+    }
+
+    // Dados mockados para a lista de transações
     listData.value = [
       {
-        date: '2025-04-25',
+        date: '2025-04-15',
         description: 'Venda #1234',
-        value: 'R$ 150,00',
+        value: 'R$ 1.500,00',
         status: 'paid'
       },
       {
-        date: '2025-04-26',
-        description: 'Venda #1235',
-        value: 'R$ 200,00',
-        status: 'pending'
+        date: '2025-04-14',
+        description: 'Venda #1233',
+        value: 'R$ 2.000,00',
+        status: 'paid'
+      },
+      {
+        date: '2025-04-13',
+        description: 'Venda #1232',
+        value: 'R$ 800,00',
+        status: 'awaiting_payment'
+      },
+      {
+        date: '2025-04-12',
+        description: 'Venda #1231',
+        value: 'R$ 1.200,00',
+        status: 'refunded'
+      },
+      {
+        date: '2025-04-11',
+        description: 'Venda #1230',
+        value: 'R$ 950,00',
+        status: 'cancelled'
       }
     ]
 
@@ -275,7 +373,7 @@ async function fetchDashboardData() {
     withdrawalsData.value = null
     customersData.value = null
     chartData.value = []
-    paymentMethods.value = []
+    paymentMethods.value = { data: { methods: [], totalPaid: '0' } }
     paymentStatus.value = []
     listData.value = []
   } finally {
