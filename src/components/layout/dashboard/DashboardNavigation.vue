@@ -5,7 +5,7 @@
       :key="item.id"
       @click="$emit('update:modelValue', item.id)"
       :class="[
-        'nav-btn relative px-4 py-2 rounded-lg transition-colors bg-transparent outline-none border-none',
+        'nav-btn text-[14px] font-inter leading-[18px] relative px-4 py-2 rounded-lg transition-colors bg-transparent outline-none border-none',
         modelValue === item.id ? 'active' : ''
       ]"
     >
