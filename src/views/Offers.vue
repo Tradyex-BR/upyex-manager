@@ -2,7 +2,7 @@
   <div v-if="loading" class="flex w-full h-full items-center justify-center text-gray-400">
     <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
   </div>
-  <div v-else-if="offers.length === 0" class="flex w-full h-full items-center justify-center text-gray-400">
+  <div v-else-if="offers.length === 0" class="w-full min-h-[calc(100vh-200px)] items-center justify-center text-gray-400">
     Nenhuma oferta encontrada.
   </div>
   <div v-else class="overflow-hidden">

@@ -13,11 +13,14 @@
                 Nova Venda
               </BaseButton> -->
             </div>
-            <div>
+            <div >
               <div v-if="loading" class="flex items-center justify-center py-10">
                 <span class="text-white text-lg">Carregando vendas...</span>
               </div>
-              <table class="w-full text-white border-collapse">
+              <div v-else-if="sales.length === 0" class="flex w-full min-h-[200px] items-center justify-center text-gray-400 text-lg">
+                Nenhuma venda encontrada
+              </div>
+              <table v-else class="w-full text-white border-collapse">
                 <thead>
                   <tr class="bg-[#1A1F3C]">
                     <template v-if="isManager">
@@ -41,9 +44,6 @@
                   </tr>
                 </thead>
                 <tbody>
-                  <tr v-if="sales.length === 0" class="border-b border-[#1A1F3C]">
-                    <td :colspan="isManager ? 8 : 8" class="p-4 text-center text-gray-400">Nenhuma venda encontrada</td>
-                  </tr>
                   <tr v-for="sale in sales" :key="sale.id" class="border-b border-[#1A1F3C]">
                     <template v-if="isManager">
                       <td class="p-4">{{ new Date(sale.created_at).toLocaleDateString('pt-BR') }}</td>

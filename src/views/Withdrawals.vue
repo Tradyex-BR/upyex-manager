@@ -13,19 +13,14 @@
             </div>
 
             <!-- Modais -->
-            <WithdrawalRequestModal
-              v-if="showRequestModal"
-              @close="showRequestModal = false"
-              @submit="handleWithdrawalRequest"
-            />
-            <WithdrawalSuccessModal
-              v-if="showSuccessModal"
-              @close="showSuccessModal = false"
-            />
+            <WithdrawalRequestModal v-if="showRequestModal" @close="showRequestModal = false"
+              @submit="handleWithdrawalRequest" />
+            <WithdrawalSuccessModal v-if="showSuccessModal" @close="showSuccessModal = false" />
 
             <!-- Conteúdo condicional -->
             <div class="flex w-full min-h-[calc(100vh-200px)] items-center justify-center text-gray-400">
-              <div v-if="loading" class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+              <div v-if="loading" class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500">
+              </div>
               <div v-else-if="withdrawals.length === 0">Nenhum saque encontrado.</div>
               <div v-else class="w-full">
                 <table class="w-full text-white border-collapse">
@@ -56,26 +51,18 @@
                       <template v-if="role === 'manager'">
                         <td class="p-4">
                           <div class="relative">
-                            <button 
-                              class="px-3 py-1 bg-[#1A1F3C] rounded-lg hover:bg-[#2A2F4C] transition-colors"
-                              @click="toggleDropdown(withdrawal.id)"
-                            >
+                            <button class="px-3 py-1 bg-[#1A1F3C] rounded-lg hover:bg-[#2A2F4C] transition-colors"
+                              @click="toggleDropdown(withdrawal.id)">
                               Ações
                             </button>
-                            <div 
-                              v-if="dropdownOpen === withdrawal.id"
-                              class="absolute right-0 mt-2 w-48 bg-[#1a1a1a] rounded-lg shadow-lg z-10"
-                            >
-                              <button 
-                                class="w-full text-left px-4 py-2 hover:bg-[#2A2F4C] text-green-500"
-                                @click="aprovar(withdrawal.id)"
-                              >
+                            <div v-if="dropdownOpen === withdrawal.id"
+                              class="absolute right-0 mt-2 w-48 bg-[#1a1a1a] rounded-lg shadow-lg z-10">
+                              <button class="w-full text-left px-4 py-2 hover:bg-[#2A2F4C] text-green-500"
+                                @click="aprovar(withdrawal.id)">
                                 Aprovar
                               </button>
-                              <button 
-                                class="w-full text-left px-4 py-2 hover:bg-[#2A2F4C] text-red-500"
-                                @click="rejeitar(withdrawal.id)"
-                              >
+                              <button class="w-full text-left px-4 py-2 hover:bg-[#2A2F4C] text-red-500"
+                                @click="rejeitar(withdrawal.id)">
                                 Rejeitar
                               </button>
                             </div>
@@ -84,7 +71,8 @@
                       </template>
                       <template v-else>
                         <td class="p-4">
-                          <a v-if="withdrawal.link" :href="withdrawal.link" target="_blank" class="text-blue-400 hover:text-blue-300 transition-colors">
+                          <a v-if="withdrawal.link" :href="withdrawal.link" target="_blank"
+                            class="text-blue-400 hover:text-blue-300 transition-colors">
                             <i class="fas fa-external-link-alt mr-1"></i>
                             Ver detalhes
                           </a>
@@ -97,7 +85,7 @@
             </div>
 
             <!-- Paginação -->
-           <!--  <div v-if="pagination && pagination.links && pagination.links.length > 1" class="flex justify-center mt-6">
+            <!--  <div v-if="pagination && pagination.links && pagination.links.length > 1" class="flex justify-center mt-6">
               <button
                 v-for="link in pagination.links"
                 :key="link.label"
@@ -137,7 +125,7 @@ export default defineComponent({
     WithdrawalSuccessModal
   },
   data() {
-    const role  = localStorage.getItem('role')
+    const role = localStorage.getItem('role')
     return {
       store: useDashboardStore(),
       dropdownOpen: null as number | null,
@@ -166,7 +154,7 @@ export default defineComponent({
     })
   },
   beforeUnmount() {
-    document.removeEventListener('click', () => {})
+    document.removeEventListener('click', () => { })
   },
   methods: {
     async loadWithdrawals() {
@@ -182,7 +170,7 @@ export default defineComponent({
           sort_by: 'created_at',
           sort_order: 'desc'
         });
-        
+
         this.withdrawals = (response.data || []).map((item: any) => ({
           id: item.id,
           date: item.created_at ? new Date(item.created_at).toLocaleString('pt-BR') : '',
@@ -207,7 +195,15 @@ export default defineComponent({
       }
     },
     async handleWithdrawalRequest({ amount, pixKey }: { amount: string, pixKey: string }) {
+      /*  // MOCK: Simula sucesso imediato
+       this.showRequestModal = false;
+     setTimeout(() => {
+       this.showSuccessModal = true;
+     }, 500);
+     // Não chama API nem recarrega lista
+   }, */
       try {
+
         await managerService.withdrawals.request({
           amount: Number(amount),
           pix_key: pixKey
@@ -277,4 +273,4 @@ export default defineComponent({
     }
   }
 })
-</script> 
+</script>
