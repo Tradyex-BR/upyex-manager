@@ -17,7 +17,8 @@ import {
   Title,
   Tooltip,
   Legend,
-  Filler
+  Filler,
+  FontSpec
 } from 'chart.js'
 // Importa o adaptador e a localidade
 import 'chartjs-adapter-date-fns';
@@ -50,13 +51,21 @@ Chart.register(
 const chartRef = ref<HTMLCanvasElement | null>(null)
 let chartInstance: Chart | null = null
 
-// Removendo os dados mockados que estavam causando o problema
-// const mockData = ref<ChartData[]>([...])
+// Dados mockados para visualização
+const mockData = ref<ChartData[]>([
+  { date: '2024-03-18', count: 120 },
+  { date: '2024-03-19', count: 180 },
+  { date: '2024-03-20', count: 150 },
+  { date: '2024-03-21', count: 200 },
+  { date: '2024-03-22', count: 220 },
+  { date: '2024-03-23', count: 190 },
+  { date: '2024-03-24', count: 160 }
+])
 
 // Cores baseadas na imagem
 const chartLineColor = '#F9A825'; // Laranja
-const chartGridColor = 'rgba(255, 255, 255, 0.1)'; // Cor suave para ticks
-const chartTickColor = '#CCCCCC'; // Cinza claro para os rótulos dos eixos
+const chartGridColor = '#F9A825'; // Cor suave para ticks
+const chartTickColor = '#B8B8B8'; // Cinza claro para os rótulos dos eixos
 
 // Função para criar ou atualizar o gráfico
 const createOrUpdateChart = () => {
@@ -125,10 +134,14 @@ const defaultFont: Partial<FontSpec> = { // Usa Partial<FontSpec> para tipagem
         // Eixo Y
         y: {
           beginAtZero: true,
-           suggestedMax: 250, // Mudando de max para suggestedMax
+          max: 250,
+          border: {
+            color: '#2C3652'
+          },
           grid: {
+            display: false,
             drawBorder: false,
-            drawOnChartArea: true,
+            drawOnChartArea: false,
             color: chartGridColor,
             lineWidth: 1,
             borderDash: [3, 3],
@@ -138,14 +151,13 @@ const defaultFont: Partial<FontSpec> = { // Usa Partial<FontSpec> para tipagem
             color: defaultTextColor,
             font: defaultFont,
             padding: 10,
-            callback: function (value, index, ticks) {
-              // Mostra apenas 0 e o valor máximo
-              if (value === 0 || value === this.getLabelForValue(this.max)) {
+            maxTicksLimit: 2,
+            callback: function (value) {
+              if (value === 0 || value === 250) {
                 return value.toString();
               }
               return '';
-            },
-            stepSize: 125
+            }
           }
         },
         // Eixo X - Usando TimeScale
@@ -166,6 +178,9 @@ const defaultFont: Partial<FontSpec> = { // Usa Partial<FontSpec> para tipagem
           grid: {
             display: false,
             drawBorder: false,
+          },
+          border: {
+            color: '#2C3652'
           },
           ticks: {
             color: chartTickColor,
