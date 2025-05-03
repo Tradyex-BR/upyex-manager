@@ -1,6 +1,6 @@
 <template>
   <!-- Adiciona cor de fundo e padding ao container -->
-  <div class="w-full h-full">
+  <div class="w-[200px] h-[200px]">
     <canvas ref="chartRef"></canvas>
   </div>
 </template>
@@ -92,8 +92,6 @@ const chartConfigData = computed(() => {
             data: percentages,
             backgroundColor: backgroundColors,
             borderWidth: 0,
-            spacing: 2,
-            hoverOffset: 4,
             hoverBorderColor: '#2C2E3E'
         }]
     };
@@ -117,19 +115,19 @@ const createOrUpdateChart = () => {
     data: chartConfigData.value, // Usa os dados computados
     options: {
       responsive: true,
-      maintainAspectRatio: false, // Permite que o gráfico se ajuste ao container
-      cutout: '75%', // Ajusta o tamanho do buraco central (experimente valores como '70%' a '85%')
+      maintainAspectRatio: true, // Permite que o gráfico se ajuste ao container
+      cutout: '90%', // Ajusta o tamanho do buraco central (experimente valores como '70%' a '85%')
+      
 
       plugins: {
         legend: {
-          display: true, // Mantém a legenda visível
+          display: false, // Mantém a legenda visível
           position: 'right' as const, // Posiciona a legenda à direita
           align: 'center' as const, // Centraliza os itens verticalmente na legenda
           labels: {
             color: defaultTextColor, // Aplica a cor padrão do texto
             font: defaultFont,       // Aplica a fonte padrão
-            boxWidth: 14,            // Largura da caixa/ponto de cor
-            padding: 15,             // Espaçamento entre os itens da legenda
+            padding: 20,             // Espaçamento entre os itens da legenda
             usePointStyle: true,     // Usa 'circle' ou outro estilo de ponto
             pointStyle: 'circle',    // Define o estilo do ponto como círculo
 
@@ -153,6 +151,7 @@ const createOrUpdateChart = () => {
                     // Propriedades adicionadas para garantir estilo
                     fontColor: defaultTextColor,
                     pointStyle: 'circle',
+            
                   };
                 });
               }

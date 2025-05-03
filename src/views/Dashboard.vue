@@ -17,7 +17,12 @@
 
               <div class="grid grid-cols-2 gap-8 mb-8">
                 <GraphicSection title="Status das vendas" description="Distribuição por status de pagamento" class="h-[446px]">
-                   <DoughnutChart v-if="chartData.length > 0" :data="chartData.find(item => item.status === 'by_payment_status')" />
+                  <div class="flex gap-8 h-full justify-center items-center">
+                    <DoughnutChart v-if="chartData.length > 0" :data="chartData.find(item => item.status === 'by_payment_status')" />
+                    <div class="flex flex-col gap-4">
+                      <DoughnutChartLegends v-if="chartData.length > 0" :data="chartData.find(item => item.status === 'by_payment_status')" />
+                    </div>
+                  </div>
                 </GraphicSection>
                 <GraphicSection title="Método de pagamento" description="Distribuição por método de pagamento" class="h-[446px]">
                   <PaymentMethodCards v-if="chartData.length > 0" :data="chartData.find(item => item.status === 'by_payment_method')" />
@@ -45,6 +50,7 @@ import DashboardNavigation from "@/components/layout/dashboard/DashboardNavigati
 import DashboardList from "@/components/layout/dashboard/DashboardList.vue"
 import CartesianAxes from "@/components/graphics/CartesianAxes.vue"
 import DoughnutChart from "@/components/graphics/DoughnutChart.vue"
+import DoughnutChartLegends from "@/components/graphics/DoughnutChartLegends.vue"
 import PaymentMethodCards from "@/components/graphics/PaymentMethodCards.vue"
 import GraphicSection from "@/components/graphics/GraphicSection.vue"
 import TopBar from "@/components/layout/dashboard/TopBar.vue"
