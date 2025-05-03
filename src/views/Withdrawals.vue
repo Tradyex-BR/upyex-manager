@@ -19,7 +19,7 @@
               <WithdrawalSuccessModal v-if="showSuccessModal" @close="showSuccessModal = false" />
 
               <!-- Conteúdo condicional -->
-              <div class="flex w-full min-h-[calc(100vh-200px)] items-center justify-center text-gray-400">
+              <div class="flex w-full min-h-[calc(100vh-200px)] justify-center text-gray-400">
                 <div v-if="loading" class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500">
                 </div>
                 <div v-else-if="withdrawals.length === 0">Nenhum saque encontrado.</div>
@@ -119,6 +119,49 @@ import WithdrawalSuccessModal from '@/components/withdrawals/WithdrawalSuccessMo
 const loading = ref(true)
 const withdrawalsSuccess = ref(false)
 
+// Dados mockados para testes
+const MOCK_WITHDRAWALS = {
+  data: [
+    {
+      id: 1,
+      created_at: '2024-03-20T10:00:00Z',
+      amount: 1500.00,
+      destination: 'chave.pix@exemplo.com',
+      method: 'pix',
+      status: 'requested',
+      links: { frontend: 'https://exemplo.com/saque/1' }
+    },
+    {
+      id: 2,
+      created_at: '2024-03-19T15:30:00Z',
+      amount: 2500.00,
+      destination: '0x1234...5678',
+      method: 'crypto',
+      status: 'approved',
+      links: { frontend: 'https://exemplo.com/saque/2' }
+    },
+    {
+      id: 3,
+      created_at: '2024-03-18T09:15:00Z',
+      amount: 800.00,
+      destination: 'chave.pix@outro.com',
+      method: 'pix',
+      status: 'rejected',
+      links: { frontend: 'https://exemplo.com/saque/3' }
+    }
+  ],
+  meta: {
+    current_page: 1,
+    last_page: 1,
+    per_page: 20,
+    total: 3,
+    links: []
+  }
+}
+
+// Flag para controlar se usa dados mockados
+const USE_MOCK_DATA = true
+
 export default defineComponent({
   name: 'Withdrawals',
   components: {
@@ -165,16 +208,22 @@ export default defineComponent({
     async loadWithdrawals() {
       this.loading = true;
       try {
-        const response = await managerService.withdrawals.list({
-          start_date: '',
-          end_date: '',
-          status: null,
-          method: null,
-          page: this.pagination.current_page,
-          per_page: this.pagination.per_page,
-          sort_by: 'created_at',
-          sort_order: 'desc'
-        });
+        let response;
+        
+        if (USE_MOCK_DATA) {
+          response = MOCK_WITHDRAWALS;
+        } else {
+          response = await managerService.withdrawals.list({
+            start_date: '',
+            end_date: '',
+            status: null,
+            method: null,
+            page: this.pagination.current_page,
+            per_page: this.pagination.per_page,
+            sort_by: 'created_at',
+            sort_order: 'desc'
+          });
+        }
 
         this.withdrawals = (response.data || []).map((item: any) => ({
           id: item.id,
