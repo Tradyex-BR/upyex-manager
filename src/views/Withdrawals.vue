@@ -8,7 +8,7 @@
               <!-- Título e botão sempre visíveis -->
               <div class="flex justify-between items-center mb-6">
                 <p class="text-white text-2xl font-semibold">Withdrawals</p>
-                <BaseButton class="ml-2" @click="showRequestModal = true" v-if="role === 'affiliate'">
+                <BaseButton class="ml-2" @click="showRequestModal = true">
                   Novo Saque
                 </BaseButton>
               </div>
