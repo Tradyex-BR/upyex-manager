@@ -1,12 +1,13 @@
 <template>
   <div class="mt-6 flex items-center justify-start gap-4">
     <button 
-      v-for="item in navigationItems" 
+      v-for="(item, index) in navigationItems" 
       :key="item.id"
       @click="$emit('update:modelValue', item.id)"
       :class="[
         'nav-btn text-[14px] font-inter leading-[18px] relative px-4 py-2 rounded-lg transition-colors bg-transparent outline-none border-none',
-        modelValue === item.id ? 'active' : ''
+        modelValue === item.id ? 'active' : '',
+        role === 'affiliate' && index === 1 ? 'hidden' : ''
       ]"
     >
       {{ item.label }}
@@ -48,9 +49,10 @@ defineEmits<{
   (e: 'update:modelValue', value: string): void;
 }>();
 
+const role = localStorage.getItem('role')
 const navigationItems: NavigationItem[] = [
-  { id: 'cards', label: 'Dashboard' },
-  { id: 'list', label: 'Lista' }
+  { id: 'cards', label: 'Visão Geral' },
+  { id: 'list', label: role === 'manager' ? 'Análise' : 'Vendas' }
 ];
 </script>
 

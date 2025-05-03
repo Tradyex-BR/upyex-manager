@@ -36,7 +36,7 @@
               </div>
             </div>
             <div v-else-if="currentView === 'list'">
-              <div class="flex flex-row gap-6">
+              <div class="flex flex-row gap-6" v-if="role === 'manager'">
                 <GraphicSection title="Análise de clientes" description="Detalhes sobre base de clientes"
                   class="w-[352px] h-[446px] mt-6">
                   <DashboardCards v-if="customersData" :data="customersData" border vertical />
@@ -45,6 +45,9 @@
                   class="w-full h-[446px] mt-6">
                   <BarChart v-if="withdrawalsData" :data="withdrawalsData" />
                 </GraphicSection>
+              </div>
+              <div class="flex flex-row gap-6" v-else>
+                
               </div>
             </div>
           </section>
