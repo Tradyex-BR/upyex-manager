@@ -1,9 +1,13 @@
 <template>
   <div v-if="formattedData.length > 0" class="grid grid-cols-1 gap-2">
-    <div v-for="(item, index) in formattedData" :key="index" class="h-[70px] bg-transparent rounded-lg border border-[#2C3652] p-3">
+    <div v-for="(item, index) in formattedData" :key="index" 
+      class="h-[70px] bg-transparent rounded-lg border border-[#2C3652] p-3 payment-card"
+      :style="{
+        animationDelay: `${index * 100}ms`
+      }">
       <div class="flex items-center gap-3 mb-3">
         <div class="w-[46px] h-[46px] rounded-full flex items-center justify-center"  style="background-color: rgba(4, 13, 37, 0.16)">
-          <component :is="icons[item.icon]" />
+          <component :is="icons[item.icon as keyof typeof icons]" />
         </div>
         <div class="w-full flex flex-col gap-1">
           <h3 class="text-white font-inter text-[14px] leading-[18px] font-medium">{{ item.label }}</h3>
@@ -39,12 +43,12 @@ const icons = {
   pix: PixIcon,
   bank: BoletusIcon,
   other: OthersIcon
-}
+} as const
 
 interface ChartDataItem {
   label: string
   value: number
-  icon: string
+  icon: keyof typeof icons
   iconColor: string
   barColor: string
 }
@@ -72,3 +76,22 @@ const formattedData = computed(() => {
   }))
 })
 </script>
+
+<style scoped>
+.payment-card {
+  opacity: 0;
+  transform: translateY(20px);
+  animation: fadeInUp 0.5s ease forwards;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+</style>

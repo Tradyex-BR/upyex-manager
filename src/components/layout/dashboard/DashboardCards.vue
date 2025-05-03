@@ -1,7 +1,7 @@
 <template>
   <div class="flex flex-row h-full" :class="{ 'flex-col': vertical }" :style="{ gap: `${gap}px` }">
     <template v-if="Array.isArray(data)">
-      <StatCard v-for="(item, key) in data" :key="key" :value="item.value" :label="item.label" :border="border" :class="$attrs.class" />
+      <StatCard v-for="(item, index) in data" :key="index" :value="item.value" :label="item.label" :border="border" :class="$attrs.class" :index="index" />
     </template>
     <template v-else-if="isDashboardCard(data)">
       <StatCard 
@@ -9,6 +9,7 @@
         :label="data.label" 
         :border="border"
         :class="$attrs.class"
+        :index="0"
       />
     </template>
     <template v-else-if="isCustomerData(data)">
@@ -17,16 +18,20 @@
         label="Total de Clientes" 
         :border="border"
         :class="$attrs.class"
+        :index="0"
+        :animate="true"
       />
       <StatCard 
         :value="data.new.toString()" 
         label="Novos Clientes" 
         :border="border"
         :class="$attrs.class"
+        :index="1"
+        :animate="true"
       />
     </template>
     <template v-else>
-      <StatCard v-for="(item, key) in Object.values(data || {})" :key="key" :value="item.value" :label="item.label" :border="border" :class="$attrs.class" />
+      <StatCard v-for="(item, index) in Object.values(data || {})" :key="index" :value="item.value" :label="item.label" :border="border" :class="$attrs.class" :index="index" />
     </template>
   </div>
 </template>
