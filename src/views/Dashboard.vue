@@ -1,8 +1,5 @@
 <template>
-  <div v-if="checkingAuth || dashboardLoading" class="flex w-full h-full items-center justify-center">
-    <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-  </div>
-  <div v-else-if="authStore.isAuthenticated">
+  <AuthenticatedLayout :loading="dashboardLoading">
     <div class="gap-5 flex max-md:flex-col max-md:items-stretch">
       <main class="w-full">
         <div class="w-full max-md:max-w-full">
@@ -54,10 +51,7 @@
         </div>
       </main>
     </div>
-  </div>
-  <div v-else class="flex w-full h-full items-center justify-center text-gray-400">
-    Você não está autenticado.
-  </div>
+  </AuthenticatedLayout>
 </template>
 
 <script setup lang="ts">
@@ -72,9 +66,9 @@ import PaymentMethodCards from "@/components/graphics/PaymentMethodCards.vue"
 import GraphicSection from "@/components/graphics/GraphicSection.vue"
 import BarChart from "@/components/graphics/BarChart.vue"
 import { useDashboard } from '@/composables/useDashboard'
+import AuthenticatedLayout from '@/components/layout/AuthenticatedLayout.vue'
 
 const authStore = useAuthStore()
-const checkingAuth = ref(true)
 const currentView = ref('cards')
 
 const {
@@ -91,8 +85,6 @@ const {
 } = useDashboard()
 
 onMounted(async () => {
-  await authStore.checkAuth()
-  checkingAuth.value = false
   await fetchDashboardData()
 })
 </script>

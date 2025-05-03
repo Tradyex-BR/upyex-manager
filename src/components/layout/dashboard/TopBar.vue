@@ -92,6 +92,7 @@ const toggleDropdown = () => {
 
 const handleLogout = async () => {
   try {
+    isDropdownOpen.value = false
     await authStore.logout()
     router.push('/login')
   } catch (error) {

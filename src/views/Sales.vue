@@ -1,12 +1,9 @@
 <template>
-  <div v-if="loading" class="flex w-full h-full items-center justify-center text-gray-400">
-    <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-  </div>
-  <div v-else class="overflow-hidden">
+  <AuthenticatedLayout :loading="loading">
     <div class="gap-5 flex max-md:flex-col max-md:items-stretch">
       <main class="w-full max-md:w-full max-md:ml-0">
         <div class="w-full max-md:max-w-full">
-          <section class=" min-h-[944px] w-full overflow-hidden max-md:max-w-full max-md:px-5">
+          <section class="min-h-[944px] w-full overflow-hidden max-md:max-w-full max-md:px-5">
             <div class="flex justify-between items-center mb-6">
               <p class="text-white text-2xl font-semibold">Vendas</p>
               <!-- <BaseButton @click="handleNewSale" class="bg-[#CF631C] cursor-pointer text-white font-bold py-2 px-4 rounded-lg transition-colors">
@@ -75,7 +72,7 @@
         </div>
       </main>
     </div>
-  </div>
+  </AuthenticatedLayout>
   <!-- Modal de edição de afiliado -->
   <div v-if="showEditModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60">
     <div class="bg-[#23263a] rounded-lg p-8 w-full max-w-lg relative">
@@ -469,13 +466,15 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue'
+import { defineComponent, ref, onMounted, watch } from 'vue'
+import { useRouter } from 'vue-router'
+import { useAuthStore } from '@/stores/auth'
 import { useDashboardStore } from '@/stores/dashboard'
 import { managerService } from '@/services/managerService'
 import { externalService } from '@/services/externalService'
-import Sidebar from '@/components/layout/dashboard/Sidebar.vue'
-import TopBar from '@/components/layout/dashboard/TopBar.vue'
+import AuthenticatedLayout from '@/components/layout/AuthenticatedLayout.vue'
 import BaseButton from '@/components/common/BaseButton.vue'
+import { useToast } from 'vue-toastification'
 
 // Função para gerar ID único
 function generateUniqueId(): string {
@@ -495,24 +494,66 @@ export default defineComponent({
   },
   name: 'Sales',
   components: {
-    Sidebar,
-    TopBar,
+    AuthenticatedLayout,
     BaseButton
   },
   setup() {
     const store = useDashboardStore()
-    return { store }
+    const router = useRouter()
+    const authStore = useAuthStore()
+    const toast = useToast()
+    const loading = ref(true)
+    const sales = ref<any[]>([])
+    const showCreateModal = ref(false)
+    const showDetailsModal = ref(false)
+    const selectedSale = ref(null)
+    const searchQuery = ref('')
+
+    // Adiciona watcher para monitorar o estado de autenticação
+    watch(() => authStore.isAuthenticated, (isAuthenticated) => {
+      if (!isAuthenticated) {
+        router.push('/login')
+      }
+    })
+
+    const handleSearch = async (term: string) => {
+      loading.value = true
+      try {
+        const response = await managerService.sales.list({
+          search: term,
+          page: 1,
+          per_page: 20,
+          sort_by: 'created_at',
+          sort_order: 'desc'
+        })
+        sales.value = response.data || []
+      } catch (e) {
+        console.error('Erro ao buscar vendas:', e)
+      } finally {
+        loading.value = false
+      }
+    }
+
+    return { 
+      store, 
+      router, 
+      authStore, 
+      toast,
+      loading, 
+      sales, 
+      showCreateModal, 
+      showDetailsModal, 
+      selectedSale, 
+      searchQuery,
+      handleSearch
+    }
   },
   data() {
     return {
-      sales: [] as any[],
       customers: [] as any[],
       availableProducts: [] as any[],
       dropdownOpen: null as string | null,
-      loading: true,
-      showCreateModal: false,
       showEditModal: false,
-      showDetailModal: false,
       editingSale: null as any,
       newSale: {
         id: '',
@@ -688,10 +729,10 @@ export default defineComponent({
         await externalService.sales.register(payload);
         await this.loadSales();
         this.showCreateModal = false;
-        this.$toast.success('Venda registrada com sucesso!');
+        this.toast.success('Venda registrada com sucesso!');
       } catch (error) {
         console.error('Erro ao criar venda:', error);
-        this.$toast.error('Erro ao registrar venda');
+        this.toast.error('Erro ao registrar venda');
       }
     },
 
@@ -713,18 +754,18 @@ export default defineComponent({
 
     showSaleDetails(sale: any) {
       this.editingSale = { ...sale };
-      this.showDetailModal = true;
+      this.showDetailsModal = true;
       this.dropdownOpen = null;
     },
 
-    async handleSaleAction(saleId, newStatus) {
+    async handleSaleAction(saleId: string, newStatus: string) {
       try {
-        await externalService.sales.update(saleId, { status: newStatus });
-        this.$toast.success('Status atualizado com sucesso!');
-        this.dropdownOpen = null;
-        await this.loadSales();
-      } catch (error) {
-        this.$toast.error('Erro ao atualizar status: ' + error.message);
+        await externalService.sales.update(saleId, { status: newStatus })
+        this.toast.success('Status atualizado com sucesso!')
+        this.dropdownOpen = null
+        await this.loadSales()
+      } catch (error: any) {
+        this.toast.error('Erro ao atualizar status: ' + error.message)
       }
     },
 
