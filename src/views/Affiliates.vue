@@ -4,8 +4,9 @@
     <section class=" min-h-[944px] w-full overflow-visible">
       <div class="flex justify-between items-center mb-6">
         <p class="text-white text-2xl font-semibold">Afiliados</p>
-        <BaseButton @click="openCreateModal"
-          class="bg-[#CF631C] cursor-pointer text-white font-bold py-2 px-4 rounded-lg transition-colors">
+        <BaseButton
+          variant="primary"
+          @click="openCreateModal">
           Novo Afiliado
         </BaseButton>
       </div>

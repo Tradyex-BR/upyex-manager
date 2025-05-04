@@ -36,23 +36,26 @@
       <div class="flex flex-col gap-4">
         <div class="flex items-center justify-between">
           <h3 class="text-white text-sm font-medium leading-5">Aplicações</h3>
-          <button type="button" 
-            class="bg-[#CF631C] text-white px-4 py-2 rounded-lg hover:bg-[#B5520A] transition-colors flex items-center gap-2" 
+          <BaseButton 
+            variant="primary"
             @click="addApp">
-            <i class="fas fa-plus"></i>
+            <template #icon>
+              <i class="fas fa-plus"></i>
+            </template>
             Adicionar Aplicação
-          </button>
+          </BaseButton>
         </div>
 
         <div v-for="(app, idx) in form.applications" :key="idx" 
           class="p-4 bg-[#1A1F3C] rounded-lg border border-[#162F65]">
           <div class="flex justify-between items-center mb-4">
             <h4 class="text-white text-sm font-medium">Aplicação #{{ idx + 1 }}</h4>
-            <button type="button"
-  class="text-red-400 hover:text-red-300 text-sm font-medium bg-transparent border-none outline-none focus:outline-none focus:ring-0 p-0"
-  @click="removeApp(idx)">
-  Remover
-            </button>
+            <BaseButton
+              variant="ghost"
+              class="text-red-400 hover:text-red-300"
+              @click="removeApp(idx)">
+              Remover
+            </BaseButton>
           </div>
           <div class="grid grid-cols-3 gap-4">
             <div class="flex flex-col gap-1">
@@ -91,17 +94,19 @@
 
     <template #footer>
       <div class="flex justify-end gap-4">
-        <button type="button" 
-          class="px-6 py-2 bg-[#162F65] hover:bg-[#1A3A7A] rounded-lg text-white font-medium transition-colors" 
+        <BaseButton
+          variant="secondary"
           @click="$emit('close')">
           Cancelar
-        </button>
-        <button type="submit" 
-          class="px-6 py-2 bg-[#CF631C] hover:bg-[#E67E22] rounded-lg text-white font-medium transition-colors" 
+        </BaseButton>
+        <BaseButton
+          variant="primary"
+          type="submit"
           :disabled="loading"
+          :loading="loading"
           @click="handleSubmit">
           {{ loading ? "Criando..." : "Criar Afiliado" }}
-        </button>
+        </BaseButton>
       </div>
     </template>
   </BaseModal>
@@ -110,6 +115,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import BaseModal from '@/components/common/BaseModal.vue'
+import BaseButton from '@/components/common/BaseButton.vue'
 
 interface Application {
   id: string;

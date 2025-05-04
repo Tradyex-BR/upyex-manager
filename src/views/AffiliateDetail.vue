@@ -17,8 +17,10 @@
                 </button>
                 <p class="text-white text-2xl font-semibold">Detalhes do Afiliado</p>
               </div>
-              <BaseButton @click="handleEdit" class="bg-[#CF631C] cursor-pointer text-white font-bold py-2 px-4 rounded-lg transition-colors">
-                Editar Afiliado
+              <BaseButton
+                variant="primary"
+                @click="handleEdit">
+                Editar
               </BaseButton>
             </div>
 

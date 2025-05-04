@@ -52,10 +52,13 @@
       </div>
 
       <div class="flex flex-col gap-4">
-        <button type="submit" :disabled="loading"
-          class="bg-[#CF631C] text-white font-bold py-2 px-4 rounded-lg disabled:opacity-50">
-          {{ loading ? 'Entrando...' : 'Entrar' }}
-        </button>
+        <BaseButton
+          type="submit"
+          variant="primary"
+          :disabled="loading"
+          :loading="loading">
+          Entrar
+        </BaseButton>
 
         <div class="text-center font-inter text-[14px] leading-[18px] text-[#040D25]">
           <router-link to="/forgot-password" class="text-[#CF631C] hover:underline hover:text-[#CF631C]">
