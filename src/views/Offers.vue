@@ -78,7 +78,6 @@
                         </td>
                         <td class="p-4 text-center">
                           <span :class="getStatusClass(offer.is_active)">
-                            <i :class="['fas mr-2', offer.is_active ? 'fa-check-circle' : 'fa-ban']"></i>
                             {{ offer.is_active ? 'Ativa' : 'Inativa' }}
                           </span>
                         </td>
@@ -393,9 +392,10 @@ export default defineComponent({
       }
     },
     getStatusClass(isActive: boolean): string {
+      const baseClass = 'font-inter text-[14px] font-medium leading-[18px] inline-flex h-6 px-2 justify-center items-center gap-1 rounded-[6px] w-fit mx-auto'
       return isActive 
-        ? 'px-2 py-1 rounded-full text-sm bg-green-500/20 text-green-500'
-        : 'px-2 py-1 rounded-full text-sm bg-red-500/20 text-red-500'
+        ? `${baseClass} bg-green-500/20 text-green-500`
+        : `${baseClass} bg-red-500/20 text-red-500`
     },
     async handleCreateApplication() {
       try {

@@ -1,91 +1,88 @@
 <template>
   <AuthenticatedLayout :loading="loading">
-    <div class="overflow-hidden">
-      <div class="gap-5 flex max-md:flex-col max-md:items-stretch">
-        <main class="w-full max-md:w-full max-md:ml-0">
-          <div class="w-full max-md:max-w-full">
-            <section class="min-h-[944px] w-full overflow-hidden max-md:max-w-full max-md:px-5">
-              <!-- Título e botão sempre visíveis -->
-              <div class="flex justify-between items-center mb-6">
-                <p class="text-white text-2xl font-semibold">Withdrawals</p>
-                <BaseButton class="ml-2" @click="showRequestModal = true">
-                  Novo Saque
-                </BaseButton>
-              </div>
+    <section class="min-h-[944px] w-full overflow-visible">
+      <!-- Título e botão sempre visíveis -->
+      <div class="flex justify-between items-center mb-6 overflow-visible">
+        <p class="text-white text-2xl font-semibold">Withdrawals</p>
+        <BaseButton class="ml-2 " @click="showRequestModal = true">
+          Novo Saque
+        </BaseButton>
+      </div>
 
-              <!-- Modais -->
-              <WithdrawalRequestModal v-if="showRequestModal" @close="showRequestModal = false"
-                @submit="handleWithdrawalRequest" />
-              <WithdrawalSuccessModal v-if="showSuccessModal" @close="showSuccessModal = false" />
+      <!-- Modais -->
+      <WithdrawalRequestModal v-if="showRequestModal" @close="showRequestModal = false"
+        @submit="handleWithdrawalRequest" />
+      <WithdrawalSuccessModal v-if="showSuccessModal" :amount="lastWithdrawalAmount" :pix-key="lastWithdrawalPixKey"
+        @close="showSuccessModal = false" />
 
-              <!-- Conteúdo condicional -->
-              <div class="flex w-full min-h-[calc(100vh-200px)] justify-center text-gray-400">
-                <div v-if="loading" class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500">
-                </div>
-                <div v-else-if="withdrawals.length === 0">Nenhum saque encontrado.</div>
-                <div v-else class="w-full">
-                  <table class="w-full text-white border-collapse">
-                    <thead>
-                      <tr class="bg-[#1A1F3C]">
-                        <th class="p-4 text-left">Data</th>
-                        <th class="p-4 text-center">Valor BRL</th>
-                        <th class="p-4 text-center">Destino (Chave Pix)</th>
-                        <th class="p-4 text-center">Tipo</th>
-                        <th class="p-4 text-center">Status</th>
-                        <template v-if="role === 'manager'">
-                          <th class="p-4 text-center">Ações</th>
-                        </template>
-                        <template v-else>
-                          <th class="p-4 text-center">Link</th>
-                        </template>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr v-for="withdrawal in withdrawals" :key="withdrawal.id" class="border-b border-[#1A1F3C]">
-                        <td class="p-4">{{ withdrawal.date }}</td>
-                        <td class="p-4 text-center">{{ withdrawal.valueBRL }}</td>
-                        <td class="p-4 text-center">{{ withdrawal.destination }}</td>
-                        <td class="p-4 text-center">{{ withdrawal.type }}</td>
-                        <td class="p-4 text-center">
-                          <span :class="getStatusClass(withdrawal.status)">{{ withdrawal.status }}</span>
-                        </td>
-                        <template v-if="role === 'manager'">
-                          <td class="p-4 text-center">
-                            <div class="relative">
-                              <button class="px-3 py-1 bg-[#1A1F3C] rounded-lg hover:bg-[#2A2F4C] transition-colors"
-                                @click="toggleDropdown(withdrawal.id)">
-                                Ações
-                              </button>
-                              <div v-if="dropdownOpen === withdrawal.id"
-                                class="absolute right-0 mt-2 w-48 bg-[#1a1a1a] rounded-lg shadow-lg z-10">
-                                <button class="w-full text-left px-4 py-2 hover:bg-[#2A2F4C] text-green-500"
-                                  @click="aprovar(withdrawal.id)">
-                                  Aprovar
-                                </button>
-                                <button class="w-full text-left px-4 py-2 hover:bg-[#2A2F4C] text-red-500"
-                                  @click="rejeitar(withdrawal.id)">
-                                  Rejeitar
-                                </button>
-                              </div>
-                            </div>
-                          </td>
-                        </template>
-                        <template v-else>
-                          <td class="p-4 text-center">
-                            <a v-if="withdrawal.link" :href="withdrawal.link" target="_blank"
-                              class="flex items-center justify-center">
-                              <RedirectIcon />
-                            </a>
-                          </td>
-                        </template>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </div>
+      <!-- Conteúdo condicional -->
+      <div class="flex w-full min-h-[calc(100vh-200px)] justify-center text-gray-400">
+        <div v-if="loading" class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500">
+        </div>
+        <div v-else-if="withdrawals.length === 0">Nenhum saque encontrado.</div>
+        <div v-else class="w-full">
+          <table class="w-full text-white border-collapse">
+            <thead>
+              <tr class="bg-[#1A1F3C]">
+                <th class="p-4 text-left">Data</th>
+                <th class="p-4 text-center">Valor BRL</th>
+                <th class="p-4 text-center">Destino (Chave Pix)</th>
+                <th class="p-4 text-center">Tipo</th>
+                <th class="p-4 text-center">Status</th>
+                <template v-if="role === 'manager'">
+                  <th class="p-4 text-center">Ações</th>
+                </template>
+                <template v-else>
+                  <th class="p-4 text-center">Link</th>
+                </template>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="withdrawal in withdrawals" :key="withdrawal.id" class="border-b border-[#1A1F3C]">
+                <td class="p-4">{{ withdrawal.date }}</td>
+                <td class="p-4 text-center">{{ withdrawal.valueBRL }}</td>
+                <td class="p-4 text-center">{{ withdrawal.destination }}</td>
+                <td class="p-4 text-center">{{ withdrawal.type }}</td>
+                <td class="p-4 text-center">
+                  <span :class="getStatusClass(withdrawal.status)">{{ withdrawal.status }}</span>
+                </td>
+                <template v-if="role === 'manager'">
+                  <td class="p-4 text-center">
+                    <div class="relative">
+                      <button class="px-3 py-1 bg-[#1A1F3C] rounded-lg hover:bg-[#2A2F4C] transition-colors"
+                        @click="toggleDropdown(withdrawal.id)">
+                        Ações
+                      </button>
+                      <div v-if="dropdownOpen === withdrawal.id"
+                        class="absolute right-0 mt-2 w-48 bg-[#1a1a1a] rounded-lg shadow-lg z-10">
+                        <button class="w-full text-left px-4 py-2 hover:bg-[#2A2F4C] text-green-500"
+                          @click="aprovar(withdrawal.id)">
+                          Aprovar
+                        </button>
+                        <button class="w-full text-left px-4 py-2 hover:bg-[#2A2F4C] text-red-500"
+                          @click="rejeitar(withdrawal.id)">
+                          Rejeitar
+                        </button>
+                      </div>
+                    </div>
+                  </td>
+                </template>
+                <template v-else>
+                  <td class="p-4 text-center">
+                    <a v-if="withdrawal.link" :href="withdrawal.link" target="_blank"
+                      class="flex items-center justify-center">
+                      <RedirectIcon />
+                    </a>
+                  </td>
+                </template>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
 
-              <!-- Paginação -->
-              <!--  <div v-if="pagination && pagination.links && pagination.links.length > 1" class="flex justify-center mt-6">
+      <!-- Paginação -->
+      <!--  <div v-if="pagination && pagination.links && pagination.links.length > 1" class="flex justify-center mt-6">
                 <button
                   v-for="link in pagination.links"
                   :key="link.label"
@@ -95,11 +92,7 @@
                   v-html="link.label"
                 />
               </div> -->
-            </section>
-          </div>
-        </main>
-      </div>
-    </div>
+    </section>
   </AuthenticatedLayout>
 </template>
 
@@ -180,6 +173,8 @@ export default defineComponent({
       dropdownOpen: null as string | null,
       showRequestModal: false,
       showSuccessModal: false,
+      lastWithdrawalAmount: '',
+      lastWithdrawalPixKey: '',
       loading: true,
       withdrawals: [] as Array<any>,
       pagination: {
@@ -210,7 +205,7 @@ export default defineComponent({
       this.loading = true;
       try {
         let response;
-        
+
         if (USE_MOCK_DATA) {
           response = MOCK_WITHDRAWALS;
         } else {
@@ -250,22 +245,22 @@ export default defineComponent({
       }
     },
     async handleWithdrawalRequest({ amount, pixKey }: { amount: string, pixKey: string }) {
-      /*  // MOCK: Simula sucesso imediato
-       this.showRequestModal = false;
-     setTimeout(() => {
-       this.showSuccessModal = true;
-     }, 500);
-     // Não chama API nem recarrega lista
-   }, */
       try {
-
         await managerService.withdrawals.request({
           amount: Number(amount),
           pix_key: pixKey
         });
+
+        // Salva os dados do último saque para exibir na modal de sucesso
+        this.lastWithdrawalAmount = amount;
+        this.lastWithdrawalPixKey = pixKey;
+
+        // Fecha a modal de solicitação e abre a modal de sucesso
         this.showRequestModal = false;
         this.showSuccessModal = true;
-        await this.loadWithdrawals(); // Recarrega a lista após o sucesso
+
+        // Recarrega a lista de saques
+        await this.loadWithdrawals();
       } catch (error) {
         console.error('Erro ao solicitar saque:', error);
         // Aqui você pode adicionar uma notificação de erro se desejar
@@ -275,13 +270,20 @@ export default defineComponent({
       this.dropdownOpen = this.dropdownOpen === id ? null : id
     },
     getStatusClass(status: string): string {
+      const baseClass = 'font-inter text-[14px] font-medium leading-[18px] inline-flex h-6 px-2 justify-center items-center gap-1 rounded-[6px] w-fit mx-auto'
       switch (status) {
-        case 'Completed':
-          return 'px-2 py-1 rounded-full text-sm bg-green-500/20 text-green-500'
-        case 'Rejected':
-          return 'px-2 py-1 rounded-full text-sm bg-red-500/20 text-red-500'
-        default:
-          return 'px-2 py-1 rounded-full text-sm bg-yellow-500/20 text-yellow-500'
+        case 'Aprovado':
+          return `${baseClass} bg-green-500/20 text-green-500`
+        case 'Rejeitado':
+          return `${baseClass} bg-red-500/20 text-red-500`
+        case 'Processado':
+          return `${baseClass} bg-green-500/20 text-green-500`
+        case 'Cancelado':
+          return `${baseClass} bg-red-500/20 text-red-500`
+        case 'Processando':
+          return `${baseClass} bg-blue-500/20 text-blue-500`
+        default: // Solicitação
+          return `${baseClass} bg-yellow-500/20 text-yellow-500`
       }
     },
     async aprovar(id: string) {

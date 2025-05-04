@@ -761,17 +761,18 @@ export default defineComponent({
     },
 
     getStatusClass(status: string): string {
+      const baseClass = 'font-inter text-[14px] font-medium leading-[18px] inline-flex h-6 px-2 justify-center items-center gap-1 rounded-[6px] w-fit mx-auto'
       const statusMap: { [key: string]: string } = {
-        'awaiting_payment': 'px-2 py-1 rounded-full text-sm bg-yellow-500/20 text-yellow-500',
-        'paid': 'px-2 py-1 rounded-full text-sm bg-green-500/20 text-green-500',
-        'refunded': 'px-2 py-1 rounded-full text-sm bg-gray-500/20 text-gray-500',
-        'cancelled': 'px-2 py-1 rounded-full text-sm bg-red-500/20 text-red-500',
-        'Pendente': 'px-2 py-1 rounded-full text-sm bg-yellow-500/20 text-yellow-500',
-        'Pago': 'px-2 py-1 rounded-full text-sm bg-green-500/20 text-green-500',
-        'Estornado': 'px-2 py-1 rounded-full text-sm bg-gray-500/20 text-gray-500',
-        'Cancelado': 'px-2 py-1 rounded-full text-sm bg-red-500/20 text-red-500'
+        'awaiting_payment': `${baseClass} bg-yellow-500/20 text-yellow-500`,
+        'paid': `${baseClass} bg-green-500/20 text-green-500`,
+        'refunded': `${baseClass} bg-gray-500/20 text-gray-500`,
+        'cancelled': `${baseClass} bg-red-500/20 text-red-500`,
+        'Pendente': `${baseClass} bg-yellow-500/20 text-yellow-500`,
+        'Pago': `${baseClass} bg-green-500/20 text-green-500`,
+        'Estornado': `${baseClass} bg-gray-500/20 text-gray-500`,
+        'Cancelado': `${baseClass} bg-red-500/20 text-red-500`
       }
-      return statusMap[status] || 'px-2 py-1 rounded-full text-sm bg-gray-500/20 text-gray-500'
+      return statusMap[status] || `${baseClass} bg-gray-500/20 text-gray-500`
     },
 
     handleNewSale() {
