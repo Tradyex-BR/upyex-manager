@@ -210,124 +210,118 @@
     </div>
 
     <!-- Modal de Criação de Cliente -->
-    <div v-if="showCreateModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60">
-      <div class="bg-[#23263a] rounded-lg p-8 w-full max-w-4xl relative max-h-[90vh] overflow-y-auto">
-        <!-- Header -->
-        <div class="flex justify-between items-center mb-8 border-b border-[#2A2F4C] pb-4">
-          <div class="flex items-center gap-3">
-            <div class="w-12 h-12 rounded-full bg-[#CF631C]/20 flex items-center justify-center">
-              <i class="fas fa-user-plus text-[#CF631C] text-2xl"></i>
-            </div>
-            <div>
-              <h2 class="text-2xl font-bold text-white">Novo Cliente</h2>
-              <p class="text-gray-400 text-sm">Preencha os dados do novo cliente</p>
-            </div>
-          </div>
-          <button @click="showCreateModal = false" class="text-gray-400 hover:text-white transition-colors">
-            <i class="fas fa-times text-xl"></i>
-          </button>
+    <BaseModal
+      v-if="showCreateModal"
+      title="Novo Cliente"
+      @close="showCreateModal = false"
+    >
+      <template #icon>
+        <div class="w-12 h-12 rounded-full bg-[#CF631C]/20 flex items-center justify-center">
+          <i class="fas fa-user-plus text-[#CF631C] text-2xl"></i>
         </div>
+      </template>
 
-        <form @submit.prevent="handleCreateCustomer" class="space-y-8">
-          <!-- Informações Básicas -->
-          <div class="bg-[#1a1a2a] rounded-xl p-6">
-            <h3 class="text-white text-lg font-semibold mb-6 flex items-center gap-2">
-              <i class="fas fa-user text-[#CF631C]"></i>
-              Informações Básicas
-            </h3>
-            <div class="grid grid-cols-2 gap-6">
-              <div>
-                <label class="block text-gray-400 mb-2 font-medium">Nome</label>
-                <div class="relative">
-                  <i class="fas fa-user absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
-                  <input v-model="newCustomer.name" 
-                    type="text" 
-                    required
-                    placeholder="Nome completo do cliente"
-                    class="w-full pl-10 pr-3 py-2.5 rounded-lg bg-[#23263a] text-white border border-[#2A2F4C] focus:border-[#CF631C] focus:outline-none transition-colors">
-                </div>
-              </div>
-              <div>
-                <label class="block text-gray-400 mb-2 font-medium">Email</label>
-                <div class="relative">
-                  <i class="fas fa-envelope absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
-                  <input v-model="newCustomer.email" 
-                    type="email" 
-                    required
-                    placeholder="email@exemplo.com"
-                    class="w-full pl-10 pr-3 py-2.5 rounded-lg bg-[#23263a] text-white border border-[#2A2F4C] focus:border-[#CF631C] focus:outline-none transition-colors">
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Informações de Contato -->
-          <div class="bg-[#1a1a2a] rounded-xl p-6">
-            <h3 class="text-white text-lg font-semibold mb-6 flex items-center gap-2">
-              <i class="fas fa-phone text-[#CF631C]"></i>
-              Informações de Contato
-            </h3>
-            <div class="grid grid-cols-2 gap-6">
-              <div>
-                <label class="block text-gray-400 mb-2 font-medium">Telefone</label>
-                <div class="relative">
-                  <i class="fas fa-phone absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
-                  <input v-model="newCustomer.phone" 
-                    type="tel" 
-                    required
-                    placeholder="(00) 00000-0000"
-                    class="w-full pl-10 pr-3 py-2.5 rounded-lg bg-[#23263a] text-white border border-[#2A2F4C] focus:border-[#CF631C] focus:outline-none transition-colors">
-                </div>
-              </div>
-              <div>
-                <label class="block text-gray-400 mb-2 font-medium">CPF/CNPJ</label>
-                <div class="relative">
-                  <i class="fas fa-id-card absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
-                  <input v-model="newCustomer.document_number" 
-                    type="text"
-                    placeholder="000.000.000-00"
-                    class="w-full pl-10 pr-3 py-2.5 rounded-lg bg-[#23263a] text-white border border-[#2A2F4C] focus:border-[#CF631C] focus:outline-none transition-colors">
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Informações de Afiliado -->
-          <div class="bg-[#1a1a2a] rounded-xl p-6">
-            <h3 class="text-white text-lg font-semibold mb-6 flex items-center gap-2">
-              <i class="fas fa-handshake text-[#CF631C]"></i>
-              Informações de Afiliado
-            </h3>
+      <form @submit.prevent="handleCreateCustomer" class="space-y-8">
+        <!-- Informações Básicas -->
+        <div class="bg-[#1a1a2a] rounded-xl p-6">
+          <h3 class="text-white text-lg font-semibold mb-6 flex items-center gap-2">
+            <i class="fas fa-user text-[#CF631C]"></i>
+            Informações Básicas
+          </h3>
+          <div class="grid grid-cols-2 gap-6">
             <div>
-              <label class="block text-gray-400 mb-2 font-medium">Código do Afiliado</label>
+              <label class="block text-gray-400 mb-2 font-medium">Nome</label>
               <div class="relative">
-                <i class="fas fa-hashtag absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
-                <input v-model="newCustomer.affiliate_code" 
+                <i class="fas fa-user absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                <input v-model="newCustomer.name" 
                   type="text" 
                   required
-                  placeholder="Código único do afiliado"
+                  placeholder="Nome completo do cliente"
+                  class="w-full pl-10 pr-3 py-2.5 rounded-lg bg-[#23263a] text-white border border-[#2A2F4C] focus:border-[#CF631C] focus:outline-none transition-colors">
+              </div>
+            </div>
+            <div>
+              <label class="block text-gray-400 mb-2 font-medium">Email</label>
+              <div class="relative">
+                <i class="fas fa-envelope absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                <input v-model="newCustomer.email" 
+                  type="email" 
+                  required
+                  placeholder="email@exemplo.com"
                   class="w-full pl-10 pr-3 py-2.5 rounded-lg bg-[#23263a] text-white border border-[#2A2F4C] focus:border-[#CF631C] focus:outline-none transition-colors">
               </div>
             </div>
           </div>
+        </div>
 
-          <!-- Footer -->
-          <div class="flex justify-end gap-4 pt-6 border-t border-[#2A2F4C]">
-            <button type="button" 
-              class="px-6 py-2.5 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors flex items-center gap-2" 
-              @click="showCreateModal = false">
-              <i class="fas fa-times"></i>
-              Cancelar
-            </button>
-            <button type="submit" 
-              class="px-6 py-2.5 bg-[#CF631C] text-white rounded-lg hover:bg-[#B5520A] transition-colors flex items-center gap-2">
-              <i class="fas fa-save"></i>
-              Criar Cliente
-            </button>
+        <!-- Informações de Contato -->
+        <div class="bg-[#1a1a2a] rounded-xl p-6">
+          <h3 class="text-white text-lg font-semibold mb-6 flex items-center gap-2">
+            <i class="fas fa-phone text-[#CF631C]"></i>
+            Informações de Contato
+          </h3>
+          <div class="grid grid-cols-2 gap-6">
+            <div>
+              <label class="block text-gray-400 mb-2 font-medium">Telefone</label>
+              <div class="relative">
+                <i class="fas fa-phone absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                <input v-model="newCustomer.phone" 
+                  type="tel" 
+                  required
+                  placeholder="(00) 00000-0000"
+                  class="w-full pl-10 pr-3 py-2.5 rounded-lg bg-[#23263a] text-white border border-[#2A2F4C] focus:border-[#CF631C] focus:outline-none transition-colors">
+              </div>
+            </div>
+            <div>
+              <label class="block text-gray-400 mb-2 font-medium">CPF/CNPJ</label>
+              <div class="relative">
+                <i class="fas fa-id-card absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                <input v-model="newCustomer.document_number" 
+                  type="text"
+                  placeholder="000.000.000-00"
+                  class="w-full pl-10 pr-3 py-2.5 rounded-lg bg-[#23263a] text-white border border-[#2A2F4C] focus:border-[#CF631C] focus:outline-none transition-colors">
+              </div>
+            </div>
           </div>
-        </form>
-      </div>
-    </div>
+        </div>
+
+        <!-- Informações de Afiliado -->
+        <div class="bg-[#1a1a2a] rounded-xl p-6">
+          <h3 class="text-white text-lg font-semibold mb-6 flex items-center gap-2">
+            <i class="fas fa-handshake text-[#CF631C]"></i>
+            Informações de Afiliado
+          </h3>
+          <div>
+            <label class="block text-gray-400 mb-2 font-medium">Código do Afiliado</label>
+            <div class="relative">
+              <i class="fas fa-hashtag absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+              <input v-model="newCustomer.affiliate_code" 
+                type="text" 
+                required
+                placeholder="Código único do afiliado"
+                class="w-full pl-10 pr-3 py-2.5 rounded-lg bg-[#23263a] text-white border border-[#2A2F4C] focus:border-[#CF631C] focus:outline-none transition-colors">
+            </div>
+          </div>
+        </div>
+      </form>
+
+      <template #footer>
+        <div class="flex justify-end gap-4">
+          <button type="button" 
+            class="px-6 py-2.5 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors flex items-center gap-2" 
+            @click="showCreateModal = false">
+            <i class="fas fa-times"></i>
+            Cancelar
+          </button>
+          <button type="submit" 
+            class="px-6 py-2.5 bg-[#CF631C] text-white rounded-lg hover:bg-[#B5520A] transition-colors flex items-center gap-2"
+            @click="handleCreateCustomer">
+            <i class="fas fa-save"></i>
+            Criar Cliente
+          </button>
+        </div>
+      </template>
+    </BaseModal>
   </AuthenticatedLayout>
 </template>
 
@@ -339,6 +333,7 @@ import { externalService } from '@/services/externalService'
 import Sidebar from '@/components/layout/dashboard/Sidebar.vue'
 import TopBar from '@/components/layout/dashboard/TopBar.vue'
 import BaseButton from '@/components/common/BaseButton.vue'
+import BaseModal from '@/components/common/BaseModal.vue'
 import AuthenticatedLayout from '@/components/layout/AuthenticatedLayout.vue'
 import { useRouter } from 'vue-router'
 
@@ -371,7 +366,8 @@ export default defineComponent({
     Sidebar,
     TopBar,
     BaseButton,
-    AuthenticatedLayout
+    AuthenticatedLayout,
+    BaseModal
   },
   setup() {
     const router = useRouter()
