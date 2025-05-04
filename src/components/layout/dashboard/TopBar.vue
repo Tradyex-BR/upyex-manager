@@ -5,14 +5,9 @@
         <img
           src="https://cdn.builder.io/api/v1/image/assets/7f72b52c1e064ab59dcec351fcad2273/5697248805177b7c44034604d6594552a9fa39ff?placeholderIfAbsent=true"
           class="aspect-[1] object-contain w-5 self-stretch shrink-0 my-auto" alt="Search icon" />
-        <input
-  v-model="searchQuery"
-  type="text"
-  placeholder="Digite para pesquisar"
-  :class="['text-[#B8B8B8] text-sm leading-5 self-stretch my-auto bg-transparent border-none outline-none w-full', searchDisabled ? 'cursor-not-allowed opacity-60' : '']"
-  @keyup.enter="emitSearch"
-  :disabled="searchDisabled"
-/>
+        <input v-model="searchQuery" type="text" placeholder="Digite para pesquisar"
+          :class="['text-[#B8B8B8] text-sm leading-5 self-stretch my-auto bg-transparent border-none outline-none w-full', searchDisabled ? 'cursor-not-allowed opacity-60' : '']"
+          @keyup.enter="emitSearch" :disabled="searchDisabled" />
       </div>
       <div
         class="font-inter cursor-not-allowed text-[14px] leading-5 self-stretch flex min-w-60 items-center gap-[30px] text-white my-auto">
@@ -23,27 +18,25 @@
           <div class="self-stretch flex items-stretch gap-[10px] my-auto cursor-pointer" @click="toggleDropdown">
             <div class="flex items-center gap-[15px]">
               <div class="flex items-center gap-1">
-                  <p
-                    class="font-inter text-[#FFF] text-[14px] leading-[18px] grow my-auto truncate overflow-hidden whitespace-nowrap">
-                    {{ authStore.currentUser?.name || 'Usuário' }}
-                  </p>
+                <p
+                  class="font-inter text-[#FFF] text-[14px] leading-[18px] grow my-auto truncate overflow-hidden whitespace-nowrap">
+                  {{ authStore.currentUser?.name || 'Usuário' }}
+                </p>
 
               </div>
 
               <div v-if="authStore.currentUser?.avatar_path">
-                <img
-                  :src="authStore.currentUser?.avatar_path"
-                  class="aspect-[1.65] object-contain w-[46px] h-[46px] rounded-full shrink-0" alt="User avatar" />
+                <img :src="authStore.currentUser?.avatar_path"
+                  class="aspect-[1.65] object-contain w-[46px] h-[46px] rounded-full shrink-0 bg" alt="User avatar" />
               </div>
               <div v-else>
-                <div class="w-[46px] h-[46px] rounded-full bg-[#222A3F] flex items-center justify-center"></div>
+                <img src="/png/default-avatar.png"
+                  class="aspect-[1.65] object-contain w-[46px] h-[46px] rounded-full shrink-0 bg" alt="User avatar" />
               </div>
             </div>
-            <svg
-:class="['my-auto w-5 h-w-5 transition-transform', { 'rotate-180': isDropdownOpen }]"
+            <svg :class="['my-auto w-5 h-w-5 transition-transform', { 'rotate-180': isDropdownOpen }]"
               xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
-              <path
-fill-rule="evenodd" clip-rule="evenodd"
+              <path fill-rule="evenodd" clip-rule="evenodd"
                 d="M4.41074 6.9107C4.73618 6.58527 5.26382 6.58527 5.58926 6.9107L10 11.3214L14.4107 6.9107C14.7362 6.58527 15.2638 6.58527 15.5893 6.9107C15.9147 7.23614 15.9147 7.76378 15.5893 8.08921L10.5893 13.0892C10.2638 13.4146 9.73618 13.4146 9.41075 13.0892L4.41074 8.08921C4.08531 7.76378 4.08531 7.23614 4.41074 6.9107Z"
                 fill="#637381" />
             </svg>
@@ -52,8 +45,10 @@ fill-rule="evenodd" clip-rule="evenodd"
 
           <!-- Dropdown Menu -->
           <div v-if="isDropdownOpen" class="absolute right-0 mt-5 w-48 bg-[#222A3F] rounded-md shadow-lg z-50">
-            
-            <button class="w-full h-[48px] flex items-center gap-[10px] text-left p-3 text-sm text-gray-700 border-none bg-transparent" @click="handleLogout">
+
+            <button
+              class="w-full h-[48px] flex items-center gap-[10px] text-left p-3 text-sm text-gray-700 border-none bg-transparent"
+              @click="handleLogout">
               <!-- <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <g clip-path="url(#clip0_1147_3686)">
                   <path
@@ -78,6 +73,7 @@ d="M19.0711 5.07108L4.92894 19.2132M4.92892 5.07108L19.0711 19.2132" stroke="#B8
 import { computed, ref, onMounted, onUnmounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
+
 const route = useRoute()
 const searchDisabled = computed(() => route.path === '/dashboard') // ajuste para o path correto se necessário
 
@@ -112,6 +108,8 @@ const handleClickOutside = (event: MouseEvent) => {
 // Adicionar e remover o event listener
 onMounted(() => {
   document.addEventListener('click', handleClickOutside)
+  console.log('Avatar path:', authStore.currentUser?.avatar_path)
+  console.log('Current user:', authStore.currentUser)
 })
 
 onUnmounted(() => {

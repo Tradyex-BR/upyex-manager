@@ -6,15 +6,19 @@
           <section class="min-h-[944px] w-full overflow-hidden max-md:max-w-full max-md:px-5">
             <div class="flex justify-between items-center mb-6">
               <p class="text-white text-2xl font-semibold">Vendas</p>
+              <div class="cursor-not-allowed">
+                <MenuIcon />
+              </div>
               <!-- <BaseButton @click="handleNewSale" class="bg-[#CF631C] cursor-pointer text-white font-bold py-2 px-4 rounded-lg transition-colors">
                 Nova Venda
               </BaseButton> -->
             </div>
-            <div >
+            <div>
               <div v-if="loading" class="flex items-center justify-center py-10">
                 <span class="text-white text-lg">Carregando vendas...</span>
               </div>
-              <div v-else-if="sales.length === 0" class="flex w-full min-h-[200px] items-center justify-center text-gray-400 text-lg">
+              <div v-else-if="sales.length === 0"
+                class="flex w-full min-h-[200px] items-center justify-center text-gray-400 text-lg">
                 Nenhuma venda encontrada
               </div>
               <table v-else class="w-full text-white border-collapse">
@@ -22,21 +26,21 @@
                   <tr class="bg-[#1A1F3C]">
                     <template v-if="isManager">
                       <th class="p-4 text-left">Data</th>
-                      <th class="p-4 text-left">Cliente</th>
-                      <th class="p-4 text-left">Token</th>
-                      <th class="p-4 text-left">Status</th>
-                      <th class="p-4 text-left">Método de Pagamentos</th>
-                      <th class="p-4 text-left">Volume</th>
-                      <th class="p-4 text-left">Valor BRL</th>
+                      <th class="p-4 text-center">Cliente</th>
+                      <th class="p-4 text-center">Token</th>
+                      <th class="p-4 text-center">Status</th>
+                      <th class="p-4 text-center">Método de Pagamentos</th>
+                      <th class="p-4 text-center">Volume</th>
+                      <th class="p-4 text-center">Valor BRL</th>
                     </template>
                     <template v-else>
                       <th class="p-4 text-left">Data</th>
-                      <th class="p-4 text-left">Token</th>
-                      <th class="p-4 text-left">Última Atualização</th>
-                      <th class="p-4 text-left">Valor BRL</th>
-                      <th class="p-4 text-left">Status</th>
-                      <th class="p-4 text-left">Carteira</th>
-                      <th class="p-4 text-left">ID Transação</th>
+                      <th class="p-4 text-center">Token</th>
+                      <th class="p-4 text-center">Última Atualização</th>
+                      <th class="p-4 text-center">Valor BRL</th>
+                      <th class="p-4 text-center">Status</th>
+                      <th class="p-4 text-center">Carteira</th>
+                      <th class="p-4 text-center">ID Transação</th>
                     </template>
                   </tr>
                 </thead>
@@ -44,25 +48,43 @@
                   <tr v-for="sale in sales" :key="sale.id" class="border-b border-[#1A1F3C]">
                     <template v-if="isManager">
                       <td class="p-4">{{ new Date(sale.created_at).toLocaleDateString('pt-BR') }}</td>
-                      <td class="p-4">{{ sale.customer?.name }}</td>
-                      <td class="p-4">{{ sale.token || '-' }}</td>
-                      <td class="p-4">
-                        <span :class="getStatusClass(sale.status)">{{ sale.status }}</span>
+                      <td class="p-4 text-center">{{ sale.customer?.name }}</td>
+                      <td class="p-4 text-center">{{ sale.token || '-' }}</td>
+                      <td class="p-4 text-center">
+                        <span :class="getStatusClass(sale.status)">{{ mapStatus(sale.status) }}</span>
                       </td>
-                      <td class="p-4">{{ sale.payment_method }}</td>
-                      <td class="p-4">{{ sale.products && sale.products.length ? sale.products[0].amount : '-' }}</td>
-                      <td class="p-4">R$ {{ sale.products && sale.products.length ? sale.products[0].price.toFixed(2) : '-' }}</td>
+                      <td class="p-4 text-center">{{ sale.payment_method }}</td>
+                      <td class="p-4 text-center">{{ sale.products && sale.products.length ? sale.products[0].amount : '-' }}</td>
+                      <td class="p-4 text-center">R$ {{ sale.products && sale.products.length ? sale.products[0].price.toFixed(2) : '-' }}</td>
                     </template>
                     <template v-else>
                       <td class="p-4">{{ new Date(sale.created_at).toLocaleDateString('pt-BR') }}</td>
-                      <td class="p-4">{{ sale.token || '-' }}</td>
-                      <td class="p-4">{{ new Date(sale.updated_at).toLocaleDateString('pt-BR') }}</td>
-                      <td class="p-4">R$ {{ sale.products && sale.products.length ? sale.products[0].price.toFixed(2) : '-' }}</td>
-                      <td class="p-4">
-                        <span :class="getStatusClass(sale.status)">{{ sale.status }}</span>
+                      <td class="p-4 text-center">{{ sale.token || '-' }}</td>
+                      <td class="p-4 text-center">{{ new Date(sale.updated_at).toLocaleDateString('pt-BR') }}</td>
+                      <td class="p-4 text-center">R$ {{ sale.products && sale.products.length ? sale.products[0].price.toFixed(2) : '-' }}</td>
+                      <td class="p-4 text-center">
+                        <span :class="getStatusClass(sale.status)">{{ mapStatus(sale.status) }}</span>
                       </td>
-                      <td class="p-4">{{ sale.customer?.external_id || '-' }}</td>
-                      <td class="p-4">{{ sale.id }}</td>
+                      <td class="p-4 text-center">
+                        <div class="flex items-center justify-center gap-2">
+                          <span>{{ formatWalletId(sale.customer?.external_id) || '-' }}</span>
+                          <button v-if="sale.customer?.external_id" @click="copyToClipboard(sale.customer.external_id)"
+                            class="p-0 transition-colors bg-transparent border-none outline-none"
+                            title="Copiar ID da Carteira">
+                            <CopyIcon />
+                          </button>
+                        </div>
+                      </td>
+                      <td class="p-4 text-center">
+                        <div class="flex items-center justify-center gap-2">
+                          <span>{{ formatTransactionId(sale.id) }}</span>
+                          <button @click="copyToClipboard(sale.id)"
+                            class="p-0 transition-colors bg-transparent border-none outline-none"
+                            title="Copiar ID da Transação">
+                            <CopyIcon />
+                          </button>
+                        </div>
+                      </td>
                     </template>
                   </tr>
                 </tbody>
@@ -260,7 +282,7 @@
                 </div>
                 <p class="text-[#CF631C] font-bold text-xl">
                   R$ {{editingSale?.products?.reduce((acc: number, curr: any) => acc + (curr.price * curr.amount),
-                  0).toFixed(2) }}
+                    0).toFixed(2)}}
                 </p>
               </div>
             </div>
@@ -475,6 +497,93 @@ import { externalService } from '@/services/externalService'
 import AuthenticatedLayout from '@/components/layout/AuthenticatedLayout.vue'
 import BaseButton from '@/components/common/BaseButton.vue'
 import { useToast } from 'vue-toastification'
+import MenuIcon from '@/components/icons/MenuIcon.vue'
+import CopyIcon from '@/components/icons/CopyIcon.vue'
+
+// Mock de dados para desenvolvimento
+const MOCK_SALES = [
+  {
+    id: "019683a9-6f64-709f-a8c4-532f49082ad5",
+    type: "product",
+    status: "awaiting_payment",
+    payment_method: "pix",
+    token: "TOKEN123",
+    products: [
+      {
+        id: "71baa072-df2f-365d-9551-d242dee44e20",
+        name: "Produto Premium",
+        price: 199.90,
+        amount: 1
+      }
+    ],
+    platform_fee: "5.05",
+    affiliate_commission: "10.00",
+    created_at: "2024-03-20T22:27:21.000000Z",
+    updated_at: "2024-03-20T22:27:21.000000Z",
+    customer: {
+      id: "019683a9-6eb5-7205-9639-cdc0af76c47e",
+      external_id: "CLI123456",
+      name: "João Silva",
+      email: "joao.silva@exemplo.com",
+      phone: "(11) 98765-4321",
+      document_number: "123.456.789-00"
+    }
+  },
+  {
+    id: "019683a9-6f64-709f-a8c4-532f49082ad6",
+    type: "product",
+    status: "paid",
+    payment_method: "credit_card",
+    token: "TOKEN456",
+    products: [
+      {
+        id: "71baa072-df2f-365d-9551-d242dee44e21",
+        name: "Produto Básico",
+        price: 99.90,
+        amount: 2
+      }
+    ],
+    platform_fee: "5.05",
+    affiliate_commission: "5.00",
+    created_at: "2024-03-19T15:30:00.000000Z",
+    updated_at: "2024-03-19T15:35:00.000000Z",
+    customer: {
+      id: "019683a9-6eb5-7205-9639-cdc0af76c47f",
+      external_id: "CLI789012",
+      name: "Maria Santos",
+      email: "maria.santos@exemplo.com",
+      phone: "(11) 91234-5678",
+      document_number: "987.654.321-00"
+    }
+  },
+  {
+    id: "019683a9-6f64-709f-a8c4-532f49082ad7",
+    type: "product",
+    status: "refunded",
+    payment_method: "bank_transfer",
+    token: "TOKEN789",
+    products: [
+      {
+        id: "71baa072-df2f-365d-9551-d242dee44e22",
+        name: "Produto Enterprise",
+        price: 499.90,
+        amount: 1
+      }
+    ],
+    platform_fee: "5.05",
+    affiliate_commission: "15.00",
+    created_at: "2024-03-18T10:15:00.000000Z",
+    updated_at: "2024-03-18T11:20:00.000000Z",
+    customer: {
+      id: "019683a9-6eb5-7205-9639-cdc0af76c480",
+      external_id: "CLI345678",
+      name: "Pedro Oliveira",
+      email: "pedro.oliveira@exemplo.com",
+      phone: "(11) 99876-5432",
+      document_number: "456.789.123-00"
+    }
+  }
+]
 
 // Função para gerar ID único
 function generateUniqueId(): string {
@@ -495,7 +604,9 @@ export default defineComponent({
   name: 'Sales',
   components: {
     AuthenticatedLayout,
-    BaseButton
+    BaseButton,
+    MenuIcon,
+    CopyIcon
   },
   setup() {
     const store = useDashboardStore()
@@ -534,16 +645,16 @@ export default defineComponent({
       }
     }
 
-    return { 
-      store, 
-      router, 
-      authStore, 
+    return {
+      store,
+      router,
+      authStore,
       toast,
-      loading, 
-      sales, 
-      showCreateModal, 
-      showDetailsModal, 
-      selectedSale, 
+      loading,
+      sales,
+      showCreateModal,
+      showDetailsModal,
+      selectedSale,
       searchQuery,
       handleSearch
     }
@@ -554,6 +665,7 @@ export default defineComponent({
       availableProducts: [] as any[],
       dropdownOpen: null as string | null,
       showEditModal: false,
+      showDetailModal: false,
       editingSale: null as any,
       newSale: {
         id: '',
@@ -564,7 +676,8 @@ export default defineComponent({
         products: [] as { id: string; name: string; price: number; amount: number }[],
         platform_fee: '0.00'
       },
-      isManager: false
+      isManager: false,
+      useMockData: true // Flag para controlar o uso do mock
     }
   },
   async mounted() {
@@ -581,72 +694,29 @@ export default defineComponent({
   methods: {
     async loadSales() {
       try {
-        const response = await managerService.sales.list({
-          search: '',
-          page: 1,
-          per_page: 20,
-          sort_by: 'created_at',
-          sort_order: 'desc'
-        });
-        /* const response = {
-          data: [
-            {
-              "id": "019683a9-6f64-709f-a8c4-532f49082ad5",
-              "type": "product",
-              "status": "awaiting_payment",
-              "payment_method": "pix",
-              "token": "TOKEN123",
-              "products": [
-                {
-                  "id": "71baa072-df2f-365d-9551-d242dee44e20",
-                  "name": "ex",
-                  "price": 32.33,
-                  "amount": 3
-                },
-                {
-                  "id": "4d4e2821-8a4a-3b88-b3a1-dfbddcc1f031",
-                  "name": "doloribus",
-                  "price": 6.1,
-                  "amount": 5
-                }
-              ],
-              "platform_fee": "5.05",
-              "affiliate_commission": "0.00",
-              "created_at": "2025-04-29T22:27:21.000000Z",
-              "updated_at": "2025-04-29T22:27:21.000000Z",
-              "customer": {
-                "id": "019683a9-6eb5-7205-9639-cdc0af76c47e",
-                "external_id": "a65e1db9-0639-38eb-bd62-aa4a2bce0a49",
-                "name": "Sr. Edilson Juliano Sandoval Neto",
-                "email": "valentin58@example.com",
-                "phone": "(62) 96839-6248",
-                "document_number": "30089750826",
-                "created_at": "2025-04-29T22:27:21.000000Z",
-                "updated_at": "2025-04-29T22:27:21.000000Z"
-              }
-            }
-          ]
+        let response;
+
+        if (this.useMockData) {
+          // Usa os dados mockados
+          response = { data: MOCK_SALES };
+        } else {
+          // Faz a chamada real à API
+          response = await managerService.sales.list({
+            search: '',
+            page: 1,
+            per_page: 20,
+            sort_by: 'created_at',
+            sort_order: 'desc'
+          });
         }
- */
+
         this.sales = (response.data || []).map((sale: any) => ({
-          id: sale.id,
-          type: sale.type,
-          status: this.mapStatus(sale.status),
-          payment_method: this.mapPaymentMethod(sale.payment_method),
-          token: sale.token,
-          products: sale.products || [],
-          platform_fee: sale.platform_fee,
-          affiliate_commission: sale.affiliate_commission,
-          created_at: sale.created_at,
-          updated_at: sale.updated_at,
+          ...sale,
           customer: sale.customer ? {
-            id: sale.customer.id,
-            name: sale.customer.name,
-            email: sale.customer.email,
-            phone: sale.customer.phone,
-            document_number: sale.customer.document_number
+            ...sale.customer,
+            external_id: sale.customer.external_id || '-'
           } : null
-        }))
+        }));
       } catch (e) {
         console.error('Erro ao carregar vendas:', e)
       } finally {
@@ -674,13 +744,17 @@ export default defineComponent({
     },
 
     getStatusClass(status: string): string {
-      const classes = {
-        'Pago': 'px-2 py-1 rounded-full text-sm bg-green-500/20 text-green-500',
+      const statusMap: { [key: string]: string } = {
+        'awaiting_payment': 'px-2 py-1 rounded-full text-sm bg-yellow-500/20 text-yellow-500',
+        'paid': 'px-2 py-1 rounded-full text-sm bg-green-500/20 text-green-500',
+        'refunded': 'px-2 py-1 rounded-full text-sm bg-gray-500/20 text-gray-500',
+        'cancelled': 'px-2 py-1 rounded-full text-sm bg-red-500/20 text-red-500',
         'Pendente': 'px-2 py-1 rounded-full text-sm bg-yellow-500/20 text-yellow-500',
-        'Cancelado': 'px-2 py-1 rounded-full text-sm bg-red-500/20 text-red-500',
-        'Estornado': 'px-2 py-1 rounded-full text-sm bg-gray-500/20 text-gray-500'
+        'Pago': 'px-2 py-1 rounded-full text-sm bg-green-500/20 text-green-500',
+        'Estornado': 'px-2 py-1 rounded-full text-sm bg-gray-500/20 text-gray-500',
+        'Cancelado': 'px-2 py-1 rounded-full text-sm bg-red-500/20 text-red-500'
       }
-      return classes[status as keyof typeof classes] || ''
+      return statusMap[status] || 'px-2 py-1 rounded-full text-sm bg-gray-500/20 text-gray-500'
     },
 
     handleNewSale() {
@@ -771,6 +845,28 @@ export default defineComponent({
 
     toggleDropdown(saleId: string) {
       this.dropdownOpen = this.dropdownOpen === saleId ? null : saleId;
+    },
+
+    async copyToClipboard(text: string) {
+      try {
+        await navigator.clipboard.writeText(text);
+        this.toast.success('ID copiado com sucesso!');
+      } catch (err) {
+        this.toast.error('Erro ao copiar ID');
+        console.error('Erro ao copiar para a área de transferência:', err);
+      }
+    },
+
+    formatWalletId(id: string | undefined): string {
+      if (!id) return '-';
+      if (id.length <= 8) return id;
+      return `${id.slice(0, 4)}...${id.slice(-6)}`;
+    },
+
+    formatTransactionId(id: string): string {
+      if (!id) return '-';
+      if (id.length <= 8) return id;
+      return `${id.slice(0, 8)}...`;
     }
   }
 })
