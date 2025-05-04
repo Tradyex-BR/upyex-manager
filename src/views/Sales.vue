@@ -25,77 +25,97 @@
                 <thead>
                   <tr class="bg-[#1A1F3C]">
                     <template v-if="isManager">
-                      <th class="p-4 text-left">Data</th>
-                      <th class="p-4 text-center">Cliente</th>
-                      <th class="p-4 text-center">Token</th>
-                      <th class="p-4 text-center">Status</th>
-                      <th class="p-4 text-center">Método de Pagamentos</th>
-                      <th class="p-4 text-center">Volume</th>
-                      <th class="p-4 text-center">Valor BRL</th>
+                      <th class="p-4 text-left font-inter text-[14px] font-medium leading-[18px] text-white">Data</th>
+                      <th class="p-4 text-center font-inter text-[14px] font-medium leading-[18px] text-white">Cliente
+                      </th>
+                      <th class="p-4 text-center font-inter text-[14px] font-medium leading-[18px] text-white">Token
+                      </th>
+                      <th class="p-4 text-center font-inter text-[14px] font-medium leading-[18px] text-white">Status
+                      </th>
+                      <th class="p-4 text-center font-inter text-[14px] font-medium leading-[18px] text-white">Método de
+                        Pagamentos</th>
+                      <th class="p-4 text-center font-inter text-[14px] font-medium leading-[18px] text-white">Volume
+                      </th>
+                      <th class="p-4 text-center font-inter text-[14px] font-medium leading-[18px] text-white">Valor BRL
+                      </th>
                     </template>
                     <template v-else>
-                      <th class="p-4 text-left">Data</th>
-                      <th class="p-4 text-center">Token</th>
-                      <th class="p-4 text-center">Última Atualização</th>
-                      <th class="p-4 text-center">Valor BRL</th>
-                      <th class="p-4 text-center">Status</th>
-                      <th class="p-4 text-center">Carteira</th>
-                      <th class="p-4 text-center">ID Transação</th>
+                      <th class="p-4 text-left font-inter text-[14px] font-medium leading-[18px] text-white">Data</th>
+                      <th class="p-4 text-center font-inter text-[14px] font-medium leading-[18px] text-white">Token
+                      </th>
+                      <th class="p-4 text-center font-inter text-[14px] font-medium leading-[18px] text-white">Última
+                        Atualização</th>
+                      <th class="p-4 text-center font-inter text-[14px] font-medium leading-[18px] text-white">Valor BRL
+                      </th>
+                      <th class="p-4 text-center font-inter text-[14px] font-medium leading-[18px] text-white">Status
+                      </th>
+                      <th class="p-4 text-center font-inter text-[14px] font-medium leading-[18px] text-white">Carteira
+                      </th>
+                      <th class="p-4 text-center font-inter text-[14px] font-medium leading-[18px] text-white">ID
+                        Transação</th>
                     </template>
                   </tr>
                 </thead>
                 <tbody>
                   <tr v-for="sale in sales" :key="sale.id" class="border-b border-[#1A1F3C]">
                     <template v-if="isManager">
-                      <td class="p-4">{{ new Date(sale.created_at).toLocaleDateString('pt-BR') }}</td>
-                      <td class="p-4 text-center">{{ sale.customer?.name }}</td>
+                      <td class="p-4 font-inter text-[14px] font-normal leading-[18px] text-white">{{ new
+                        Date(sale.created_at).toLocaleDateString('pt-BR') }}</td>
+                      <td class="p-4 text-center font-inter text-[14px] font-normal leading-[18px] text-white">{{
+                        sale.customer?.name }}</td>
                       <td class="p-4 text-center">
                         <div class="flex items-center justify-center gap-3">
-                          <img 
-                            :src="sale.token ? `https://ui-avatars.com/api/?name=${sale.token}&background=random` : ''" 
-                            :alt="sale.token" 
-                            class="w-10 h-10 rounded-full object-cover"
-                          />
+                          <img
+                            :src="sale.token ? `https://ui-avatars.com/api/?name=${sale.token}&background=random` : ''"
+                            :alt="sale.token" class="w-10 h-10 rounded-full object-cover" />
                           <div class="flex flex-col">
-                            <span class="font-semibold">{{ sale.token || '-' }}</span>
+                            <span class="font-inter text-[14px] font-normal leading-[18px] text-white">{{ sale.token ||
+                              '-' }}</span>
                           </div>
                         </div>
                       </td>
                       <td class="p-4 text-center">
                         <span :class="getStatusClass(sale.status)">{{ mapStatus(sale.status) }}</span>
                       </td>
-                      <td class="p-4 text-center">{{ sale.payment_method }}</td>
-                      <td class="p-4 text-center">{{ sale.products && sale.products.length ? sale.products[0].amount : '-' }}</td>
-                      <td class="p-4 text-center">R$ {{ sale.products && sale.products.length ? sale.products[0].price.toFixed(2) : '-' }}</td>
+                      <td class="p-4 text-center font-inter text-[14px] font-normal leading-[18px] text-white">{{
+                        sale.payment_method }}</td>
+                      <td class="p-4 text-center font-inter text-[14px] font-normal leading-[18px] text-white">{{
+                        sale.products && sale.products.length ? sale.products[0].amount : '-' }}</td>
+                      <td class="p-4 text-center font-inter text-[14px] font-normal leading-[18px] text-white">R$ {{
+                        sale.products && sale.products.length ? sale.products[0].price.toFixed(2) : '-' }}</td>
                     </template>
                     <template v-else>
-                      <td class="p-4">{{ new Date(sale.created_at).toLocaleDateString('pt-BR') }}</td>
+                      <td class="p-4 font-inter text-[14px] font-normal leading-[18px] text-white">{{ new
+                        Date(sale.created_at).toLocaleDateString('pt-BR') }}</td>
                       <td class="p-4 text-center">
                         <div class="flex items-center justify-center gap-3">
-                          <img 
-                            :src="sale.token ? `https://ui-avatars.com/api/?name=${sale.token}&background=random` : ''" 
-                            :alt="sale.token" 
-                            class="w-10 h-10 rounded-full object-cover"
-                          />
+                          <img
+                            :src="sale.token ? `https://ui-avatars.com/api/?name=${sale.token}&background=random` : ''"
+                            :alt="sale.token" class="w-10 h-10 rounded-full object-cover" />
                           <div class="flex flex-col">
-                            <span class="font-semibold">{{ sale.token || '-' }}</span>
+                            <span class="font-inter text-[14px] font-normal leading-[18px] text-white">{{ sale.token ||
+                              '-' }}</span>
                           </div>
                         </div>
                       </td>
-                      <td class="p-4 text-center">{{ new Date(sale.updated_at).toLocaleDateString('pt-BR') }}</td>
-                      <td class="p-4 text-center">R$ {{ sale.products && sale.products.length ? sale.products[0].price.toFixed(2) : '-' }}</td>
+                      <td class="p-4 text-center font-inter text-[14px] font-normal leading-[18px] text-white">{{ new
+                        Date(sale.updated_at).toLocaleDateString('pt-BR') }}</td>
+                      <td class="p-4 text-center font-inter text-[14px] font-normal leading-[18px] text-white">R$ {{
+                        sale.products && sale.products.length ? sale.products[0].price.toFixed(2) : '-' }}</td>
                       <td class="p-4 text-center">
                         <span :class="getStatusClass(sale.status)">{{ mapStatus(sale.status) }}</span>
                       </td>
                       <td class="p-4 text-center">
                         <div class="flex items-center justify-center gap-2">
-                          <span>{{ formatWalletId(sale.customer?.external_id) || '-' }}</span>
+                          <span class="font-inter text-[14px] font-normal leading-[18px] text-white">{{
+                            formatWalletId(sale.customer?.external_id) || '-' }}</span>
                           <CopyButton v-if="sale.customer?.external_id" :stringToCopy="sale.customer.external_id" />
                         </div>
                       </td>
                       <td class="p-4 text-center">
                         <div class="flex items-center justify-center gap-2">
-                          <span>{{ formatTransactionId(sale.id) }}</span>
+                          <span class="font-inter text-[14px] font-normal leading-[18px] text-white">{{
+                            formatTransactionId(sale.id) }}</span>
                           <CopyButton :stringToCopy="sale.id" />
                         </div>
                       </td>
