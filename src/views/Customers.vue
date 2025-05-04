@@ -1,81 +1,75 @@
 <template>
   <AuthenticatedLayout :loading="loading">
-    <div class="overflow-hidden">
-      <div class="gap-5 flex max-md:flex-col max-md:items-stretch">
-        <main class="w-full max-md:w-full max-md:ml-0">
-          <div class="w-full max-md:max-w-full">
-            <section class=" min-h-[944px] w-full overflow-hidden max-md:max-w-full max-md:px-5">
-              <div class="flex justify-between items-center mb-6">
-                <p class="text-white text-2xl font-semibold">Clientes</p>
-                <BaseButton class="ml-2" @click="showCreateModal = true">
-                  Novo Cliente
-                </BaseButton>
-              </div>
-              <div>
-                <div v-if="customers.length === 0" class="flex w-full min-h-[200px] items-center justify-center text-gray-400 text-lg">
-                  Nenhum cliente encontrado
-                </div>
-                <table v-else class="w-full text-white border-collapse">
-                  <thead>
-                    <tr class="bg-[#1A1F3C]">
-                      <th class="p-4 text-left">Nome</th>
-                      <th class="p-4 text-left">Email</th>
-                      <th class="p-4 text-left">Status</th>
-                      <th class="p-4 text-left">Data de cadastro</th>
-                      <th class="p-4 text-left">Último acesso</th>
-                      <th class="p-4 text-left">Ações</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr v-for="usuario in customers" :key="usuario.id" class="border-b border-[#1A1F3C]">
-                      <td class="p-4">{{ usuario.nome }}</td>
-                      <td class="p-4">{{ usuario.email }}</td>
-                      <td class="p-4">
-                        <span :class="getStatusClass(usuario.status)">{{ usuario.status }}</span>
-                      </td>
-                      <td class="p-4">{{ usuario.dataCadastro }}</td>
-                      <td class="p-4">{{ usuario.ultimoAcesso }}</td>
-                      <td class="p-4">
-                        <div class="relative">
-                          <button class="px-3 py-1 bg-[#1A1F3C] rounded-lg hover:bg-[#2A2F4C] transition-colors"
-                            @click="toggleDropdown(usuario.id)">
-                            Ações
-                          </button>
-                          <div v-if="dropdownOpen === usuario.id"
-                            class="absolute right-0 mt-2 w-48 bg-[#1a1a1a] rounded-lg shadow-lg z-10">
-                            <button class="w-full text-left px-4 py-2 hover:bg-[#2A2F4C] text-yellow-500"
-                              @click="handleCustomerAction(usuario.id, 'bloquear')">
-                              <i class="fas fa-ban mr-2"></i>
-                              {{ usuario.status === 'Ativo' ? 'Bloquear' : 'Desbloquear' }}
-                            </button>
-                            <button class="w-full text-left px-4 py-2 hover:bg-[#2A2F4C] text-blue-500"
-                              @click="handleCustomerAction(usuario.id, 'editar_permissao')">
-                              <i class="fas fa-key mr-2"></i>
-                              Editar Permissão
-                            </button>
-                            <button class="w-full text-left px-4 py-2 hover:bg-[#2A2F4C] text-orange-500"
-                              @click="handleCustomerAction(usuario.id, 'resetar_senha')">
-                              <i class="fas fa-key mr-2"></i>
-                              Resetar Senha
-                            </button>
-                            <button class="w-full text-left px-4 py-2 hover:bg-[#2A2F4C] text-red-500"
-                              @click="handleCustomerAction(usuario.id, 'excluir')">
-                              <i class="fas fa-trash-alt mr-2"></i>
-                              Excluir
-                            </button>
-                          </div>
-                        </div>
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            </section>
-          </div>
-        </main>
+
+    <section class=" min-h-[944px] w-full overflow-visible">
+      <div class="flex justify-between items-center mb-6">
+        <p class="text-white text-2xl font-semibold">Clientes</p>
+        <BaseButton class="ml-2" @click="showCreateModal = true">
+          Novo Cliente
+        </BaseButton>
       </div>
-    </div>
-    
+      <div>
+        <div v-if="customers.length === 0"
+          class="flex w-full min-h-[200px] items-center justify-center text-gray-400 text-lg">
+          Nenhum cliente encontrado
+        </div>
+        <table v-else class="w-full text-white border-collapse">
+          <thead>
+            <tr class="bg-[#1A1F3C]">
+              <th class="p-4 text-left">Nome</th>
+              <th class="p-4 text-left">Email</th>
+              <th class="p-4 text-left">Status</th>
+              <th class="p-4 text-left">Data de cadastro</th>
+              <th class="p-4 text-left">Último acesso</th>
+              <th class="p-4 text-left">Ações</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="usuario in customers" :key="usuario.id" class="border-b border-[#1A1F3C]">
+              <td class="p-4">{{ usuario.nome }}</td>
+              <td class="p-4">{{ usuario.email }}</td>
+              <td class="p-4">
+                <span :class="getStatusClass(usuario.status)">{{ usuario.status }}</span>
+              </td>
+              <td class="p-4">{{ usuario.dataCadastro }}</td>
+              <td class="p-4">{{ usuario.ultimoAcesso }}</td>
+              <td class="p-4">
+                <div class="relative">
+                  <button class="px-3 py-1 bg-[#1A1F3C] rounded-lg hover:bg-[#2A2F4C] transition-colors"
+                    @click="toggleDropdown(usuario.id)">
+                    Ações
+                  </button>
+                  <div v-if="dropdownOpen === usuario.id"
+                    class="absolute right-0 mt-2 w-48 bg-[#1a1a1a] rounded-lg shadow-lg z-10">
+                    <button class="w-full text-left px-4 py-2 hover:bg-[#2A2F4C] text-yellow-500"
+                      @click="handleCustomerAction(usuario.id, 'bloquear')">
+                      <i class="fas fa-ban mr-2"></i>
+                      {{ usuario.status === 'Ativo' ? 'Bloquear' : 'Desbloquear' }}
+                    </button>
+                    <button class="w-full text-left px-4 py-2 hover:bg-[#2A2F4C] text-blue-500"
+                      @click="handleCustomerAction(usuario.id, 'editar_permissao')">
+                      <i class="fas fa-key mr-2"></i>
+                      Editar Permissão
+                    </button>
+                    <button class="w-full text-left px-4 py-2 hover:bg-[#2A2F4C] text-orange-500"
+                      @click="handleCustomerAction(usuario.id, 'resetar_senha')">
+                      <i class="fas fa-key mr-2"></i>
+                      Resetar Senha
+                    </button>
+                    <button class="w-full text-left px-4 py-2 hover:bg-[#2A2F4C] text-red-500"
+                      @click="handleCustomerAction(usuario.id, 'excluir')">
+                      <i class="fas fa-trash-alt mr-2"></i>
+                      Excluir
+                    </button>
+                  </div>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
     <!-- Modal de visualização/edição de cliente -->
     <div v-if="showDetailModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60">
       <div class="bg-[#23263a] rounded-lg p-8 w-full max-w-4xl relative">
@@ -99,8 +93,8 @@
         <div class="mb-8">
           <span :class="[
             'px-4 py-2 rounded-full text-sm font-medium',
-            editingCustomer?.status === 'Ativo' 
-              ? 'bg-green-500/20 text-green-500' 
+            editingCustomer?.status === 'Ativo'
+              ? 'bg-green-500/20 text-green-500'
               : 'bg-red-500/20 text-red-500'
           ]">
             <i :class="[
@@ -174,8 +168,7 @@
                   <label class="text-gray-400 text-sm">Link da API</label>
                   <div class="flex items-center gap-2 bg-[#23263a] rounded-lg p-2">
                     <p class="text-white font-medium truncate flex-1">{{ editingCustomer?.linkApi }}</p>
-                    <button v-if="editingCustomer?.linkApi" 
-                      @click="copyToClipboard(editingCustomer.linkApi)" 
+                    <button v-if="editingCustomer?.linkApi" @click="copyToClipboard(editingCustomer.linkApi)"
                       class="text-[#CF631C] hover:text-[#E67E22] transition-colors p-1">
                       <i class="fas fa-copy"></i>
                     </button>
@@ -193,13 +186,13 @@
             Ações
           </h3>
           <div class="flex gap-4">
-            <button @click="handleCustomerAction(editingCustomer?.id, 'bloquear')" 
+            <button @click="handleCustomerAction(editingCustomer?.id, 'bloquear')"
               class="flex items-center gap-2 px-6 py-3 rounded-lg text-white font-medium transition-colors"
               :class="editingCustomer?.status === 'Ativo' ? 'bg-red-600 hover:bg-red-700' : 'bg-green-600 hover:bg-green-700'">
               <i :class="['fas', editingCustomer?.status === 'Ativo' ? 'fa-ban' : 'fa-unlock']"></i>
               {{ editingCustomer?.status === 'Ativo' ? 'Bloquear' : 'Desbloquear' }}
             </button>
-            <button @click="handleCustomerAction(editingCustomer?.id, 'resetar_senha')" 
+            <button @click="handleCustomerAction(editingCustomer?.id, 'resetar_senha')"
               class="flex items-center gap-2 px-6 py-3 bg-[#CF631C] hover:bg-[#E67E22] rounded-lg text-white font-medium transition-colors">
               <i class="fas fa-key"></i>
               Resetar Senha
@@ -210,118 +203,7 @@
     </div>
 
     <!-- Modal de Criação de Cliente -->
-    <BaseModal
-      v-if="showCreateModal"
-      title="Novo Cliente"
-      @close="showCreateModal = false"
-    >
-      <template #icon>
-        <div class="w-12 h-12 rounded-full bg-[#CF631C]/20 flex items-center justify-center">
-          <i class="fas fa-user-plus text-[#CF631C] text-2xl"></i>
-        </div>
-      </template>
-
-      <form @submit.prevent="handleCreateCustomer" class="space-y-8">
-        <!-- Informações Básicas -->
-        <div class="bg-[#1a1a2a] rounded-xl p-6">
-          <h3 class="text-white text-lg font-semibold mb-6 flex items-center gap-2">
-            <i class="fas fa-user text-[#CF631C]"></i>
-            Informações Básicas
-          </h3>
-          <div class="grid grid-cols-2 gap-6">
-            <div>
-              <label class="block text-gray-400 mb-2 font-medium">Nome</label>
-              <div class="relative">
-                <i class="fas fa-user absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
-                <input v-model="newCustomer.name" 
-                  type="text" 
-                  required
-                  placeholder="Nome completo do cliente"
-                  class="w-full pl-10 pr-3 py-2.5 rounded-lg bg-[#23263a] text-white border border-[#2A2F4C] focus:border-[#CF631C] focus:outline-none transition-colors">
-              </div>
-            </div>
-            <div>
-              <label class="block text-gray-400 mb-2 font-medium">Email</label>
-              <div class="relative">
-                <i class="fas fa-envelope absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
-                <input v-model="newCustomer.email" 
-                  type="email" 
-                  required
-                  placeholder="email@exemplo.com"
-                  class="w-full pl-10 pr-3 py-2.5 rounded-lg bg-[#23263a] text-white border border-[#2A2F4C] focus:border-[#CF631C] focus:outline-none transition-colors">
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Informações de Contato -->
-        <div class="bg-[#1a1a2a] rounded-xl p-6">
-          <h3 class="text-white text-lg font-semibold mb-6 flex items-center gap-2">
-            <i class="fas fa-phone text-[#CF631C]"></i>
-            Informações de Contato
-          </h3>
-          <div class="grid grid-cols-2 gap-6">
-            <div>
-              <label class="block text-gray-400 mb-2 font-medium">Telefone</label>
-              <div class="relative">
-                <i class="fas fa-phone absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
-                <input v-model="newCustomer.phone" 
-                  type="tel" 
-                  required
-                  placeholder="(00) 00000-0000"
-                  class="w-full pl-10 pr-3 py-2.5 rounded-lg bg-[#23263a] text-white border border-[#2A2F4C] focus:border-[#CF631C] focus:outline-none transition-colors">
-              </div>
-            </div>
-            <div>
-              <label class="block text-gray-400 mb-2 font-medium">CPF/CNPJ</label>
-              <div class="relative">
-                <i class="fas fa-id-card absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
-                <input v-model="newCustomer.document_number" 
-                  type="text"
-                  placeholder="000.000.000-00"
-                  class="w-full pl-10 pr-3 py-2.5 rounded-lg bg-[#23263a] text-white border border-[#2A2F4C] focus:border-[#CF631C] focus:outline-none transition-colors">
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Informações de Afiliado -->
-        <div class="bg-[#1a1a2a] rounded-xl p-6">
-          <h3 class="text-white text-lg font-semibold mb-6 flex items-center gap-2">
-            <i class="fas fa-handshake text-[#CF631C]"></i>
-            Informações de Afiliado
-          </h3>
-          <div>
-            <label class="block text-gray-400 mb-2 font-medium">Código do Afiliado</label>
-            <div class="relative">
-              <i class="fas fa-hashtag absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
-              <input v-model="newCustomer.affiliate_code" 
-                type="text" 
-                required
-                placeholder="Código único do afiliado"
-                class="w-full pl-10 pr-3 py-2.5 rounded-lg bg-[#23263a] text-white border border-[#2A2F4C] focus:border-[#CF631C] focus:outline-none transition-colors">
-            </div>
-          </div>
-        </div>
-      </form>
-
-      <template #footer>
-        <div class="flex justify-end gap-4">
-          <button type="button" 
-            class="px-6 py-2.5 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors flex items-center gap-2" 
-            @click="showCreateModal = false">
-            <i class="fas fa-times"></i>
-            Cancelar
-          </button>
-          <button type="submit" 
-            class="px-6 py-2.5 bg-[#CF631C] text-white rounded-lg hover:bg-[#B5520A] transition-colors flex items-center gap-2"
-            @click="handleCreateCustomer">
-            <i class="fas fa-save"></i>
-            Criar Cliente
-          </button>
-        </div>
-      </template>
-    </BaseModal>
+    <CreateCustomerModal :show="showCreateModal" @close="showCreateModal = false" @submit="handleCreateCustomer" />
   </AuthenticatedLayout>
 </template>
 
@@ -335,11 +217,12 @@ import TopBar from '@/components/layout/dashboard/TopBar.vue'
 import BaseButton from '@/components/common/BaseButton.vue'
 import BaseModal from '@/components/common/BaseModal.vue'
 import AuthenticatedLayout from '@/components/layout/AuthenticatedLayout.vue'
+import CreateCustomerModal from '@/components/customers/CreateCustomerModal.vue'
 import { useRouter } from 'vue-router'
 
 // Função para gerar ID único
 function generateUniqueId(): string {
-  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
     const r = Math.random() * 16 | 0;
     const v = c === 'x' ? r : (r & 0x3 | 0x8);
     return v.toString(16);
@@ -367,7 +250,8 @@ export default defineComponent({
     TopBar,
     BaseButton,
     AuthenticatedLayout,
-    BaseModal
+    BaseModal,
+    CreateCustomerModal
   },
   setup() {
     const router = useRouter()
@@ -387,15 +271,7 @@ export default defineComponent({
       loading: true,
       showDetailModal: false,
       showCreateModal: false,
-      editingCustomer: null as Usuario | null,
-      newCustomer: {
-        id: '',
-        name: '',
-        email: '',
-        phone: '',
-        document_number: '',
-        affiliate_code: ''
-      }
+      editingCustomer: null as Usuario | null
     }
   },
   async mounted() {
@@ -481,27 +357,19 @@ export default defineComponent({
         this.showDetailModal = true
       }
     },
-    async handleCreateCustomer() {
+    async handleCreateCustomer(formData: any) {
       try {
         const payload = {
-          ...this.newCustomer,
+          ...formData,
           id: generateUniqueId()
         };
-        
+
         await externalService.customers.register(payload);
-        
+
         // Atualizar a lista de clientes
         await this.loadCustomers();
-        
+
         this.showCreateModal = false;
-        this.newCustomer = {
-          id: '',
-          name: '',
-          email: '',
-          phone: '',
-          document_number: '',
-          affiliate_code: ''
-        };
       } catch (error) {
         console.error('Erro ao criar cliente:', error);
       }
