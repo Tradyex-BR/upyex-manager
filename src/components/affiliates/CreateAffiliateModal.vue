@@ -3,12 +3,6 @@
     title="Criar Afiliado"
     @close="$emit('close')"
   >
-    <template #icon>
-      <button @click="$emit('close')" class="text-white hover:text-gray-300 transition-colors">
-        <i class="fas fa-arrow-left text-xl"></i>
-      </button>
-    </template>
-
     <form @submit.prevent="handleSubmit" class="flex flex-col gap-6">
       <!-- Informações Básicas -->
       <div class="flex flex-col gap-1 text-left">
@@ -54,10 +48,10 @@
           class="p-4 bg-[#1A1F3C] rounded-lg border border-[#162F65]">
           <div class="flex justify-between items-center mb-4">
             <h4 class="text-white text-sm font-medium">Aplicação #{{ idx + 1 }}</h4>
-            <button type="button" 
-              class="text-red-400 hover:text-red-300 transition-colors" 
-              @click="removeApp(idx)">
-              <i class="fas fa-trash-alt"></i>
+            <button type="button"
+  class="text-red-400 hover:text-red-300 text-sm font-medium bg-transparent border-none outline-none focus:outline-none focus:ring-0 p-0"
+  @click="removeApp(idx)">
+  Remover
             </button>
           </div>
           <div class="grid grid-cols-3 gap-4">

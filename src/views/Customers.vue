@@ -17,27 +17,28 @@
           <thead>
             <tr class="bg-[#1A1F3C]">
               <th class="p-4 text-left font-inter text-[14px] font-medium leading-[18px] text-white">Nome</th>
-              <th class="p-4 text-left font-inter text-[14px] font-medium leading-[18px] text-white">Email</th>
-              <th class="p-4 text-left font-inter text-[14px] font-medium leading-[18px] text-white">Status</th>
-              <th class="p-4 text-left font-inter text-[14px] font-medium leading-[18px] text-white">Data de cadastro</th>
-              <th class="p-4 text-left font-inter text-[14px] font-medium leading-[18px] text-white">Último acesso</th>
-              <th class="p-4 text-left font-inter text-[14px] font-medium leading-[18px] text-white">Ações</th>
+              <th class="p-4 text-center font-inter text-[14px] font-medium leading-[18px] text-white">Email</th>
+              <th class="p-4 text-center font-inter text-[14px] font-medium leading-[18px] text-white">Status</th>
+              <th class="p-4 text-center font-inter text-[14px] font-medium leading-[18px] text-white">Data de cadastro</th>
+              <th class="p-4 text-center font-inter text-[14px] font-medium leading-[18px] text-white">Último acesso</th>
+              <th class="p-4 text-center font-inter text-[14px] font-medium leading-[18px] text-white">Ações</th>
             </tr>
           </thead>
           <tbody>
             <tr v-for="usuario in customers" :key="usuario.id" class="border-b border-[#1A1F3C]">
               <td class="p-4 font-inter text-[14px] font-normal leading-[18px] text-white">{{ usuario.nome }}</td>
-              <td class="p-4 font-inter text-[14px] font-normal leading-[18px] text-white">{{ usuario.email }}</td>
-              <td class="p-4">
+              <td class="p-4 text-center font-inter text-[14px] font-normal leading-[18px] text-white">{{ usuario.email }}</td>
+              <td class="p-4 text-center">
                 <span :class="getStatusClass(usuario.status)">{{ usuario.status }}</span>
               </td>
-              <td class="p-4 font-inter text-[14px] font-normal leading-[18px] text-white">{{ usuario.dataCadastro }}</td>
-              <td class="p-4 font-inter text-[14px] font-normal leading-[18px] text-white">{{ usuario.ultimoAcesso }}</td>
-              <td class="p-4">
+              <td class="p-4 text-center font-inter text-[14px] font-normal leading-[18px] text-white">{{ usuario.dataCadastro }}</td>
+              <td class="p-4 text-center font-inter text-[14px] font-normal leading-[18px] text-white">{{ usuario.ultimoAcesso }}</td>
+              <td class="p-4 text-center">
                 <div class="relative">
-                  <button class="px-3 py-1 bg-[#1A1F3C] rounded-lg hover:bg-[#2A2F4C] transition-colors font-inter text-[14px] font-normal leading-[18px] text-white"
+                  <button
+                    class="outline-none border-none bg-transparent p-0"
                     @click="toggleDropdown(usuario.id)">
-                    Ações
+                    <MenuIcon />
                   </button>
                   <div v-if="dropdownOpen === usuario.id"
                     class="absolute right-0 mt-2 w-48 bg-[#1a1a1a] rounded-lg shadow-lg z-10">
@@ -219,7 +220,7 @@ import BaseModal from '@/components/common/BaseModal.vue'
 import AuthenticatedLayout from '@/components/layout/AuthenticatedLayout.vue'
 import CreateCustomerModal from '@/components/customers/CreateCustomerModal.vue'
 import { useRouter } from 'vue-router'
-
+import MenuIcon from '@/components/icons/MenuIcon.vue'
 // Função para gerar ID único
 function generateUniqueId(): string {
   return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
@@ -251,7 +252,8 @@ export default defineComponent({
     BaseButton,
     AuthenticatedLayout,
     BaseModal,
-    CreateCustomerModal
+    CreateCustomerModal,
+    MenuIcon
   },
   setup() {
     const router = useRouter()

@@ -26,7 +26,8 @@
               <tr class="bg-[#1A1F3C]">
                 <th class="p-4 text-left font-inter text-[14px] font-medium leading-[18px] text-white">Data</th>
                 <th class="p-4 text-center font-inter text-[14px] font-medium leading-[18px] text-white">Valor BRL</th>
-                <th class="p-4 text-center font-inter text-[14px] font-medium leading-[18px] text-white">Destino (Chave Pix)</th>
+                <th class="p-4 text-center font-inter text-[14px] font-medium leading-[18px] text-white">Destino (Chave
+                  Pix)</th>
                 <th class="p-4 text-center font-inter text-[14px] font-medium leading-[18px] text-white">Tipo</th>
                 <th class="p-4 text-center font-inter text-[14px] font-medium leading-[18px] text-white">Status</th>
                 <template v-if="role === 'manager'">
@@ -40,26 +41,33 @@
             <tbody>
               <tr v-for="withdrawal in withdrawals" :key="withdrawal.id" class="border-b border-[#1A1F3C]">
                 <td class="p-4 font-inter text-[14px] font-normal leading-[18px] text-white">{{ withdrawal.date }}</td>
-                <td class="p-4 text-center font-inter text-[14px] font-normal leading-[18px] text-white">{{ withdrawal.valueBRL }}</td>
-                <td class="p-4 text-center font-inter text-[14px] font-normal leading-[18px] text-white">{{ withdrawal.destination }}</td>
-                <td class="p-4 text-center font-inter text-[14px] font-normal leading-[18px] text-white">{{ withdrawal.type }}</td>
+                <td class="p-4 text-center font-inter text-[14px] font-normal leading-[18px] text-white">{{
+                  withdrawal.valueBRL }}
+                </td>
+                <td class="p-4 text-center font-inter text-[14px] font-normal leading-[18px] text-white">{{
+                  withdrawal.destination
+                  }}</td>
+                <td class="p-4 text-center font-inter text-[14px] font-normal leading-[18px] text-white">{{
+                  withdrawal.type }}</td>
                 <td class="p-4 text-center">
                   <span :class="getStatusClass(withdrawal.status)">{{ withdrawal.status }}</span>
                 </td>
                 <template v-if="role === 'manager'">
                   <td class="p-4 text-center">
                     <div class="relative">
-                      <button class="px-3 py-1 bg-[#1A1F3C] rounded-lg hover:bg-[#2A2F4C] transition-colors font-inter text-[14px] font-normal leading-[18px] text-white"
+                      <button class="outline-none border-none bg-transparent p-0"
                         @click="toggleDropdown(withdrawal.id)">
-                        Ações
+                        <MenuIcon />
                       </button>
                       <div v-if="dropdownOpen === withdrawal.id"
                         class="absolute right-0 mt-2 w-48 bg-[#1a1a1a] rounded-lg shadow-lg z-10">
-                        <button class="w-full text-left px-4 py-2 hover:bg-[#2A2F4C] text-green-500 font-inter text-[14px] font-normal leading-[18px]"
+                        <button
+                          class="w-full text-left px-4 py-2 hover:bg-[#2A2F4C] text-green-500 font-inter text-[14px] font-normal leading-[18px]"
                           @click="aprovar(withdrawal.id)">
                           Aprovar
                         </button>
-                        <button class="w-full text-left px-4 py-2 hover:bg-[#2A2F4C] text-red-500 font-inter text-[14px] font-normal leading-[18px]"
+                        <button
+                          class="w-full text-left px-4 py-2 hover:bg-[#2A2F4C] text-red-500 font-inter text-[14px] font-normal leading-[18px]"
                           @click="rejeitar(withdrawal.id)">
                           Rejeitar
                         </button>
@@ -108,6 +116,7 @@ import AuthenticatedLayout from '@/components/layout/AuthenticatedLayout.vue'
 import WithdrawalRequestModal from '@/components/withdrawals/WithdrawalRequestModal.vue'
 import WithdrawalSuccessModal from '@/components/withdrawals/WithdrawalSuccessModal.vue'
 import RedirectIcon from '@/components/icons/RedirectIcon.vue'
+import MenuIcon from '@/components/icons/MenuIcon.vue'
 
 const loading = ref(true)
 const withdrawalsSuccess = ref(false)
@@ -164,7 +173,8 @@ export default defineComponent({
     AuthenticatedLayout,
     WithdrawalRequestModal,
     WithdrawalSuccessModal,
-    RedirectIcon
+    RedirectIcon,
+    MenuIcon
   },
   data() {
     const role = localStorage.getItem('role')

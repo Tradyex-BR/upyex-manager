@@ -1,84 +1,78 @@
 <template>
   <AuthenticatedLayout :loading="loading">
-    <div class="overflow-hidden">
-      <div class="gap-5 flex max-md:flex-col max-md:items-stretch">
-        <main class="w-full max-md:w-full max-md:ml-0">
-          <div class="w-full max-md:max-w-full">
-            <section class=" min-h-[944px] w-full overflow-hidden max-md:max-w-full max-md:px-5">
-              <div class="flex justify-between items-center mb-6">
-                <p class="text-white text-2xl font-semibold">Afiliados</p>
-                <BaseButton @click="openCreateModal" class="bg-[#CF631C] cursor-pointer text-white font-bold py-2 px-4 rounded-lg transition-colors">
-                  Novo Afiliado
-                </BaseButton>
-              </div>
-              <div>
-                <div v-if="affiliates.length === 0" class="flex w-full h-full items-center justify-center text-gray-400">
-                  Nenhum afiliado encontrado.
-                </div>
-                <table v-else class="w-full text-white border-collapse">
-                  <thead>
-                    <tr class="bg-[#1A1F3C]">
-                      <th class="p-4 text-left font-inter text-[14px] font-medium leading-[18px] text-white">Nome</th>
-                      <th class="p-4 text-left font-inter text-[14px] font-medium leading-[18px] text-white">ID</th>
-                      <th class="p-4 text-left font-inter text-[14px] font-medium leading-[18px] text-white">Data de cadastro</th>
-                      <th class="p-4 text-left font-inter text-[14px] font-medium leading-[18px] text-white">Status</th>
-                      <th class="p-4 text-left font-inter text-[14px] font-medium leading-[18px] text-white">Ações</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr v-for="affiliate in affiliates" :key="affiliate.id" class="border-b border-[#1A1F3C]">
-                      <td class="p-4 flex items-center gap-2">
-                        <img :src="`https://ui-avatars.com/api/?name=${affiliate.name}&background=random`"
-                          :alt="affiliate.name" class="w-10 h-10 rounded-full" />
-                        <p class="font-inter text-[14px] font-normal leading-[18px] text-white">{{ affiliate.name }}</p>
-                      </td>
-                      <td class="p-4">
-                        <span class="font-inter text-[14px] font-normal leading-[18px] text-white">{{ affiliate.id }}</span>
-                      </td>
-                      <td class="p-4 font-inter text-[14px] font-normal leading-[18px] text-white">{{ new Date(affiliate.created_at).toLocaleDateString('pt-BR') }}</td>
-                      <td class="p-4">
-                        <span
-                          :class="affiliate.is_active ? 'px-2 py-1 rounded-full text-sm bg-green-500/20 text-green-500' : 'px-2 py-1 rounded-full text-sm bg-red-500/20 text-red-500'">
-                          {{ affiliate.is_active ? 'Ativo' : 'Inativo' }}
-                        </span>
-                      </td>
-                      <td class="p-4">
-                        <div class="relative">
-                          <button class="px-3 py-1 bg-[#1A1F3C] rounded-lg hover:bg-[#2A2F4C] transition-colors font-inter text-[14px] font-normal leading-[18px] text-white"
-                            @click="toggleDropdown(affiliate.id)">
-                            Ações
-                          </button>
-                          <div v-if="dropdownOpen === affiliate.id"
-                            class="absolute right-0 mt-2 w-48 bg-[#1a1a1a] rounded-lg shadow-lg z-10">
-                            <button class="w-full text-left px-4 py-2 hover:bg-[#2A2F4C] text-green-500"
-                              @click="handleAction(affiliate.id, 'aprovar')">
-                              <i class="fas fa-check-circle mr-2"></i>
-                              Aprovar
-                            </button>
-                            <button class="w-full text-left px-4 py-2 hover:bg-[#2A2F4C] text-red-500"
-                              @click="handleAction(affiliate.id, 'bloquear')">
-                              <i class="fas fa-ban mr-2"></i>
-                              Bloquear
-                            </button>
-                          </div>
-                        </div>
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            </section>
-          </div>
-        </main>
+
+    <section class=" min-h-[944px] w-full overflow-visible">
+      <div class="flex justify-between items-center mb-6">
+        <p class="text-white text-2xl font-semibold">Afiliados</p>
+        <BaseButton @click="openCreateModal"
+          class="bg-[#CF631C] cursor-pointer text-white font-bold py-2 px-4 rounded-lg transition-colors">
+          Novo Afiliado
+        </BaseButton>
       </div>
-    </div>
+      <div>
+        <div v-if="affiliates.length === 0" class="flex w-full h-full items-center justify-center text-gray-400">
+          Nenhum afiliado encontrado.
+        </div>
+        <table v-else class="w-full text-white border-collapse">
+          <thead>
+            <tr class="bg-[#1A1F3C]">
+              <th class="p-4 text-left font-inter text-[14px] font-medium leading-[18px] text-white">Nome</th>
+              <th class="p-4 text-center font-inter text-[14px] font-medium leading-[18px] text-white">ID de Afiliado
+              </th>
+              <th class="p-4 text-center font-inter text-[14px] font-medium leading-[18px] text-white">Data de cadastro
+              </th>
+              <th class="p-4 text-center font-inter text-[14px] font-medium leading-[18px] text-white">Status</th>
+              <th class="p-4 text-center font-inter text-[14px] font-medium leading-[18px] text-white">Ações</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="affiliate in affiliates" :key="affiliate.id" class="border-b border-[#1A1F3C]">
+              <td class="p-4 flex items-center gap-2">
+                <img :src="`https://ui-avatars.com/api/?name=${affiliate.name}&background=random`" :alt="affiliate.name"
+                  class="w-10 h-10 rounded-full" />
+                <p class="font-inter text-[14px] font-normal leading-[18px] text-white">{{ affiliate.name }}</p>
+              </td>
+              <td class="p-4 text-center">
+                <span class="font-inter text-[14px] font-normal leading-[18px] text-white">{{ affiliate.id }}</span>
+              </td>
+              <td class="p-4 text-center font-inter text-[14px] font-normal leading-[18px] text-white">{{ new
+                Date(affiliate.created_at).toLocaleDateString('pt-BR') }}</td>
+              <td class="p-4 text-center">
+                <span
+                  :class="affiliate.is_active ? 'px-2 py-1 rounded-full text-sm bg-green-500/20 text-green-500' : 'px-2 py-1 rounded-full text-sm bg-red-500/20 text-red-500'">
+                  {{ affiliate.is_active ? 'Ativo' : 'Inativo' }}
+                </span>
+              </td>
+              <td class="p-4 text-center">
+                <div class="relative">
+                  <button
+                    class="outline-none border-none bg-transparent p-0"
+                    @click="toggleDropdown(affiliate.id)">
+                    <MenuIcon />
+                  </button>
+                  <div v-if="dropdownOpen === affiliate.id"
+                    class="absolute right-0 mt-2 w-48 bg-[#1a1a1a] rounded-lg shadow-lg z-10">
+                    <button class="w-full text-left px-4 py-2 hover:bg-[#2A2F4C] text-green-500"
+                      @click="handleAction(affiliate.id, 'aprovar')">
+                      <i class="fas fa-check-circle mr-2"></i>
+                      Aprovar
+                    </button>
+                    <button class="w-full text-left px-4 py-2 hover:bg-[#2A2F4C] text-red-500"
+                      @click="handleAction(affiliate.id, 'bloquear')">
+                      <i class="fas fa-ban mr-2"></i>
+                      Bloquear
+                    </button>
+                  </div>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
 
     <!-- Modal de criação de afiliado -->
-    <CreateAffiliateModal
-      v-if="showCreateModal"
-      @close="closeCreateModal"
-      @submit="handleCreate"
-    />
+    <CreateAffiliateModal v-if="showCreateModal" @close="closeCreateModal" @submit="handleCreate" />
   </AuthenticatedLayout>
 </template>
 
@@ -93,7 +87,7 @@ import BaseButton from '@/components/common/BaseButton.vue'
 import BaseModal from '@/components/common/BaseModal.vue'
 import AuthenticatedLayout from '@/components/layout/AuthenticatedLayout.vue'
 import CreateAffiliateModal from '@/components/affiliates/CreateAffiliateModal.vue'
-
+import MenuIcon from '@/components/icons/MenuIcon.vue'
 interface Application {
   id: string;
   commission_percentage: number;
@@ -139,7 +133,8 @@ export default defineComponent({
     AuthenticatedLayout,
     BaseModal,
     BaseButton,
-    CreateAffiliateModal
+    CreateAffiliateModal,
+    MenuIcon
   },
   setup() {
     const store = useDashboardStore()

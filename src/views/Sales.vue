@@ -26,7 +26,7 @@
                   <tr class="bg-[#1A1F3C]">
                     <template v-if="isManager">
                       <th class="p-4 text-left font-inter text-[14px] font-medium leading-[18px] text-white">Data</th>
-                      <th class="p-4 text-center font-inter text-[14px] font-medium leading-[18px] text-white">Cliente</th>
+                      <th class="p-4 text-left font-inter text-[14px] font-medium leading-[18px] text-white">Cliente</th>
                       <th class="p-4 text-center font-inter text-[14px] font-medium leading-[18px] text-white">Token</th>
                       <th class="p-4 text-center font-inter text-[14px] font-medium leading-[18px] text-white">Status</th>
                       <th class="p-4 text-center font-inter text-[14px] font-medium leading-[18px] text-white">Método de Pagamentos</th>
@@ -49,7 +49,7 @@
                     <template v-if="isManager">
                       <td class="p-4 font-inter text-[14px] font-normal leading-[18px] text-white">{{ new
                         Date(sale.created_at).toLocaleDateString('pt-BR') }}</td>
-                      <td class="p-4 text-center font-inter text-[14px] font-normal leading-[18px] text-white">{{
+                      <td class="p-4 text-left font-inter text-[14px] font-normal leading-[18px] text-white">{{
                         sale.customer?.name }}</td>
                       <td class="p-4 text-center">
                         <div class="flex items-center justify-center gap-3">
