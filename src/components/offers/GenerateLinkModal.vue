@@ -48,8 +48,9 @@
           <div class="flex flex-col gap-1 text-left w-full">
             <label class="text-white text-sm font-medium leading-5">Seu link de afiliado</label>
             <div class="h-14 flex flex-row items-center bg-transparent px-3 py-4 rounded-lg border border-[#162F65]">
-              <p class="text-white font-medium break-all flex-1">{{ genericLink }}</p>
-              <CopyButton :stringToCopy="genericLink" />
+              <p v-if="loading" class="text-white font-medium flex-1">Gerando link...</p>
+              <p v-else class="text-white font-medium break-all flex-1">{{ affiliateLink }}</p>
+              <CopyButton v-if="!loading" :stringToCopy="affiliateLink" />
             </div>
           </div>
         </div>
@@ -76,22 +77,27 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import BaseModal from '@/components/common/BaseModal.vue'
 import CopyButton from '@/components/common/CopyButton.vue'
+import { managerService } from '@/services/managerService'
+import { useToast } from 'vue-toastification'
 
 const props = defineProps({
   role: {
     type: String,
     required: true
   },
-  genericLink: {
+  applicationId: {
     type: String,
-    default: ''
+    required: true
   }
 })
 
 const emit = defineEmits(['close', 'submit'])
+const toast = useToast()
+const loading = ref(false)
+const affiliateLink = ref('')
 
 const form = ref({
   name: '',
@@ -103,4 +109,25 @@ const form = ref({
 const handleSubmit = () => {
   emit('submit', form.value)
 }
+
+const generateAffiliateLink = async () => {
+  if (props.role === 'manager') return
+
+  loading.value = true
+  try {
+    const response = await managerService.applications.generateAffiliateLink(props.applicationId)
+    affiliateLink.value = response.affiliate_link
+  } catch (error) {
+    console.error('Erro ao gerar link de afiliado:', error)
+    toast.error('Erro ao gerar link de afiliado')
+  } finally {
+    loading.value = false
+  }
+}
+
+onMounted(() => {
+  if (props.role !== 'manager') {
+    generateAffiliateLink()
+  }
+})
 </script> 

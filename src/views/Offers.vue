@@ -239,7 +239,7 @@
     <GenerateLinkModal
       v-if="showCreateModal"
       :role="role"
-      :generic-link="genericLink"
+      :application-id="selectedOffer?.id"
       @close="showCreateModal = false"
       @submit="handleCreateApplication"
     />
@@ -383,14 +383,9 @@ export default defineComponent({
     async loadOffers() {
       await this.handleSearch('');
     },
-    handleGenerateLink() {
-      if (this.role === 'manager') {
-        this.showCreateModal = true;
-      } else {
-        // Gera um link genérico para afiliados
-        this.genericLink = `${window.location.origin}/affiliate/${localStorage.getItem('user_id')}`;
-        this.showCreateModal = true;
-      }
+    handleGenerateLink(offer: any) {
+      this.selectedOffer = offer
+      this.showCreateModal = true
     }
   }
 })
