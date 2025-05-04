@@ -74,151 +74,11 @@
     </div>
 
     <!-- Modal de criação de afiliado -->
-    <BaseModal
+    <CreateAffiliateModal
       v-if="showCreateModal"
-      title="Criar Afiliado"
       @close="closeCreateModal"
-    >
-      <template #icon>
-        <div class="w-12 h-12 rounded-full bg-[#CF631C]/20 flex items-center justify-center">
-          <i class="fas fa-user-plus text-[#CF631C] text-2xl"></i>
-        </div>
-      </template>
-
-      <form @submit.prevent="handleCreate" class="space-y-8">
-        <!-- Informações Básicas -->
-        <div class="bg-[#1a1a2a] rounded-xl p-6">
-          <h3 class="text-white text-lg font-semibold mb-6 flex items-center gap-2">
-            <i class="fas fa-user text-[#CF631C]"></i>
-            Informações Básicas
-          </h3>
-          <div class="grid grid-cols-2 gap-6">
-            <div>
-              <label class="block text-gray-400 mb-2 font-medium">Nome</label>
-              <div class="relative">
-                <i class="fas fa-user absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
-                <input v-model="createForm.name" 
-                  class="w-full pl-10 pr-3 py-2.5 rounded-lg bg-[#23263a] text-white border border-[#2A2F4C] focus:border-[#CF631C] focus:outline-none transition-colors" 
-                  placeholder="Nome completo do afiliado"
-                  required />
-              </div>
-            </div>
-            <div>
-              <label class="block text-gray-400 mb-2 font-medium">E-mail</label>
-              <div class="relative">
-                <i class="fas fa-envelope absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
-                <input v-model="createForm.email" 
-                  type="email" 
-                  class="w-full pl-10 pr-3 py-2.5 rounded-lg bg-[#23263a] text-white border border-[#2A2F4C] focus:border-[#CF631C] focus:outline-none transition-colors" 
-                  placeholder="email@exemplo.com"
-                  required />
-              </div>
-            </div>
-            <div class="col-span-2">
-              <label class="block text-gray-400 mb-2 font-medium">Código de Integração</label>
-              <div class="relative">
-                <i class="fas fa-code absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
-                <input v-model="createForm.integration_code" 
-                  class="w-full pl-10 pr-3 py-2.5 rounded-lg bg-[#23263a] text-white border border-[#2A2F4C] focus:border-[#CF631C] focus:outline-none transition-colors" 
-                  placeholder="Código único de integração"
-                  required />
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Aplicações -->
-        <div class="bg-[#1a1a2a] rounded-xl p-6">
-          <div class="flex items-center justify-between mb-6">
-            <h3 class="text-white text-lg font-semibold flex items-center gap-2">
-              <i class="fas fa-mobile-alt text-[#CF631C]"></i>
-              Aplicações
-            </h3>
-            <button type="button" 
-              class="bg-[#CF631C] text-white px-4 py-2 rounded-lg hover:bg-[#B5520A] transition-colors flex items-center gap-2" 
-              @click="addApp">
-              <i class="fas fa-plus"></i>
-              Adicionar Aplicação
-            </button>
-          </div>
-
-          <div v-for="(app, idx) in createForm.applications" :key="idx" 
-            class="mb-4 p-6 bg-[#23263a] rounded-lg border border-[#2A2F4C] hover:border-[#CF631C] transition-colors">
-            <div class="flex justify-between items-center mb-4">
-              <h4 class="text-white font-medium">Aplicação #{{ idx + 1 }}</h4>
-              <button type="button" 
-                class="text-red-400 hover:text-red-300 transition-colors flex items-center gap-1" 
-                @click="removeApp(idx)">
-                <i class="fas fa-trash-alt"></i>
-                Remover
-              </button>
-            </div>
-            <div class="grid grid-cols-3 gap-6">
-              <div>
-                <label class="block text-gray-400 text-sm mb-2">ID da Aplicação</label>
-                <div class="relative">
-                  <i class="fas fa-hashtag absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
-                  <input v-model="app.id" 
-                    class="w-full pl-10 pr-3 py-2.5 rounded-lg bg-[#1a1a2a] text-white border border-[#2A2F4C] focus:border-[#CF631C] focus:outline-none transition-colors" 
-                    placeholder="ID único da aplicação"
-                    required />
-                </div>
-              </div>
-              <div>
-                <label class="block text-gray-400 text-sm mb-2">% Comissão</label>
-                <div class="relative">
-                  <i class="fas fa-percent absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
-                  <input v-model.number="app.commission_percentage" 
-                    type="number" 
-                    step="0.01" 
-                    min="0" 
-                    max="1"
-                    class="w-full pl-10 pr-3 py-2.5 rounded-lg bg-[#1a1a2a] text-white border border-[#2A2F4C] focus:border-[#CF631C] focus:outline-none transition-colors" 
-                    placeholder="0.00"
-                    required />
-                </div>
-              </div>
-              <div>
-                <label class="block text-gray-400 text-sm mb-2">Dias para Liberação</label>
-                <div class="relative">
-                  <i class="fas fa-calendar-day absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
-                  <input v-model.number="app.commission_release_days" 
-                    type="number" 
-                    min="0"
-                    class="w-full pl-10 pr-3 py-2.5 rounded-lg bg-[#1a1a2a] text-white border border-[#2A2F4C] focus:border-[#CF631C] focus:outline-none transition-colors" 
-                    placeholder="0"
-                    required />
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div v-if="createError" class="p-4 bg-red-500/20 text-red-500 rounded-lg flex items-center gap-2">
-          <i class="fas fa-exclamation-circle"></i>
-          {{ createError }}
-        </div>
-      </form>
-
-      <template #footer>
-        <div class="flex justify-end gap-4">
-          <button type="button" 
-            class="px-6 py-2.5 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors flex items-center gap-2" 
-            @click="closeCreateModal">
-            <i class="fas fa-times"></i>
-            Cancelar
-          </button>
-          <button type="submit" 
-            class="px-6 py-2.5 bg-[#CF631C] text-white rounded-lg hover:bg-[#B5520A] transition-colors flex items-center gap-2" 
-            :disabled="createLoading"
-            @click="handleCreate">
-            <i class="fas fa-save"></i>
-            <span v-if="createLoading">Salvando...</span>
-            <span v-else>Criar Afiliado</span>
-          </button>
-        </div>
-      </template>
-    </BaseModal>
+      @submit="handleCreate"
+    />
   </AuthenticatedLayout>
 </template>
 
@@ -232,6 +92,7 @@ import TopBar from '@/components/layout/dashboard/TopBar.vue'
 import BaseButton from '@/components/common/BaseButton.vue'
 import BaseModal from '@/components/common/BaseModal.vue'
 import AuthenticatedLayout from '@/components/layout/AuthenticatedLayout.vue'
+import CreateAffiliateModal from '@/components/affiliates/CreateAffiliateModal.vue'
 
 interface Application {
   id: string;
@@ -276,7 +137,9 @@ export default defineComponent({
     Sidebar,
     TopBar,
     AuthenticatedLayout,
-    BaseModal
+    BaseModal,
+    BaseButton,
+    CreateAffiliateModal
   },
   setup() {
     const store = useDashboardStore()
@@ -354,27 +217,13 @@ export default defineComponent({
       router.push(`/affiliates/${affiliate.id}/edit`)
     }
 
-    const handleCreate = async () => {
-      createLoading.value = true
-      createError.value = ''
+    const handleCreate = async (formData: any) => {
       try {
-        const payload = {
-          name: createForm.value.name,
-          email: createForm.value.email,
-          integration_code: createForm.value.integration_code,
-          applications: createForm.value.applications.map(app => ({
-            id: app.id,
-            commission_percentage: app.commission_percentage,
-            commission_release_days: app.commission_release_days
-          }))
-        }
-        await managerService.affiliates.create(payload)
+        await managerService.affiliates.create(formData)
         await handleSearch('')
         closeCreateModal()
       } catch (e) {
-        createError.value = 'Erro ao criar afiliado.'
-      } finally {
-        createLoading.value = false
+        console.error('Erro ao criar afiliado:', e)
       }
     }
 
