@@ -311,11 +311,13 @@ export default defineComponent({
   },
   methods: {
     getStatusClass(status: string): string {
-      const classes = {
-        'Ativo': 'px-2 py-1 rounded-full text-sm bg-green-500/20 text-green-500',
-        'Bloqueado': 'px-2 py-1 rounded-full text-sm bg-red-500/20 text-red-500'
+      const baseClass = 'font-inter text-[14px] font-medium leading-[18px] inline-flex h-6 px-2 justify-center items-center gap-1 rounded-[6px] w-fit mx-auto'
+      const statusMap: { [key: string]: string } = {
+        'Ativo': `${baseClass} bg-green-500/20 text-green-500`,
+        'Bloqueado': `${baseClass} bg-red-500/20 text-red-500`,
+        'Inativo': `${baseClass} bg-red-500/20 text-red-500`
       }
-      return classes[status as keyof typeof classes] || ''
+      return statusMap[status] || `${baseClass} bg-gray-500/20 text-gray-500`
     },
     toggleDropdown(id: string) {
       this.dropdownOpen = this.dropdownOpen === id ? null : id

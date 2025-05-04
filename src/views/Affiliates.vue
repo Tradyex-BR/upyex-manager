@@ -39,8 +39,7 @@
               <td class="p-4 text-center font-inter text-[14px] font-normal leading-[18px] text-white">{{ new
                 Date(affiliate.created_at).toLocaleDateString('pt-BR') }}</td>
               <td class="p-4 text-center">
-                <span
-                  :class="affiliate.is_active ? 'px-2 py-1 rounded-full text-sm bg-green-500/20 text-green-500' : 'px-2 py-1 rounded-full text-sm bg-red-500/20 text-red-500'">
+                <span :class="getStatusClass(affiliate.is_active ? 'Ativo' : 'Inativo')">
                   {{ affiliate.is_active ? 'Ativo' : 'Inativo' }}
                 </span>
               </td>
@@ -313,6 +312,16 @@ export default defineComponent({
       editForm.value.applications.push({ id: '', commission_percentage: 0.2, commission_release_days: 7 })
     }
 
+    const getStatusClass = (status: string): string => {
+      const baseClass = 'font-inter text-[14px] font-medium leading-[18px] inline-flex h-6 px-2 justify-center items-center gap-1 rounded-[6px] w-fit mx-auto'
+      const statusMap: { [key: string]: string } = {
+        'Ativo': `${baseClass} bg-green-500/20 text-green-500`,
+        'Inativo': `${baseClass} bg-red-500/20 text-red-500`,
+        'Bloqueado': `${baseClass} bg-red-500/20 text-red-500`
+      }
+      return statusMap[status] || `${baseClass} bg-gray-500/20 text-gray-500`
+    }
+
     onMounted(loadAffiliates)
 
     return {
@@ -346,7 +355,8 @@ export default defineComponent({
       addApp,
       saveAffiliateEdits,
       removeEditApp,
-      addEditApp
+      addEditApp,
+      getStatusClass
     }
   }
 })
