@@ -49,7 +49,18 @@
                     <template v-if="isManager">
                       <td class="p-4">{{ new Date(sale.created_at).toLocaleDateString('pt-BR') }}</td>
                       <td class="p-4 text-center">{{ sale.customer?.name }}</td>
-                      <td class="p-4 text-center">{{ sale.token || '-' }}</td>
+                      <td class="p-4 text-center">
+                        <div class="flex items-center justify-center gap-3">
+                          <img 
+                            :src="sale.token ? `https://ui-avatars.com/api/?name=${sale.token}&background=random` : ''" 
+                            :alt="sale.token" 
+                            class="w-10 h-10 rounded-full object-cover"
+                          />
+                          <div class="flex flex-col">
+                            <span class="font-semibold">{{ sale.token || '-' }}</span>
+                          </div>
+                        </div>
+                      </td>
                       <td class="p-4 text-center">
                         <span :class="getStatusClass(sale.status)">{{ mapStatus(sale.status) }}</span>
                       </td>
@@ -59,7 +70,18 @@
                     </template>
                     <template v-else>
                       <td class="p-4">{{ new Date(sale.created_at).toLocaleDateString('pt-BR') }}</td>
-                      <td class="p-4 text-center">{{ sale.token || '-' }}</td>
+                      <td class="p-4 text-center">
+                        <div class="flex items-center justify-center gap-3">
+                          <img 
+                            :src="sale.token ? `https://ui-avatars.com/api/?name=${sale.token}&background=random` : ''" 
+                            :alt="sale.token" 
+                            class="w-10 h-10 rounded-full object-cover"
+                          />
+                          <div class="flex flex-col">
+                            <span class="font-semibold">{{ sale.token || '-' }}</span>
+                          </div>
+                        </div>
+                      </td>
                       <td class="p-4 text-center">{{ new Date(sale.updated_at).toLocaleDateString('pt-BR') }}</td>
                       <td class="p-4 text-center">R$ {{ sale.products && sale.products.length ? sale.products[0].price.toFixed(2) : '-' }}</td>
                       <td class="p-4 text-center">
@@ -68,21 +90,13 @@
                       <td class="p-4 text-center">
                         <div class="flex items-center justify-center gap-2">
                           <span>{{ formatWalletId(sale.customer?.external_id) || '-' }}</span>
-                          <button v-if="sale.customer?.external_id" @click="copyToClipboard(sale.customer.external_id)"
-                            class="p-0 transition-colors bg-transparent border-none outline-none"
-                            title="Copiar ID da Carteira">
-                            <CopyIcon />
-                          </button>
+                          <CopyButton v-if="sale.customer?.external_id" :stringToCopy="sale.customer.external_id" />
                         </div>
                       </td>
                       <td class="p-4 text-center">
                         <div class="flex items-center justify-center gap-2">
                           <span>{{ formatTransactionId(sale.id) }}</span>
-                          <button @click="copyToClipboard(sale.id)"
-                            class="p-0 transition-colors bg-transparent border-none outline-none"
-                            title="Copiar ID da Transação">
-                            <CopyIcon />
-                          </button>
+                          <CopyButton :stringToCopy="sale.id" />
                         </div>
                       </td>
                     </template>
@@ -499,6 +513,8 @@ import BaseButton from '@/components/common/BaseButton.vue'
 import { useToast } from 'vue-toastification'
 import MenuIcon from '@/components/icons/MenuIcon.vue'
 import CopyIcon from '@/components/icons/CopyIcon.vue'
+import CopyButton from '@/components/common/CopyButton.vue'
+import { formatWalletId as formatWalletIdUtil, formatTransactionId as formatTransactionIdUtil } from '@/utils/formatters'
 
 // Mock de dados para desenvolvimento
 const MOCK_SALES = [
@@ -606,7 +622,8 @@ export default defineComponent({
     AuthenticatedLayout,
     BaseButton,
     MenuIcon,
-    CopyIcon
+    CopyIcon,
+    CopyButton
   },
   setup() {
     const store = useDashboardStore()
@@ -847,26 +864,12 @@ export default defineComponent({
       this.dropdownOpen = this.dropdownOpen === saleId ? null : saleId;
     },
 
-    async copyToClipboard(text: string) {
-      try {
-        await navigator.clipboard.writeText(text);
-        this.toast.success('ID copiado com sucesso!');
-      } catch (err) {
-        this.toast.error('Erro ao copiar ID');
-        console.error('Erro ao copiar para a área de transferência:', err);
-      }
-    },
-
     formatWalletId(id: string | undefined): string {
-      if (!id) return '-';
-      if (id.length <= 8) return id;
-      return `${id.slice(0, 4)}...${id.slice(-6)}`;
+      return formatWalletIdUtil(id);
     },
 
     formatTransactionId(id: string): string {
-      if (!id) return '-';
-      if (id.length <= 8) return id;
-      return `${id.slice(0, 8)}...`;
+      return formatTransactionIdUtil(id);
     }
   }
 })

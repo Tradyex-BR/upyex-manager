@@ -28,29 +28,29 @@
                     <thead>
                       <tr class="bg-[#1A1F3C]">
                         <th class="p-4 text-left">Data</th>
-                        <th class="p-4 text-left">Valor BRL</th>
-                        <th class="p-4 text-left">Destino (Chave Pix)</th>
-                        <th class="p-4 text-left">Tipo</th>
-                        <th class="p-4 text-left">Status</th>
+                        <th class="p-4 text-center">Valor BRL</th>
+                        <th class="p-4 text-center">Destino (Chave Pix)</th>
+                        <th class="p-4 text-center">Tipo</th>
+                        <th class="p-4 text-center">Status</th>
                         <template v-if="role === 'manager'">
-                          <th class="p-4 text-left">Ações</th>
+                          <th class="p-4 text-center">Ações</th>
                         </template>
                         <template v-else>
-                          <th class="p-4 text-left">Link</th>
+                          <th class="p-4 text-center">Link</th>
                         </template>
                       </tr>
                     </thead>
                     <tbody>
                       <tr v-for="withdrawal in withdrawals" :key="withdrawal.id" class="border-b border-[#1A1F3C]">
                         <td class="p-4">{{ withdrawal.date }}</td>
-                        <td class="p-4">{{ withdrawal.valueBRL }}</td>
-                        <td class="p-4">{{ withdrawal.destination }}</td>
-                        <td class="p-4">{{ withdrawal.type }}</td>
-                        <td class="p-4">
+                        <td class="p-4 text-center">{{ withdrawal.valueBRL }}</td>
+                        <td class="p-4 text-center">{{ withdrawal.destination }}</td>
+                        <td class="p-4 text-center">{{ withdrawal.type }}</td>
+                        <td class="p-4 text-center">
                           <span :class="getStatusClass(withdrawal.status)">{{ withdrawal.status }}</span>
                         </td>
                         <template v-if="role === 'manager'">
-                          <td class="p-4">
+                          <td class="p-4 text-center">
                             <div class="relative">
                               <button class="px-3 py-1 bg-[#1A1F3C] rounded-lg hover:bg-[#2A2F4C] transition-colors"
                                 @click="toggleDropdown(withdrawal.id)">
@@ -71,11 +71,10 @@
                           </td>
                         </template>
                         <template v-else>
-                          <td class="p-4">
+                          <td class="p-4 text-center">
                             <a v-if="withdrawal.link" :href="withdrawal.link" target="_blank"
-                              class="text-blue-400 hover:text-blue-300 transition-colors">
-                              <i class="fas fa-external-link-alt mr-1"></i>
-                              Ver detalhes
+                              class="flex items-center justify-center">
+                              <RedirectIcon />
                             </a>
                           </td>
                         </template>
@@ -115,6 +114,7 @@ import BaseButton from '@/components/common/BaseButton.vue'
 import AuthenticatedLayout from '@/components/layout/AuthenticatedLayout.vue'
 import WithdrawalRequestModal from '@/components/withdrawals/WithdrawalRequestModal.vue'
 import WithdrawalSuccessModal from '@/components/withdrawals/WithdrawalSuccessModal.vue'
+import RedirectIcon from '@/components/icons/RedirectIcon.vue'
 
 const loading = ref(true)
 const withdrawalsSuccess = ref(false)
@@ -170,13 +170,14 @@ export default defineComponent({
     BaseButton,
     AuthenticatedLayout,
     WithdrawalRequestModal,
-    WithdrawalSuccessModal
+    WithdrawalSuccessModal,
+    RedirectIcon
   },
   data() {
     const role = localStorage.getItem('role')
     return {
       store: useDashboardStore(),
-      dropdownOpen: null as number | null,
+      dropdownOpen: null as string | null,
       showRequestModal: false,
       showSuccessModal: false,
       loading: true,
@@ -235,7 +236,7 @@ export default defineComponent({
           link: item.links?.frontend || ''
         }));
 
-        if (response.meta) {
+        if ('meta' in response) {
           this.pagination.current_page = response.meta.current_page;
           this.pagination.last_page = response.meta.last_page;
           this.pagination.per_page = response.meta.per_page;

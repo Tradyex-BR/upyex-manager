@@ -20,14 +20,14 @@
                     <tr class="bg-[#1A1F3C]">
                       <template v-if="role === 'manager'">
                         <th class="p-4 text-left">Nome</th>
-                        <th class="p-4 text-left">ID de Afiliado</th>
-                        <th class="p-4 text-left">Data de Cadastro</th>
-                        <th class="p-4 text-left">Status</th>
+                        <th class="p-4 text-center">ID de Afiliado</th>
+                        <th class="p-4 text-center">Data de Cadastro</th>
+                        <th class="p-4 text-center">Status</th>
                       </template>
                       <template v-else>
                         <th class="p-4 text-left">Nome</th>
-                        <th class="p-4 text-left">Status</th>
-                        <th class="p-4 text-left">Link direto</th>
+                        <th class="p-4 text-center">Status</th>
+                        <th class="p-4 text-center">Link direto</th>
                       </template>
                     </tr>
                   </thead>
@@ -46,16 +46,16 @@
                             </div>
                           </div>
                         </td>
-                        <td class="p-4">
+                        <td class="p-4 text-center">
                           <span class="text-sm text-gray-400">{{ offer.id }}</span>
                         </td>
-                        <td class="p-4">
-                          <div class="flex items-center gap-2">
+                        <td class="p-4 text-center">
+                          <div class="flex items-center justify-center gap-2">
                             <i class="fas fa-calendar text-[#CF631C]"></i>
                             <span>{{ new Date(offer.created_at).toLocaleDateString('pt-BR') }}</span>
                           </div>
                         </td>
-                        <td class="p-4">
+                        <td class="p-4 text-center">
                           <span :class="getStatusClass(offer.is_active)">
                             <i :class="['fas mr-2', offer.is_active ? 'fa-check-circle' : 'fa-ban']"></i>
                             {{ offer.is_active ? 'Ativa' : 'Inativa' }}
@@ -76,19 +76,16 @@
                             </div>
                           </div>
                         </td>
-                        <td class="p-4">
+                        <td class="p-4 text-center">
                           <span :class="getStatusClass(offer.is_active)">
                             <i :class="['fas mr-2', offer.is_active ? 'fa-check-circle' : 'fa-ban']"></i>
                             {{ offer.is_active ? 'Ativa' : 'Inativa' }}
                           </span>
                         </td>
-                        <td class="p-4">
-                          <div class="flex items-center gap-2">
-                            <span class="text-sm text-gray-400 truncate max-w-[200px]">{{ offer.affiliate_link }}</span>
-                            <button @click="copyToClipboard(offer.affiliate_link)" 
-                              class="text-[#CF631C] hover:text-[#E67E22] transition-colors p-2 hover:bg-[#23263a] rounded-lg">
-                              <i class="fas fa-copy"></i>
-                            </button>
+                        <td class="p-4 text-center">
+                          <div class="flex items-center justify-center gap-2">
+                            <span class="text-sm text-gray-400 truncate max-w-[200px]">{{ formatLink(offer.affiliate_link) }}</span>
+                            <CopyButton :stringToCopy="offer.affiliate_link" />
                           </div>
                         </td>
                       </template>
@@ -184,20 +181,14 @@
                 <label class="text-gray-400 text-sm mb-2 block">Link de Afiliado</label>
                 <div class="flex items-center gap-2 bg-[#23263a] rounded-lg p-3">
                   <p class="text-white font-medium break-all">{{ selectedOffer?.affiliate_link }}</p>
-                  <button @click="copyToClipboard(selectedOffer?.affiliate_link)" 
-                    class="text-[#CF631C] hover:text-[#E67E22] transition-colors p-2 hover:bg-[#23263a] rounded-lg flex-shrink-0">
-                    <i class="fas fa-copy"></i>
-                  </button>
+                  <CopyButton :stringToCopy="selectedOffer?.affiliate_link" />
                 </div>
               </div>
               <div>
                 <label class="text-gray-400 text-sm mb-2 block">API Link</label>
                 <div class="flex items-center gap-2 bg-[#23263a] rounded-lg p-3">
                   <p class="text-white font-medium break-all">{{ selectedOffer?.links?.api }}</p>
-                  <button @click="copyToClipboard(selectedOffer?.links?.api)" 
-                    class="text-[#CF631C] hover:text-[#E67E22] transition-colors p-2 hover:bg-[#23263a] rounded-lg flex-shrink-0">
-                    <i class="fas fa-copy"></i>
-                  </button>
+                  <CopyButton :stringToCopy="selectedOffer?.links?.api" />
                 </div>
               </div>
             </div>
@@ -239,10 +230,7 @@
               <label class="text-gray-400 text-sm">Secret Key</label>
               <div class="flex items-center gap-2 bg-[#23263a] rounded-lg p-3">
                 <p class="text-white font-medium truncate flex-1">{{ selectedOffer?.api_secret }}</p>
-                <button @click="copyToClipboard(selectedOffer?.api_secret)" 
-                  class="text-[#CF631C] hover:text-[#E67E22] transition-colors p-2 hover:bg-[#23263a] rounded-lg">
-                  <i class="fas fa-copy"></i>
-                </button>
+                <CopyButton :stringToCopy="selectedOffer?.api_secret" />
               </div>
             </div>
           </div>
@@ -308,10 +296,7 @@
                 <label class="text-gray-400 text-sm mb-2 block">Seu link de afiliado</label>
                 <div class="flex items-center gap-2 bg-[#23263a] rounded-lg p-3">
                   <p class="text-white font-medium break-all">{{ genericLink }}</p>
-                  <button @click="copyToClipboard(genericLink)" 
-                    class="text-[#CF631C] hover:text-[#E67E22] transition-colors p-2 hover:bg-[#23263a] rounded-lg flex-shrink-0">
-                    <i class="fas fa-copy"></i>
-                  </button>
+                  <CopyButton :stringToCopy="genericLink" />
                 </div>
               </div>
             </div>
@@ -337,6 +322,8 @@ import BaseButton from '@/components/common/BaseButton.vue'
 import { managerService } from '@/services/managerService'
 import { useRouter } from 'vue-router'
 import { useToast } from 'vue-toastification'
+import CopyButton from '@/components/common/CopyButton.vue'
+import { formatLink } from '@/utils/formatters'
 
 export default defineComponent({
   props: {
@@ -348,7 +335,8 @@ export default defineComponent({
   name: 'Offers',
   components: {
     AuthenticatedLayout,
-    BaseButton
+    BaseButton,
+    CopyButton
   },
   setup() {
     const store = useDashboardStore()
@@ -384,6 +372,9 @@ export default defineComponent({
     }
   },
   methods: {
+    formatLink(link: string): string {
+      return formatLink(link);
+    },
     async handleSearch(term: string) {
       this.loading = true;
       try {
