@@ -18,11 +18,11 @@
                 <table v-else class="w-full text-white border-collapse">
                   <thead>
                     <tr class="bg-[#1A1F3C]">
-                      <th class="p-4 text-left">Nome</th>
-                      <th class="p-4 text-left">ID de Afiliado</th>
-                      <th class="p-4 text-left">Data de Cadastro</th>
-                      <th class="p-4 text-left">Status</th>
-                      <th class="p-4 text-left">Ações</th>
+                      <th class="p-4 text-left font-inter text-[14px] font-medium leading-[18px] text-white">Nome</th>
+                      <th class="p-4 text-left font-inter text-[14px] font-medium leading-[18px] text-white">ID</th>
+                      <th class="p-4 text-left font-inter text-[14px] font-medium leading-[18px] text-white">Data de cadastro</th>
+                      <th class="p-4 text-left font-inter text-[14px] font-medium leading-[18px] text-white">Status</th>
+                      <th class="p-4 text-left font-inter text-[14px] font-medium leading-[18px] text-white">Ações</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -30,12 +30,12 @@
                       <td class="p-4 flex items-center gap-2">
                         <img :src="`https://ui-avatars.com/api/?name=${affiliate.name}&background=random`"
                           :alt="affiliate.name" class="w-10 h-10 rounded-full" />
-                        <p class="text-white text-sm font-semibold">{{ affiliate.name }}</p>
+                        <p class="font-inter text-[14px] font-normal leading-[18px] text-white">{{ affiliate.name }}</p>
                       </td>
                       <td class="p-4">
-                        <span class="text-sm text-gray-400">{{ affiliate.id }}</span>
+                        <span class="font-inter text-[14px] font-normal leading-[18px] text-white">{{ affiliate.id }}</span>
                       </td>
-                      <td class="p-4">{{ new Date(affiliate.created_at).toLocaleDateString('pt-BR') }}</td>
+                      <td class="p-4 font-inter text-[14px] font-normal leading-[18px] text-white">{{ new Date(affiliate.created_at).toLocaleDateString('pt-BR') }}</td>
                       <td class="p-4">
                         <span
                           :class="affiliate.is_active ? 'px-2 py-1 rounded-full text-sm bg-green-500/20 text-green-500' : 'px-2 py-1 rounded-full text-sm bg-red-500/20 text-red-500'">
@@ -44,7 +44,7 @@
                       </td>
                       <td class="p-4">
                         <div class="relative">
-                          <button class="px-3 py-1 bg-[#1A1F3C] rounded-lg hover:bg-[#2A2F4C] transition-colors"
+                          <button class="px-3 py-1 bg-[#1A1F3C] rounded-lg hover:bg-[#2A2F4C] transition-colors font-inter text-[14px] font-normal leading-[18px] text-white"
                             @click="toggleDropdown(affiliate.id)">
                             Ações
                           </button>

@@ -16,26 +16,26 @@
         <table v-else class="w-full text-white border-collapse">
           <thead>
             <tr class="bg-[#1A1F3C]">
-              <th class="p-4 text-left">Nome</th>
-              <th class="p-4 text-left">Email</th>
-              <th class="p-4 text-left">Status</th>
-              <th class="p-4 text-left">Data de cadastro</th>
-              <th class="p-4 text-left">Último acesso</th>
-              <th class="p-4 text-left">Ações</th>
+              <th class="p-4 text-left font-inter text-[14px] font-medium leading-[18px] text-white">Nome</th>
+              <th class="p-4 text-left font-inter text-[14px] font-medium leading-[18px] text-white">Email</th>
+              <th class="p-4 text-left font-inter text-[14px] font-medium leading-[18px] text-white">Status</th>
+              <th class="p-4 text-left font-inter text-[14px] font-medium leading-[18px] text-white">Data de cadastro</th>
+              <th class="p-4 text-left font-inter text-[14px] font-medium leading-[18px] text-white">Último acesso</th>
+              <th class="p-4 text-left font-inter text-[14px] font-medium leading-[18px] text-white">Ações</th>
             </tr>
           </thead>
           <tbody>
             <tr v-for="usuario in customers" :key="usuario.id" class="border-b border-[#1A1F3C]">
-              <td class="p-4">{{ usuario.nome }}</td>
-              <td class="p-4">{{ usuario.email }}</td>
+              <td class="p-4 font-inter text-[14px] font-normal leading-[18px] text-white">{{ usuario.nome }}</td>
+              <td class="p-4 font-inter text-[14px] font-normal leading-[18px] text-white">{{ usuario.email }}</td>
               <td class="p-4">
                 <span :class="getStatusClass(usuario.status)">{{ usuario.status }}</span>
               </td>
-              <td class="p-4">{{ usuario.dataCadastro }}</td>
-              <td class="p-4">{{ usuario.ultimoAcesso }}</td>
+              <td class="p-4 font-inter text-[14px] font-normal leading-[18px] text-white">{{ usuario.dataCadastro }}</td>
+              <td class="p-4 font-inter text-[14px] font-normal leading-[18px] text-white">{{ usuario.ultimoAcesso }}</td>
               <td class="p-4">
                 <div class="relative">
-                  <button class="px-3 py-1 bg-[#1A1F3C] rounded-lg hover:bg-[#2A2F4C] transition-colors"
+                  <button class="px-3 py-1 bg-[#1A1F3C] rounded-lg hover:bg-[#2A2F4C] transition-colors font-inter text-[14px] font-normal leading-[18px] text-white"
                     @click="toggleDropdown(usuario.id)">
                     Ações
                   </button>

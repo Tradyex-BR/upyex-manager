@@ -26,33 +26,21 @@
                   <tr class="bg-[#1A1F3C]">
                     <template v-if="isManager">
                       <th class="p-4 text-left font-inter text-[14px] font-medium leading-[18px] text-white">Data</th>
-                      <th class="p-4 text-center font-inter text-[14px] font-medium leading-[18px] text-white">Cliente
-                      </th>
-                      <th class="p-4 text-center font-inter text-[14px] font-medium leading-[18px] text-white">Token
-                      </th>
-                      <th class="p-4 text-center font-inter text-[14px] font-medium leading-[18px] text-white">Status
-                      </th>
-                      <th class="p-4 text-center font-inter text-[14px] font-medium leading-[18px] text-white">Método de
-                        Pagamentos</th>
-                      <th class="p-4 text-center font-inter text-[14px] font-medium leading-[18px] text-white">Volume
-                      </th>
-                      <th class="p-4 text-center font-inter text-[14px] font-medium leading-[18px] text-white">Valor BRL
-                      </th>
+                      <th class="p-4 text-center font-inter text-[14px] font-medium leading-[18px] text-white">Cliente</th>
+                      <th class="p-4 text-center font-inter text-[14px] font-medium leading-[18px] text-white">Token</th>
+                      <th class="p-4 text-center font-inter text-[14px] font-medium leading-[18px] text-white">Status</th>
+                      <th class="p-4 text-center font-inter text-[14px] font-medium leading-[18px] text-white">Método de Pagamentos</th>
+                      <th class="p-4 text-center font-inter text-[14px] font-medium leading-[18px] text-white">Volume</th>
+                      <th class="p-4 text-center font-inter text-[14px] font-medium leading-[18px] text-white">Valor BRL</th>
                     </template>
                     <template v-else>
                       <th class="p-4 text-left font-inter text-[14px] font-medium leading-[18px] text-white">Data</th>
-                      <th class="p-4 text-center font-inter text-[14px] font-medium leading-[18px] text-white">Token
-                      </th>
-                      <th class="p-4 text-center font-inter text-[14px] font-medium leading-[18px] text-white">Última
-                        Atualização</th>
-                      <th class="p-4 text-center font-inter text-[14px] font-medium leading-[18px] text-white">Valor BRL
-                      </th>
-                      <th class="p-4 text-center font-inter text-[14px] font-medium leading-[18px] text-white">Status
-                      </th>
-                      <th class="p-4 text-center font-inter text-[14px] font-medium leading-[18px] text-white">Carteira
-                      </th>
-                      <th class="p-4 text-center font-inter text-[14px] font-medium leading-[18px] text-white">ID
-                        Transação</th>
+                      <th class="p-4 text-center font-inter text-[14px] font-medium leading-[18px] text-white">Token</th>
+                      <th class="p-4 text-center font-inter text-[14px] font-medium leading-[18px] text-white">Última Atualização</th>
+                      <th class="p-4 text-center font-inter text-[14px] font-medium leading-[18px] text-white">Valor BRL</th>
+                      <th class="p-4 text-center font-inter text-[14px] font-medium leading-[18px] text-white">Status</th>
+                      <th class="p-4 text-center font-inter text-[14px] font-medium leading-[18px] text-white">Carteira</th>
+                      <th class="p-4 text-center font-inter text-[14px] font-medium leading-[18px] text-white">ID Transação</th>
                     </template>
                   </tr>
                 </thead>
