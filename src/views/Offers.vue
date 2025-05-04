@@ -236,79 +236,13 @@
     </div>
 
     <!-- Modal de Criação de Aplicação -->
-    <div v-if="showCreateModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60">
-      <div class="bg-[#23263a] rounded-lg p-8 w-full max-w-2xl relative">
-        <div class="flex justify-between items-center mb-6">
-          <h2 class="text-xl font-bold text-white">{{ role === 'manager' ? 'Nova Aplicação' : 'Gerar Link Genérico' }}
-          </h2>
-          <button @click="showCreateModal = false" class="text-gray-400 hover:text-white transition-colors">
-            <i class="fas fa-times text-xl"></i>
-          </button>
-        </div>
-
-        <form v-if="role === 'manager'" @submit.prevent="handleCreateApplication" class="space-y-6">
-          <div class="grid grid-cols-2 gap-4">
-            <div>
-              <label class="block text-gray-400 mb-2">Nome</label>
-              <input v-model="newApplication.name" type="text" required
-                class="w-full bg-[#1a1a2a] text-white rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#CF631C]">
-            </div>
-            <div>
-              <label class="block text-gray-400 mb-2">Descrição</label>
-              <input v-model="newApplication.description" type="text" required
-                class="w-full bg-[#1a1a2a] text-white rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#CF631C]">
-            </div>
-            <div>
-              <label class="block text-gray-400 mb-2">URL do Logo</label>
-              <input v-model="newApplication.logo_url" type="url"
-                class="w-full bg-[#1a1a2a] text-white rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#CF631C]">
-            </div>
-            <div>
-              <label class="block text-gray-400 mb-2">Link Base de Afiliado</label>
-              <input v-model="newApplication.base_affiliate_link" type="url" required
-                class="w-full bg-[#1a1a2a] text-white rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#CF631C]">
-            </div>
-          </div>
-
-          <div class="flex justify-end gap-4 mt-6">
-            <button type="button" @click="showCreateModal = false"
-              class="px-6 py-2 bg-gray-600 hover:bg-gray-700 rounded-lg text-white font-medium transition-colors">
-              Cancelar
-            </button>
-            <button type="submit"
-              class="px-6 py-2 bg-[#CF631C] hover:bg-[#E67E22] rounded-lg text-white font-medium transition-colors">
-              Criar Aplicação
-            </button>
-          </div>
-        </form>
-
-        <!-- Conteúdo para afiliados -->
-        <div v-else class="space-y-6">
-          <div class="bg-[#1a1a2a] rounded-xl p-6">
-            <h3 class="text-white text-lg font-semibold mb-6 flex items-center gap-2">
-              <i class="fas fa-link text-[#CF631C]"></i>
-              Link Genérico
-            </h3>
-            <div class="space-y-4">
-              <div>
-                <label class="text-gray-400 text-sm mb-2 block">Seu link de afiliado</label>
-                <div class="flex items-center gap-2 bg-[#23263a] rounded-lg p-3">
-                  <p class="text-white font-medium break-all">{{ genericLink }}</p>
-                  <CopyButton :stringToCopy="genericLink" />
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="flex justify-end">
-            <button @click="showCreateModal = false"
-              class="px-6 py-2 bg-gray-600 hover:bg-gray-700 rounded-lg text-white font-medium transition-colors">
-              Fechar
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
+    <GenerateLinkModal
+      v-if="showCreateModal"
+      :role="role"
+      :generic-link="genericLink"
+      @close="showCreateModal = false"
+      @submit="handleCreateApplication"
+    />
   </AuthenticatedLayout>
 </template>
 
@@ -317,6 +251,7 @@ import { defineComponent, ref } from 'vue'
 import { useDashboardStore } from '@/stores/dashboard'
 import AuthenticatedLayout from '@/components/layout/AuthenticatedLayout.vue'
 import BaseButton from '@/components/common/BaseButton.vue'
+import GenerateLinkModal from '@/components/offers/GenerateLinkModal.vue'
 import { managerService } from '@/services/managerService'
 import { useRouter } from 'vue-router'
 import { useToast } from 'vue-toastification'
@@ -334,7 +269,8 @@ export default defineComponent({
   components: {
     AuthenticatedLayout,
     BaseButton,
-    CopyButton
+    CopyButton,
+    GenerateLinkModal
   },
   setup() {
     const store = useDashboardStore()
@@ -351,12 +287,6 @@ export default defineComponent({
       showDetailsModal: false,
       dropdownOpen: null as string | null,
       selectedOffer: null as any,
-      newApplication: {
-        name: '',
-        description: '',
-        logo_url: null,
-        base_affiliate_link: ''
-      },
       role: localStorage.getItem('role') || '',
       genericLink: ''
     }
@@ -396,17 +326,11 @@ export default defineComponent({
         ? `${baseClass} bg-green-500/20 text-green-500`
         : `${baseClass} bg-red-500/20 text-red-500`
     },
-    async handleCreateApplication() {
+    async handleCreateApplication(formData: any) {
       try {
-        await managerService.applications.create(this.newApplication);
+        await managerService.applications.create(formData);
         await this.handleSearch('');
         this.showCreateModal = false;
-        this.newApplication = {
-          name: '',
-          description: '',
-          logo_url: null,
-          base_affiliate_link: ''
-        };
       } catch (error) {
         console.error('Erro ao criar aplicação:', error);
       }
