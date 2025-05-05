@@ -38,7 +38,7 @@
                   <td class="p-4">
                     <div class="flex items-center gap-3">
                       <img :src="offer.logo_url || `https://ui-avatars.com/api/?name=${offer.name}&background=random`"
-                        :alt="offer.name" class="w-10 h-10 rounded-full object-cover" />
+                        :alt="offer.name" class="w-8 h-8 rounded-full object-cover" />
                       <div class="flex flex-col">
                         <span class="font-inter text-[14px] font-normal leading-[18px] text-white">{{ offer.name
                           }}</span>
@@ -66,7 +66,7 @@
                   <td class="p-4">
                     <div class="flex items-center gap-3">
                       <img :src="offer.logo_url || `https://ui-avatars.com/api/?name=${offer.name}&background=random`"
-                        :alt="offer.name" class="w-10 h-10 rounded-full object-cover" />
+                        :alt="offer.name" class="w-8 h-8 rounded-full object-cover" />
                       <div class="flex flex-col">
                         <span class="font-inter text-[14px] font-normal leading-[18px] text-white">{{ offer.name
                           }}</span>

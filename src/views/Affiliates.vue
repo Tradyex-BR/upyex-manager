@@ -30,7 +30,7 @@
             <tr v-for="affiliate in affiliates" :key="affiliate.id" class="border-b border-[#1A1F3C]">
               <td class="p-4 flex items-center gap-2">
                 <img :src="`https://ui-avatars.com/api/?name=${affiliate.name}&background=random`" :alt="affiliate.name"
-                  class="w-10 h-10 rounded-full" />
+                  class="w-8 h-w-8 rounded-full" />
                 <p class="font-inter text-[14px] font-normal leading-[18px] text-white">{{ affiliate.name }}</p>
               </td>
               <td class="p-4 text-center">
@@ -43,27 +43,24 @@
                   {{ affiliate.is_active ? 'Ativo' : 'Inativo' }}
                 </span>
               </td>
-              <td class="p-4 text-center">
-                <div class="relative">
-                  <button
-                    class="outline-none border-none bg-transparent p-0"
-                    @click="toggleDropdown(affiliate.id)">
-                    <MenuIcon />
-                  </button>
-                  <div v-if="dropdownOpen === affiliate.id"
-                    class="absolute right-0 mt-2 w-48 bg-[#1a1a1a] rounded-lg shadow-lg z-10">
-                    <button class="w-full text-left px-4 py-2 hover:bg-[#2A2F4C] text-green-500"
-                      @click="handleAction(affiliate.id, 'aprovar')">
-                      <i class="fas fa-check-circle mr-2"></i>
-                      Aprovar
-                    </button>
-                    <button class="w-full text-left px-4 py-2 hover:bg-[#2A2F4C] text-red-500"
-                      @click="handleAction(affiliate.id, 'bloquear')">
-                      <i class="fas fa-ban mr-2"></i>
-                      Bloquear
-                    </button>
-                  </div>
-                </div>
+              <td class="p-4 text-center flex items-center justify-center">
+                <BaseDropdown
+                  :options="[
+                    {
+                      text: 'Aprovar',
+                      action: 'aprovar',
+                      icon: 'fas fa-check-circle'
+                    },
+                    {
+                      text: 'Bloquear',
+                      action: 'bloquear',
+                      icon: 'fas fa-ban'
+                    }
+                  ]"
+                  @select="handleAction($event, affiliate.id)"
+                  :top="50"
+                  class="w-min"
+                />
               </td>
             </tr>
           </tbody>
@@ -88,6 +85,8 @@ import BaseModal from '@/components/common/BaseModal.vue'
 import AuthenticatedLayout from '@/components/layout/AuthenticatedLayout.vue'
 import CreateAffiliateModal from '@/components/affiliates/CreateAffiliateModal.vue'
 import MenuIcon from '@/components/icons/MenuIcon.vue'
+import BaseDropdown from '@/components/common/BaseDropdown.vue'
+
 interface Application {
   id: string;
   commission_percentage: number;
@@ -134,7 +133,8 @@ export default defineComponent({
     BaseModal,
     BaseButton,
     CreateAffiliateModal,
-    MenuIcon
+    MenuIcon,
+    BaseDropdown
   },
   setup() {
     const store = useDashboardStore()
@@ -234,30 +234,6 @@ export default defineComponent({
       // Implemente a lógica para editar as aplicações do afiliado
     }
 
-    const dropdownOpen = ref<string | null>(null)
-
-    const toggleDropdown = (id: string) => {
-      dropdownOpen.value = dropdownOpen.value === id ? null : id
-    }
-
-    const handleAction = async (id: string, action: string) => {
-      try {
-        switch (action) {
-          case 'aprovar':
-            await managerService.affiliates.approve(id);
-            await loadAffiliates();
-            break;
-          case 'bloquear':
-            await managerService.affiliates.block(id);
-            await loadAffiliates();
-            break;
-        }
-        dropdownOpen.value = null;
-      } catch (e) {
-        console.error(`Erro ao executar ação ${action}:`, e);
-      }
-    }
-
     const createLoading = ref(false)
     const createError = ref('')
     const editLoading = ref(false)
@@ -322,6 +298,23 @@ export default defineComponent({
       return statusMap[status] || `${baseClass} bg-gray-500/20 text-gray-500`
     }
 
+    const handleAction = async (action: string, id: string) => {
+      try {
+        switch (action) {
+          case 'aprovar':
+            await managerService.affiliates.approve(id);
+            await loadAffiliates();
+            break;
+          case 'bloquear':
+            await managerService.affiliates.block(id);
+            await loadAffiliates();
+            break;
+        }
+      } catch (e) {
+        console.error(`Erro ao executar ação ${action}:`, e);
+      }
+    }
+
     onMounted(loadAffiliates)
 
     return {
@@ -342,9 +335,6 @@ export default defineComponent({
       handleToggleStatus,
       handleResetSecret,
       handleEditApplications,
-      dropdownOpen,
-      toggleDropdown,
-      handleAction,
       createLoading,
       createError,
       editLoading,
@@ -356,7 +346,8 @@ export default defineComponent({
       saveAffiliateEdits,
       removeEditApp,
       addEditApp,
-      getStatusClass
+      getStatusClass,
+      handleAction
     }
   }
 })

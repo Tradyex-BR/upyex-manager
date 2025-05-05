@@ -33,37 +33,36 @@
               </td>
               <td class="p-4 text-center font-inter text-[14px] font-normal leading-[18px] text-white">{{ usuario.dataCadastro }}</td>
               <td class="p-4 text-center font-inter text-[14px] font-normal leading-[18px] text-white">{{ usuario.ultimoAcesso }}</td>
-              <td class="p-4 text-center">
-                <div class="relative">
-                  <button
-                    class="outline-none border-none bg-transparent p-0"
-                    @click="toggleDropdown(usuario.id)">
-                    <MenuIcon />
-                  </button>
-                  <div v-if="dropdownOpen === usuario.id"
-                    class="absolute right-0 mt-2 w-48 bg-[#1a1a1a] rounded-lg shadow-lg z-10">
-                    <button class="w-full text-left px-4 py-2 hover:bg-[#2A2F4C] text-yellow-500"
-                      @click="handleCustomerAction(usuario.id, 'bloquear')">
-                      <i class="fas fa-ban mr-2"></i>
-                      {{ usuario.status === 'Ativo' ? 'Bloquear' : 'Desbloquear' }}
-                    </button>
-                    <button class="w-full text-left px-4 py-2 hover:bg-[#2A2F4C] text-blue-500"
-                      @click="handleCustomerAction(usuario.id, 'editar_permissao')">
-                      <i class="fas fa-key mr-2"></i>
-                      Editar Permissão
-                    </button>
-                    <button class="w-full text-left px-4 py-2 hover:bg-[#2A2F4C] text-orange-500"
-                      @click="handleCustomerAction(usuario.id, 'resetar_senha')">
-                      <i class="fas fa-key mr-2"></i>
-                      Resetar Senha
-                    </button>
-                    <button class="w-full text-left px-4 py-2 hover:bg-[#2A2F4C] text-red-500"
-                      @click="handleCustomerAction(usuario.id, 'excluir')">
-                      <i class="fas fa-trash-alt mr-2"></i>
-                      Excluir
-                    </button>
-                  </div>
-                </div>
+              <td class="p-4 flex items-center justify-center text-center ">
+                <BaseDropdown
+                  :options="[
+                    {
+                      text: usuario.status === 'Ativo' ? 'Bloquear' : 'Desbloquear',
+                      icon: 'fa-ban',
+                      action: 'bloquear'
+                    },
+                    {
+                      text: 'Editar Permissão',
+                      icon: 'fa-key',
+                      action: 'editar_permissao'
+                    },
+                    {
+                      text: 'Resetar Senha',
+                      icon: 'fa-key',
+                      action: 'resetar_senha'
+                    },
+                    {
+                      text: 'Excluir',
+                      icon: 'fa-trash-alt',
+                      action: 'excluir'
+                    }
+                  ]"
+                  :model-value="dropdownOpen === usuario.id"
+                  @update:model-value="(value) => dropdownOpen = value ? usuario.id : null"
+                  @select="(action) => handleCustomerAction(usuario.id, action)"
+                  :top="50"
+                  class="w-min"
+                />
               </td>
             </tr>
           </tbody>
@@ -221,6 +220,7 @@ import AuthenticatedLayout from '@/components/layout/AuthenticatedLayout.vue'
 import CreateCustomerModal from '@/components/customers/CreateCustomerModal.vue'
 import { useRouter } from 'vue-router'
 import MenuIcon from '@/components/icons/MenuIcon.vue'
+import BaseDropdown from '@/components/common/BaseDropdown.vue'
 // Função para gerar ID único
 function generateUniqueId(): string {
   return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
@@ -253,7 +253,8 @@ export default defineComponent({
     AuthenticatedLayout,
     BaseModal,
     CreateCustomerModal,
-    MenuIcon
+    MenuIcon,
+    BaseDropdown
   },
   setup() {
     const router = useRouter()

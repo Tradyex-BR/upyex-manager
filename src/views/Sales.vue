@@ -55,7 +55,7 @@
                         <div class="flex items-center justify-center gap-3">
                           <img
                             :src="sale.token ? `https://ui-avatars.com/api/?name=${sale.token}&background=random` : ''"
-                            :alt="sale.token" class="w-10 h-10 rounded-full object-cover" />
+                            :alt="sale.token" class="w-8 h-w-8 rounded-full object-cover" />
                           <div class="flex flex-col">
                             <span class="font-inter text-[14px] font-normal leading-[18px] text-white">{{ sale.token ||
                               '-' }}</span>
@@ -79,7 +79,7 @@
                         <div class="flex items-center justify-center gap-3">
                           <img
                             :src="sale.token ? `https://ui-avatars.com/api/?name=${sale.token}&background=random` : ''"
-                            :alt="sale.token" class="w-10 h-10 rounded-full object-cover" />
+                            :alt="sale.token" class="w-8 h-8 rounded-full object-cover" />
                           <div class="flex flex-col">
                             <span class="font-inter text-[14px] font-normal leading-[18px] text-white">{{ sale.token ||
                               '-' }}</span>

@@ -46,33 +46,26 @@
                 </td>
                 <td class="p-4 text-center font-inter text-[14px] font-normal leading-[18px] text-white">{{
                   withdrawal.destination
-                  }}</td>
+                }}</td>
                 <td class="p-4 text-center font-inter text-[14px] font-normal leading-[18px] text-white">{{
                   withdrawal.type }}</td>
                 <td class="p-4 text-center">
                   <span :class="getStatusClass(withdrawal.status)">{{ withdrawal.status }}</span>
                 </td>
                 <template v-if="role === 'manager'">
-                  <td class="p-4 text-center">
-                    <div class="relative">
-                      <button class="outline-none border-none bg-transparent p-0"
-                        @click="toggleDropdown(withdrawal.id)">
-                        <MenuIcon />
-                      </button>
-                      <div v-if="dropdownOpen === withdrawal.id"
-                        class="absolute right-0 mt-2 w-48 bg-[#1a1a1a] rounded-lg shadow-lg z-10">
-                        <button
-                          class="w-full text-left px-4 py-2 hover:bg-[#2A2F4C] text-green-500 font-inter text-[14px] font-normal leading-[18px]"
-                          @click="aprovar(withdrawal.id)">
-                          Aprovar
-                        </button>
-                        <button
-                          class="w-full text-left px-4 py-2 hover:bg-[#2A2F4C] text-red-500 font-inter text-[14px] font-normal leading-[18px]"
-                          @click="rejeitar(withdrawal.id)">
-                          Rejeitar
-                        </button>
-                      </div>
-                    </div>
+                  <td class="p-4 text-center flex items-center justify-center">
+                    <BaseDropdown :options="[
+                      {
+                        text: 'Aprovar',
+                        action: 'approve',
+                        icon: 'fas fa-check'
+                      },
+                      {
+                        text: 'Rejeitar',
+                        action: 'reject',
+                        icon: 'fas fa-times'
+                      }
+                    ]" @select="handleDropdownAction($event, withdrawal.id)" :top="50" class="w-min" />
                   </td>
                 </template>
                 <template v-else>
@@ -117,6 +110,7 @@ import WithdrawalRequestModal from '@/components/withdrawals/WithdrawalRequestMo
 import WithdrawalSuccessModal from '@/components/withdrawals/WithdrawalSuccessModal.vue'
 import RedirectIcon from '@/components/icons/RedirectIcon.vue'
 import MenuIcon from '@/components/icons/MenuIcon.vue'
+import BaseDropdown from '@/components/common/BaseDropdown.vue'
 
 const loading = ref(true)
 const withdrawalsSuccess = ref(false)
@@ -174,13 +168,13 @@ export default defineComponent({
     WithdrawalRequestModal,
     WithdrawalSuccessModal,
     RedirectIcon,
-    MenuIcon
+    MenuIcon,
+    BaseDropdown
   },
   data() {
     const role = localStorage.getItem('role')
     return {
       store: useDashboardStore(),
-      dropdownOpen: null as string | null,
       showRequestModal: false,
       showSuccessModal: false,
       lastWithdrawalAmount: '',
@@ -199,16 +193,6 @@ export default defineComponent({
   },
   async mounted() {
     await this.loadWithdrawals();
-    // Fechar o dropdown quando clicar fora
-    document.addEventListener('click', (e) => {
-      const target = e.target as HTMLElement
-      if (!target.closest('.relative')) {
-        this.dropdownOpen = null
-      }
-    })
-  },
-  beforeUnmount() {
-    document.removeEventListener('click', () => { })
   },
   methods: {
     async loadWithdrawals() {
@@ -276,9 +260,6 @@ export default defineComponent({
         // Aqui você pode adicionar uma notificação de erro se desejar
       }
     },
-    toggleDropdown(id: string) {
-      this.dropdownOpen = this.dropdownOpen === id ? null : id
-    },
     getStatusClass(status: string): string {
       const baseClass = 'font-inter text-[14px] font-medium leading-[18px] inline-flex h-6 px-2 justify-center items-center gap-1 rounded-[6px] w-fit mx-auto'
       switch (status) {
@@ -299,7 +280,6 @@ export default defineComponent({
     async aprovar(id: string) {
       try {
         await managerService.withdrawals.approve(id);
-        this.dropdownOpen = null;
         await this.loadWithdrawals(); // Recarrega a lista após a aprovação
       } catch (error) {
         console.error('Erro ao aprovar saque:', error);
@@ -308,7 +288,6 @@ export default defineComponent({
     async rejeitar(id: string) {
       try {
         await managerService.withdrawals.reject(id);
-        this.dropdownOpen = null;
         await this.loadWithdrawals(); // Recarrega a lista após a rejeição
       } catch (error) {
         console.error('Erro ao rejeitar saque:', error);
@@ -337,6 +316,13 @@ export default defineComponent({
         'cancelled': 'Cancelado'
       };
       return statusMap[status] || status;
+    },
+    handleDropdownAction(action: string, id: string) {
+      if (action === 'approve') {
+        this.aprovar(id);
+      } else if (action === 'reject') {
+        this.rejeitar(id);
+      }
     }
   }
 })

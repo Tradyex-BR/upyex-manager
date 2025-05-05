@@ -15,54 +15,47 @@
           src="https://cdn.builder.io/api/v1/image/assets/7f72b52c1e064ab59dcec351fcad2273/af02ba544c49dcfe6925b9408f10a84e26e396f2?placeholderIfAbsent=true"
           class="aspect-[2.44] object-contain w-[83px] self-stretch shrink-0" alt="Notifications" />
         <div class="relative">
-          <div class="self-stretch flex items-stretch gap-[10px] my-auto cursor-pointer" @click="toggleDropdown">
-            <div class="flex items-center gap-[15px]">
-              <div class="flex items-center gap-1">
-                <p
-                  class="font-inter text-[#FFF] text-[14px] leading-[18px] grow my-auto truncate overflow-hidden whitespace-nowrap">
-                  {{ authStore.currentUser?.name || 'Usuário' }}
-                </p>
+          <div class="self-stretch flex items-stretch gap-[10px] my-auto cursor-pointer">
+            <BaseDropdown
+              :options="[
+                {
+                  text: 'Sair',
+                  icon: 'fa-sign-out-alt',
+                  action: 'logout'
+                }
+              ]"
+              v-model="isDropdownOpen"
+              :top="75"
+              @select="handleDropdownAction"
+              class="flex items-center w-full outline-none border-none focus:outline-none focus:ring-0 p-0"
+            >
+              <template #trigger>
+                <div class="flex items-center gap-[15px] w-full">
+                  <div class="flex items-center gap-1">
+                    <p
+                      class="font-inter text-[#FFF] text-[14px] leading-[18px] grow my-auto truncate overflow-hidden whitespace-nowrap">
+                      {{ authStore.currentUser?.name || 'Usuário' }}
+                    </p>
+                  </div>
 
-              </div>
+                  <div v-if="authStore.currentUser?.avatar_path">
+                    <img :src="authStore.currentUser?.avatar_path"
+                      class="aspect-[1.65] object-contain w-[46px] h-[46px] rounded-full shrink-0 bg" alt="User avatar" />
+                  </div>
+                  <div v-else>
+                    <img src="/png/default-avatar.png"
+                      class="aspect-[1.65] object-contain w-[46px] h-[46px] rounded-full shrink-0 bg" alt="User avatar" />
+                  </div>
 
-              <div v-if="authStore.currentUser?.avatar_path">
-                <img :src="authStore.currentUser?.avatar_path"
-                  class="aspect-[1.65] object-contain w-[46px] h-[46px] rounded-full shrink-0 bg" alt="User avatar" />
-              </div>
-              <div v-else>
-                <img src="/png/default-avatar.png"
-                  class="aspect-[1.65] object-contain w-[46px] h-[46px] rounded-full shrink-0 bg" alt="User avatar" />
-              </div>
-            </div>
-            <svg :class="['my-auto w-5 h-w-5 transition-transform', { 'rotate-180': isDropdownOpen }]"
-              xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
-              <path fill-rule="evenodd" clip-rule="evenodd"
-                d="M4.41074 6.9107C4.73618 6.58527 5.26382 6.58527 5.58926 6.9107L10 11.3214L14.4107 6.9107C14.7362 6.58527 15.2638 6.58527 15.5893 6.9107C15.9147 7.23614 15.9147 7.76378 15.5893 8.08921L10.5893 13.0892C10.2638 13.4146 9.73618 13.4146 9.41075 13.0892L4.41074 8.08921C4.08531 7.76378 4.08531 7.23614 4.41074 6.9107Z"
-                fill="#637381" />
-            </svg>
-
-          </div>
-
-          <!-- Dropdown Menu -->
-          <div v-if="isDropdownOpen" class="absolute right-0 mt-5 w-48 bg-[#222A3F] rounded-md shadow-lg z-50">
-
-            <button
-              class="w-full h-[48px] flex items-center gap-[10px] text-left p-3 text-sm text-gray-700 border-none bg-transparent"
-              @click="handleLogout">
-              <!-- <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <g clip-path="url(#clip0_1147_3686)">
-                  <path
-d="M19.0711 5.07108L4.92894 19.2132M4.92892 5.07108L19.0711 19.2132" stroke="#B8B8B8"
-                    stroke-width="1.5" />
-                </g>
-                <defs>
-                  <clipPath id="clip0_1147_3686">
-                    <rect width="24" height="24" fill="white" />
-                  </clipPath>
-                </defs>
-              </svg> -->
-              <span class="text-[#B8B8B8]">Sair</span>
-            </button>
+                  <svg :class="['w-5 h-5 transition-transform', { 'rotate-180': isDropdownOpen }]"
+                    xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" clip-rule="evenodd"
+                      d="M4.41074 6.9107C4.73618 6.58527 5.26382 6.58527 5.58926 6.9107L10 11.3214L14.4107 6.9107C14.7362 6.58527 15.2638 6.58527 15.5893 6.9107C15.9147 7.23614 15.9147 7.76378 15.5893 8.08921L10.5893 13.0892C10.2638 13.4146 9.73618 13.4146 9.41075 13.0892L4.41074 8.08921C4.08531 7.76378 4.08531 7.23614 4.41074 6.9107Z"
+                      fill="#637381" />
+                  </svg>
+                </div>
+              </template>
+            </BaseDropdown>
           </div>
         </div>
       </div>
@@ -73,6 +66,7 @@ d="M19.0711 5.07108L4.92894 19.2132M4.92892 5.07108L19.0711 19.2132" stroke="#B8
 import { computed, ref, onMounted, onUnmounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
+import BaseDropdown from '@/components/common/BaseDropdown.vue'
 
 const route = useRoute()
 const searchDisabled = computed(() => route.path === '/dashboard') // ajuste para o path correto se necessário
@@ -82,8 +76,10 @@ const authStore = useAuthStore()
 const searchQuery = ref('')
 const isDropdownOpen = ref(false)
 
-const toggleDropdown = () => {
-  isDropdownOpen.value = !isDropdownOpen.value
+const handleDropdownAction = async (action: string) => {
+  if (action === 'logout') {
+    await handleLogout()
+  }
 }
 
 const handleLogout = async () => {
@@ -96,25 +92,6 @@ const handleLogout = async () => {
   }
 }
 
-// Fechar o dropdown quando clicar fora
-const handleClickOutside = (event: MouseEvent) => {
-  const dropdown = document.querySelector('.relative')
-  const target = event.target as HTMLElement
-  if (dropdown && !dropdown.contains(target)) {
-    isDropdownOpen.value = false
-  }
-}
-
-// Adicionar e remover o event listener
-onMounted(() => {
-  document.addEventListener('click', handleClickOutside)
-  console.log('Avatar path:', authStore.currentUser?.avatar_path)
-  console.log('Current user:', authStore.currentUser)
-})
-
-onUnmounted(() => {
-  document.removeEventListener('click', handleClickOutside)
-})
 const emitSearch = () => {
   console.log('emitSearch (TopBar) enviando:', searchQuery.value);
   if (searchQuery.value && searchQuery.value.trim() !== '') {
@@ -126,5 +103,15 @@ const emitSearch = () => {
 
 // Adiciona o emit ao setup
 const emit = defineEmits(['search'])
+
+// Adicionar e remover o event listener
+onMounted(() => {
+  console.log('Avatar path:', authStore.currentUser?.avatar_path)
+  console.log('Current user:', authStore.currentUser)
+})
+
+onUnmounted(() => {
+  // Remover o event listener já que agora é gerenciado pelo BaseDropdown
+})
 
 </script>
