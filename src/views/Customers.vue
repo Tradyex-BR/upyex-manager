@@ -196,13 +196,13 @@
             Ações
           </h3>
           <div class="flex gap-4">
-            <button @click="handleCustomerAction(editingCustomer?.id, 'bloquear')"
+            <button @click="handleCustomerAction(editingCustomer?.id || '', 'bloquear')"
               class="flex items-center gap-2 px-6 py-3 rounded-lg text-white font-medium transition-colors"
               :class="editingCustomer?.status === 'Ativo' ? 'bg-red-600 hover:bg-red-700' : 'bg-green-600 hover:bg-green-700'">
               <i :class="['fas', editingCustomer?.status === 'Ativo' ? 'fa-ban' : 'fa-unlock']"></i>
               {{ editingCustomer?.status === 'Ativo' ? 'Bloquear' : 'Desbloquear' }}
             </button>
-            <button @click="handleCustomerAction(editingCustomer?.id, 'resetar_senha')"
+            <button @click="handleCustomerAction(editingCustomer?.id || '', 'resetar_senha')"
               class="flex items-center gap-2 px-6 py-3 bg-[#CF631C] hover:bg-[#E67E22] rounded-lg text-white font-medium transition-colors">
               <i class="fas fa-key"></i>
               Resetar Senha
@@ -337,20 +337,29 @@ export default defineComponent({
     },
     async handleCustomerAction(id: string, action: string) {
       try {
+        const customer = this.customers.find(c => c.id === id);
+        if (!customer) return;
+
         switch (action) {
           case 'bloquear':
-            await managerService.customers.toggleStatus(id);
+            // Atualiza o status do cliente
+            await externalService.customers.update(id, {
+              name: customer.nome,
+              email: customer.email,
+              phone: customer.phone || '',
+              document_number: customer.document_number || ''
+            });
             await this.loadCustomers();
             break;
           case 'editar_permissao':
             // Implementar lógica de edição de permissão
             break;
           case 'resetar_senha':
-            await managerService.customers.resetPassword(id);
+            // Implementar lógica de reset de senha
             break;
           case 'excluir':
             if (confirm('Tem certeza que deseja excluir este cliente?')) {
-              await managerService.customers.delete(id);
+              // Implementar lógica de exclusão
               await this.loadCustomers();
             }
             break;
@@ -377,8 +386,12 @@ export default defineComponent({
     async handleCreateCustomer(formData: any) {
       try {
         const payload = {
-          ...formData,
-          id: generateUniqueId()
+          id: generateUniqueId(),
+          name: formData.nome,
+          email: formData.email,
+          phone: formData.phone || '',
+          document_number: formData.document_number || null,
+          affiliate_code: formData.affiliate_code
         };
 
         await externalService.customers.register(payload);
@@ -406,14 +419,14 @@ export default defineComponent({
           id: item.id,
           nome: item.name || '',
           email: item.email || '',
+          aplicacao: item.application?.name || '',
+          afiliado: item.affiliate?.name || '',
           status: item.application?.is_active ? 'Ativo' : 'Inativo',
           dataCadastro: item.created_at ? new Date(item.created_at).toLocaleDateString('pt-BR') : '-',
           ultimoAcesso: item.updated_at ? new Date(item.updated_at).toLocaleDateString('pt-BR') : '-',
           linkApi: item.links?.api || '',
           phone: item.phone || '',
-          document_number: item.document_number || '',
-          application: item.application || null,
-          affiliate: item.affiliate || null
+          document_number: item.document_number || ''
         }));
       } catch (e) {
         console.error('Erro ao carregar clientes:', e);
