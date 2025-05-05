@@ -55,7 +55,7 @@
             variant="primary"
             :loading="loading"
             :disabled="!isEmailValid"
-            class="w-full"
+            class="w-full h-[40px]"
             @click="handleSubmit">
             {{ loading ? 'Enviando...' : 'Redefinir' }}
           </BaseButton>

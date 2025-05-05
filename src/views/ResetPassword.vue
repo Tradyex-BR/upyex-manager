@@ -58,7 +58,7 @@
               type="submit"
               variant="primary"
               :loading="loading"
-              class="w-full"
+              class="w-full h-[40px]"
               :disabled="!isFormValid">
               {{ loading ? 'Processando...' : 'Redefinir' }}
             </BaseButton>

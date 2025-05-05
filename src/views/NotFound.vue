@@ -15,12 +15,12 @@
 
       <div class="flex flex-col gap-6 w-full max-sm:items-center">
         <div>
-          <router-link
-            to="/"
-            class="bg-[#CF631C] rounded py-3 px-6 group relative w-full flex justify-center text-white hover:text-white font-inter text-[16px] leading-6 font-bold focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
-          >
+          <BaseButton
+            variant="primary"
+            class="w-full h-[40px]"
+            @click="router.push('/')">
             Voltar para a página inicial
-          </router-link>
+          </BaseButton>
         </div>
 
        <!--  <div class="text-center font-inter text-[14px] leading-[18px] text-[#040D25]">
@@ -40,4 +40,5 @@
 <script setup>
 import LoginBackground from '@/components/layout/login/LoginBackground.vue'
 import VerticalLines from '@/components/layout/login/VerticalLines.vue'
+import BaseButton from '@/components/common/BaseButton.vue'
 </script>

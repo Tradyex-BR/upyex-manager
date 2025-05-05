@@ -25,7 +25,7 @@ d="M52.1627 19.8508L32.0134 40.0002L21.9414 29.9255" stroke="#01DD56" stroke-wid
         <div>
           <BaseButton
             variant="primary"
-            class="w-full"
+            class="w-full h-[40px]"
             @click="router.push('/login')">
             Login
           </BaseButton>

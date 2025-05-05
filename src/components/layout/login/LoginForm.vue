@@ -48,7 +48,7 @@
       </div>
 
       <div class="flex flex-col gap-4">
-        <BaseButton type="submit" variant="primary" :disabled="!isFormValid || loading" :loading="loading">
+        <BaseButton type="submit" variant="primary" class="h-[40px]" :disabled="!isFormValid" :loading="loading">
           Entrar
         </BaseButton>
 

@@ -21,7 +21,7 @@
               type="submit"
               variant="primary"
               :loading="loading"
-              class="w-full"
+              class="w-full h-[40px]"
               @click="handleBack">
               {{ loading ? 'Enviando...' : 'Voltar' }}
             </BaseButton>
