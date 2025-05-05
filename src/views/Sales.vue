@@ -31,12 +31,12 @@
                 { key: 'value', label: 'Valor BRL', align: 'center' }
               ] : [
                 { key: 'date', label: 'Data', align: 'left' },
-                { key: 'application', label: 'Aplicação', align: 'center' },
+                { key: 'token', label: 'Token', align: 'center' },
                 { key: 'updated_at', label: 'Última Atualização', align: 'center' },
                 { key: 'value', label: 'Valor BRL', align: 'center' },
                 { key: 'status', label: 'Status', align: 'center' },
-                { key: 'customer', label: 'Cliente', align: 'center' },
-                { key: 'id', label: 'ID Transação', align: 'center' }
+                { key: 'wallet_id', label: 'Carteira', align: 'center' },
+                { key: 'transaction_id', label: 'ID Transação', align: 'center' }
               ]" :items="sales">
                 <template #date="{ item }">
                   {{ new Date(item.created_at).toLocaleDateString('pt-BR') }}
@@ -48,11 +48,11 @@
 
                 <template #token="{ item }">
                   <div class="flex items-center justify-center gap-3">
-                    <img :src="item.customer.application.logo_url ? item.customer.application.logo_url : `https://ui-avatars.com/api/?name=${item.token}&background=random`"
-                      :alt="item.token" class="w-8 h-8 rounded-full object-cover" />
+                    <img :src="item.customer?.application?.logo_url || `https://ui-avatars.com/api/?name=${item.customer?.application?.name}&background=random`"
+                      :alt="item.customer?.application?.name" class="w-8 h-8 rounded-full object-cover" />
                     <div class="flex flex-col">
                       <span class="font-inter text-[14px] font-normal leading-[18px] text-white">
-                        {{ item.customer.application.name || '-' }}
+                        {{ item.customer?.application?.name || '-' }}
                       </span>
                     </div>
                   </div>
@@ -78,12 +78,16 @@
                   {{ new Date(item.updated_at).toLocaleDateString('pt-BR') }}
                 </template>
 
-                <template #application="{ item }">
-                  {{ item.customer?.application?.name || '-' }}
+                <template #wallet_id="{ item }">
+                  <div class="flex items-center justify-center gap-2">
+                    {{ formatWalletId(item.customer?.application?.id) || '-' }} <CopyButton :stringToCopy="item.customer?.application?.id" />
+                  </div>
                 </template>
 
-                <template #id="{ item }">
-                  {{ item.id }}
+                <template #transaction_id="{ item }">
+                  <div class="flex items-center justify-center gap-2">
+                    {{ formatTransactionId(item.id) || '-' }} <CopyButton :stringToCopy="item.id" />
+                  </div>
                 </template>
               </BaseTable>
             </div>
