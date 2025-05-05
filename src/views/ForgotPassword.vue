@@ -33,10 +33,20 @@
             <span class="text-[#040D25] text-[14px] font-medium leading-5">Tipo de usuário</span>
             <span class="text-[#BE3E37] font-inter text-[14px] leading-5 font-medium">*</span>
           </label>
-          <select v-model="role" :disabled="loading"
-            class="h-[56px] px-3 py-4 border border-[#B8B8B8] rounded-lg outline-none bg-white">
-            <option v-for="r in roles" :key="r" :value="r">{{ r === 'MANAGER' ? 'Manager' : 'Afiliado' }}</option>
-          </select>
+          <BaseDropdown
+            :options="roles.map(r => ({ text: r.label, action: r.value }))"
+            :model-value="!!role"
+            @select="role = $event"
+            variant="light"
+            :top="60"
+          >
+            <template #trigger>
+              <div class="h-[56px] px-3 py-4 border border-[#B8B8B8] rounded-lg outline-none bg-white flex items-center justify-between">
+                <span class="font-inter text-[#222A3F] leading-5">{{ roles.find(r => r.value === role)?.label }}</span>
+                <ChevronDownIcon class="w-5 h-5 text-[#222A3F]" />
+              </div>
+            </template>
+          </BaseDropdown>
         </div>
       </form>
 
@@ -74,11 +84,16 @@ import { useRouter } from 'vue-router'
 import LoginBackground from '@/components/layout/login/LoginBackground.vue'
 import VerticalLines from '@/components/layout/login/VerticalLines.vue'
 import BaseButton from '@/components/common/BaseButton.vue'
+import BaseDropdown from '@/components/common/BaseDropdown.vue'
+import ChevronDownIcon from '@/components/common/icons/ChevronDownIcon.vue'
 
 const router = useRouter()
 const email = ref('')
 const role = ref('MANAGER')
-const roles = ['MANAGER', 'AFFILIATE']
+const roles = [
+  { value: 'MANAGER', label: 'Administrador' },
+  { value: 'AFFILIATE', label: 'Afiliado' }
+]
 const loading = ref(false)
 const error = ref('')
 const message = ref('')
