@@ -27,7 +27,7 @@
             class="w-full flex items-center gap-[10px] p-3 transition-colors font-inter text-[14px] font-normal leading-[18px] text-left"
             :class="[
               variant === 'light'
-                ? ' text-[#222A3F] hover:bg-black hover:bg-opacity-5 active:bg-black active:bg-opacity-10'
+                ? ' text-[#222A3F] bg-white hover:bg-black hover:bg-opacity-5 active:bg-black active:bg-opacity-10'
                 : 'text-white hover:bg-[#2A2F4C] bg-[#222A3F]'
             ]"
             @click="handleOptionClick(option)">

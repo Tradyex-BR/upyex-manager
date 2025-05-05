@@ -45,7 +45,7 @@
         <div class="flex flex-col gap-1">
           <label class="text-[14px] font-medium">Tipo de usuário <span class="text-[#BE3E37]">*</span></label>
           <BaseDropdown
-            :options="roles.map(r => ({ text: r, action: r }))"
+            :options="roles.map(r => ({ text: r.label, action: r.value }))"
             :model-value="!!role"
             @select="role = $event"
             variant="light"
@@ -53,7 +53,7 @@
           >
             <template #trigger>
               <div class="h-[56px] px-3 py-4 border border-[#B8B8B8] rounded-lg outline-none bg-white flex items-center justify-between">
-                <span class="font-inter text-[#222A3F] leading-5">{{ role }}</span>
+                <span class="font-inter text-[#222A3F] leading-5">{{ roles.find(r => r.value === role)?.label }}</span>
                 <ChevronDownIcon class="w-5 h-5 text-[#222A3F]" />
               </div>
             </template>
@@ -82,7 +82,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import BaseButton from '@/components/common/BaseButton.vue'
@@ -96,17 +96,31 @@ const router = useRouter()
 const email = ref('')
 const password = ref('')
 const showPassword = ref(false)
+const roles = [
+  { value: 'MANAGER', label: 'Administrador' },
+  { value: 'AFFILIATE', label: 'Afiliado' }
+]
 const role = ref<'MANAGER' | 'AFFILIATE'>('MANAGER')
-const roles = ['MANAGER', 'AFFILIATE']
 const loading = ref(false)
 const error = ref('')
 
 const authStore = useAuthStore()
 
+// Carregar o último tipo de usuário selecionado
+onMounted(() => {
+  const savedRole = localStorage.getItem('userRole')
+  if (savedRole) {
+    role.value = savedRole as 'MANAGER' | 'AFFILIATE'
+  }
+})
+
 const handleLogin = async () => {
   loading.value = true
   error.value = ''
   try {
+    // Salvar o tipo de usuário no localStorage
+    localStorage.setItem('userRole', role.value)
+    
     await authStore.login({
       email: email.value,
       password: password.value,
