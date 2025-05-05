@@ -7,7 +7,8 @@
             <span class="text-[#040D25] text-[14px] font-medium leading-5">Email</span>
             <span class="text-[#BE3E37] font-inter text-[14px] leading-5 font-medium">*</span>
           </label>
-          <div class="h-[56px] flex items-center border gap-2 px-3 py-4 rounded-lg border-solid border-[#B8B8B8]">
+          <div class="h-[56px] flex items-center border gap-2 px-3 py-4 rounded-lg border-solid border-[#B8B8B8]"
+            :class="{ 'border-red-500': emailError }">
             <div>
               <EmailIcon></EmailIcon>
             </div>
@@ -15,41 +16,30 @@
               class="flex-1 bg-transparent outline-none font-inter text-[#222A3F] leading-5" required
               :disabled="loading" />
           </div>
+          <span v-if="emailError" class="text-red-500 text-sm">{{ emailError }}</span>
         </div>
 
         <div class="flex flex-col gap-1">
           <label class="text-[14px] font-medium">Senha <span class="text-[#BE3E37]">*</span></label>
-            <div class="h-[56px] flex items-center border gap-2 px-3 py-4 rounded-lg border-solid border-[#B8B8B8]">
+          <div class="h-[56px] flex items-center border gap-2 px-3 py-4 rounded-lg border-solid border-[#B8B8B8]">
             <div>
               <PasswordIcon></PasswordIcon>
             </div>
-            <input
-              v-model="password"
-              :type="showPassword ? 'text' : 'password'"
-              placeholder="Digite sua senha"
-              class="flex-1 bg-transparent outline-none font-inter text-[#222A3F] leading-5"
-              required
-              :disabled="loading"
-            />
-            <PasswordVisibilityIcon 
-              :is-visible="showPassword"
-              @toggle="showPassword = !showPassword"
-            />
+            <input v-model="password" :type="showPassword ? 'text' : 'password'" placeholder="Digite sua senha"
+              class="flex-1 bg-transparent outline-none font-inter text-[#222A3F] leading-5" required
+              :disabled="loading" />
+            <PasswordVisibilityIcon :is-visible="showPassword" @toggle="showPassword = !showPassword" />
           </div>
         </div>
-        
+
         <div class="flex flex-col gap-1">
           <label class="text-[14px] font-medium">Tipo de usuário <span class="text-[#BE3E37]">*</span></label>
-          <BaseDropdown
-            :options="roles.map(r => ({ text: r.label, action: r.value }))"
-            :model-value="!!role"
-            @select="role = $event"
-            variant="light"
-            :top="60"
-          >
+          <BaseDropdown :options="roles.map(r => ({ text: r.label, action: r.value }))" :model-value="!!role"
+            @select="role = $event" variant="light" :top="60">
             <template #trigger>
-              <div class="h-[56px] px-3 py-4 border border-[#B8B8B8] rounded-lg outline-none bg-white flex items-center justify-between">
-                <span class="font-inter text-[#222A3F] leading-5">{{ roles.find(r => r.value === role)?.label }}</span>
+              <div
+                class="h-[56px] px-3 py-4 border border-[#B8B8B8] rounded-lg outline-none bg-white flex items-center justify-between">
+                <span class="font-inter text-[#222A3F] leading-5">{{roles.find(r => r.value === role)?.label}}</span>
                 <ChevronDownIcon class="w-5 h-5 text-[#222A3F]" />
               </div>
             </template>
@@ -58,11 +48,7 @@
       </div>
 
       <div class="flex flex-col gap-4">
-        <BaseButton
-          type="submit"
-          variant="primary"
-          :disabled="!isFormValid || loading"
-          :loading="loading">
+        <BaseButton type="submit" variant="primary" :disabled="!isFormValid || loading" :loading="loading">
           Entrar
         </BaseButton>
 
@@ -71,20 +57,21 @@
             <router-link 
               :to="isEmailValid ? '/forgot-password' : '#'"
               :class="[
-                'text-[#CF631C] hover:underline hover:text-[#CF631C]',
-                !isEmailValid && 'opacity-50 cursor-not-allowed pointer-events-none'
+                isEmailValid 
+                  ? 'text-[#CF631C] hover:underline hover:text-[#CF631C]'
+                  : 'text-[#444c5a] opacity-50 cursor-not-allowed pointer-events-none'
               ]"
               @click="handleForgotPassword"
             >
               Esqueci minha senha
             </router-link>
-            <div 
-              v-if="!isEmailValid"
+            <div v-if="!isEmailValid"
               class="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-[#222A3F] text-white text-xs rounded-lg whitespace-nowrap invisible group-hover:visible transition-all duration-200 pointer-events-none z-50"
-              style="width: max-content;"
-            >
+              style="width: max-content;">
               Digite um email válido primeiro
-              <div class="absolute top-full left-1/2 transform -translate-x-1/2 border-4 border-transparent border-t-[#222A3F]"></div>
+              <div
+                class="absolute top-full left-1/2 transform -translate-x-1/2 border-4 border-transparent border-t-[#222A3F]">
+              </div>
             </div>
           </div>
         </div>
@@ -109,6 +96,7 @@ const router = useRouter()
 const email = ref('')
 const password = ref('')
 const showPassword = ref(false)
+const emailError = ref('')
 const roles = [
   { value: 'MANAGER', label: 'Administrador' },
   { value: 'AFFILIATE', label: 'Afiliado' }
@@ -118,8 +106,21 @@ const loading = ref(false)
 const error = ref('')
 
 const isEmailValid = computed(() => {
+  if (!email.value) return false
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
   return emailRegex.test(email.value)
+})
+
+watch(email, (newValue) => {
+  if (!newValue) {
+    emailError.value = ''
+    return
+  }
+  if (!isEmailValid.value) {
+    emailError.value = 'Digite um email válido'
+  } else {
+    emailError.value = ''
+  }
 })
 
 const isFormValid = computed(() => {

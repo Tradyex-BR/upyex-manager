@@ -24,11 +24,9 @@
         </div>
       </div>
 
-      <button
-        class="bg-[#CF631C] px-4 py-2 border-none rounded w-full text-[#F7F7F8] font-inter text-sm font-bold leading-6 cursor-pointer disabled:bg-[#444c5a] disabled:cursor-not-allowed disabled:opacity-60"
-        :disabled="!isAmountValid || !isPixKeyValid || loading" @click="handleSubmit">
+      <BaseButton :disabled="!isAmountValid || !isPixKeyValid || loading" @click="handleSubmit">
         {{ loading ? "Processando Saque..." : "Confirmar Saque" }}
-      </button>
+      </BaseButton>
     </div>
   </BaseModal>
 </template>
@@ -37,6 +35,7 @@
 import { ref, computed } from 'vue'
 import EmailConfigIcon from "@/components/icons/EmailConfigIcon.vue";
 import BaseModal from '@/components/common/BaseModal.vue';
+import BaseButton from '@/components/common/BaseButton.vue';
 
 const emit = defineEmits(['close', 'submit'])
 const amount = ref('480.00')
