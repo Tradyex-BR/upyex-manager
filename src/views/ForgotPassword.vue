@@ -80,7 +80,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, watch, onUnmounted, computed } from 'vue'
+import { ref, onMounted, watch, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import LoginBackground from '@/components/layout/login/LoginBackground.vue'
 import VerticalLines from '@/components/layout/login/VerticalLines.vue'
@@ -122,11 +122,6 @@ watch(role, (newRole) => {
   window.localStorage.setItem('userRole', newRole)
 })
 
-// Limpar o email do localStorage quando o componente for desmontado
-onUnmounted(() => {
-  window.localStorage.removeItem('recoveryEmail')
-})
-
 const emailIcon = `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
 <path fill-rule="evenodd" clip-rule="evenodd" d="M15.374 12.718L19.88 9.663C20.581 9.189 21 8.398 21 7.552V7.552C21 6.142 19.858 5 18.449 5H5.56601C4.15701 5 3.01501 6.142 3.01501 7.551V7.551C3.01501 8.397 3.43401 9.188 4.13501 9.663L8.64101 12.718C10.674 14.096 13.341 14.096 15.374 12.718V12.718Z" stroke="#85B1FF" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
 <path d="M3 7.55103V17C3 18.657 4.343 20 6 20H18C19.657 20 21 18.657 21 17V7.55203" stroke="#85B1FF" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
@@ -141,6 +136,10 @@ const handleSubmit = async () => {
   error.value = ''
   message.value = ''
   loading.value = true
+
+  // Salvar o email no localStorage antes de fazer a requisição
+  window.localStorage.setItem('recoveryEmail', email.value)
+
   try {
     let endpoint = ''
     if (role.value === 'MANAGER') {

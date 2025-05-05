@@ -28,7 +28,11 @@
           </div>
           <div class="text-center font-inter text-[14px] leading-[18px] text-[#040D25]">
             <span>Lembrou sua senha? </span>
-            <router-link to="/login" class="text-[#CF631C] hover:underline hover:text-[#CF631C]">
+            <router-link 
+              to="/login" 
+              class="text-[#CF631C] hover:underline hover:text-[#CF631C]"
+              @click="handleLogin"
+            >
               Faça login
             </router-link>
           </div>
@@ -51,6 +55,10 @@ import PaperPlaneIcon from '@/components/icons/PaperPlaneIcon.vue'
 const router = useRouter()
 
 const loading = ref(false)
+
+const handleLogin = () => {
+  window.localStorage.removeItem('recoveryEmail')
+}
 
 const handleBack = async () => {
   try {
