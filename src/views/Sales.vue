@@ -21,56 +21,69 @@
                 class="flex w-full min-h-[200px] items-center justify-center text-gray-400 text-lg">
                 Nenhuma venda encontrada
               </div>
-              <BaseTable 
-                v-else
-                :headers="[
-                  { key: 'date', label: 'Data', align: 'left' },
-                  { key: 'customer', label: 'Cliente', align: 'center' },
-                  { key: 'token', label: 'Token', align: 'center' },
-                  { key: 'status', label: 'Status', align: 'center' },
-                  { key: 'payment_method', label: 'Método de Pagamentos', align: 'center' },
-                  { key: 'volume', label: 'Volume', align: 'center' },
-                  { key: 'value', label: 'Valor BRL', align: 'center' }
-                ]"
-                :items="sales"
-              >
+              <BaseTable v-else :headers="isManager ? [
+                { key: 'date', label: 'Data', align: 'left' },
+                { key: 'customer', label: 'Cliente', align: 'center' },
+                { key: 'token', label: 'Token', align: 'center' },
+                { key: 'status', label: 'Status', align: 'center' },
+                { key: 'payment_method', label: 'Método de Pagamentos', align: 'center' },
+                { key: 'volume', label: 'Volume', align: 'center' },
+                { key: 'value', label: 'Valor BRL', align: 'center' }
+              ] : [
+                { key: 'date', label: 'Data', align: 'left' },
+                { key: 'application', label: 'Aplicação', align: 'center' },
+                { key: 'updated_at', label: 'Última Atualização', align: 'center' },
+                { key: 'value', label: 'Valor BRL', align: 'center' },
+                { key: 'status', label: 'Status', align: 'center' },
+                { key: 'customer', label: 'Cliente', align: 'center' },
+                { key: 'id', label: 'ID Transação', align: 'center' }
+              ]" :items="sales">
                 <template #date="{ item }">
                   {{ new Date(item.created_at).toLocaleDateString('pt-BR') }}
                 </template>
-                
+
                 <template #customer="{ item }">
                   {{ item.customer?.name }}
                 </template>
-                
+
                 <template #token="{ item }">
                   <div class="flex items-center justify-center gap-3">
-                    <img
-                      :src="item.token ? `https://ui-avatars.com/api/?name=${item.token}&background=random` : ''"
-                      :alt="item.token" 
-                      class="w-8 h-w-8 rounded-full object-cover" 
-                    />
+                    <img :src="item.customer.application.logo_url ? item.customer.application.logo_url : `https://ui-avatars.com/api/?name=${item.token}&background=random`"
+                      :alt="item.token" class="w-8 h-8 rounded-full object-cover" />
                     <div class="flex flex-col">
                       <span class="font-inter text-[14px] font-normal leading-[18px] text-white">
-                        {{ item.token || '-' }}
+                        {{ item.customer.application.name || '-' }}
                       </span>
                     </div>
                   </div>
                 </template>
-                
+
                 <template #status="{ item }">
                   <span :class="getStatusClass(item.status)">{{ mapStatus(item.status) }}</span>
                 </template>
-                
+
                 <template #payment_method="{ item }">
-                  {{ item.payment_method }}
+                  {{ mapPaymentMethod(item.payment_method) }}
                 </template>
-                
+
                 <template #volume="{ item }">
                   {{ item.products && item.products.length ? item.products[0].amount : '-' }}
                 </template>
-                
+
                 <template #value="{ item }">
                   {{ item.products && item.products.length ? item.products[0].price.toFixed(2) : '-' }}
+                </template>
+
+                <template #updated_at="{ item }">
+                  {{ new Date(item.updated_at).toLocaleDateString('pt-BR') }}
+                </template>
+
+                <template #application="{ item }">
+                  {{ item.customer?.application?.name || '-' }}
+                </template>
+
+                <template #id="{ item }">
+                  {{ item.id }}
                 </template>
               </BaseTable>
             </div>
@@ -487,89 +500,231 @@ import CopyButton from '@/components/common/CopyButton.vue'
 import { formatWalletId as formatWalletIdUtil, formatTransactionId as formatTransactionIdUtil } from '@/utils/formatters'
 import BaseTable from '@/components/common/BaseTable.vue'
 
+const AFFILIATE_MOCK_DATA = [
+  {
+    "id": "019683a9-6f64-709f-a8c4-532f49082ad5",
+    "type": "product",
+    "status": "awaiting_payment",
+    "payment_method": "pix",
+    "products": [
+      {
+        "id": "71baa072-df2f-365d-9551-d242dee44e20",
+        "name": "ex",
+        "price": 32.33,
+        "amount": 3
+      },
+      {
+        "id": "4d4e2821-8a4a-3b88-b3a1-dfbddcc1f031",
+        "name": "doloribus",
+        "price": 6.1,
+        "amount": 5
+      }
+    ],
+    "platform_fee": "5.05",
+    "affiliate_commission": "0.00",
+    "created_at": "2025-04-29T22:27:21.000000Z",
+    "updated_at": "2025-04-29T22:27:21.000000Z",
+    "customer": {
+      "id": "019683a9-6eb5-7205-9639-cdc0af76c47e",
+      "name": "Sr. Edilson Juliano Sandoval Neto",
+      "email": "valentin58@example.com",
+      "phone": "(62) 96839-6248",
+      "created_at": "2025-04-29T22:27:21.000000Z",
+      "updated_at": "2025-04-29T22:27:21.000000Z",
+      "application": {
+        "id": "019683a9-6e9a-702f-b2f6-564a3cbe73b9",
+        "name": "qui ut et aut pariatur",
+        "description": "Est et dolor et odit quo natus.",
+        "logo_url": "https://via.placeholder.com/480x480.png/00ccbb?text=business+aut",
+        "affiliate_link": "",
+        "is_active": true,
+        "links": {
+          "api": "http://board-api.upyex.test/api/affiliate/applications/019683a9-6e9a-702f-b2f6-564a3cbe73b9",
+          "frontend": "http://board.upyex.test/affiliate/applications/019683a9-6e9a-702f-b2f6-564a3cbe73b9"
+        }
+      },
+      "links": {
+        "api": "http://board-api.upyex.test/api/affiliate/customers/019683a9-6eb5-7205-9639-cdc0af76c47e",
+        "frontend": "http://board.upyex.test/affiliate/customers/019683a9-6eb5-7205-9639-cdc0af76c47e"
+      }
+    },
+    "links": {
+      "api": "http://board-api.upyex.test/api/affiliate/sales/019683a9-6f64-709f-a8c4-532f49082ad5",
+      "frontend": "http://board.upyex.test/affiliate/sales/019683a9-6f64-709f-a8c4-532f49082ad5"
+    }
+  },
+  {
+    "id": "019683a9-6f71-73a0-8056-0aedeac96447",
+    "type": "product",
+    "status": "awaiting_payment",
+    "payment_method": "pix",
+    "products": [
+      {
+        "id": "305117f7-a977-3a22-a7a2-1f25e2fa5af1",
+        "name": "vero",
+        "price": 29.85,
+        "amount": 5
+      },
+      {
+        "id": "f8e3bc8d-f398-314e-b92d-7dfd076d871c",
+        "name": "in",
+        "price": 55.34,
+        "amount": 3
+      }
+    ],
+    "platform_fee": "7.49",
+    "affiliate_commission": "0.00",
+    "created_at": "2025-04-29T22:27:21.000000Z",
+    "updated_at": "2025-04-29T22:27:21.000000Z",
+    "customer": {
+      "id": "019683a9-6eb5-7205-9639-cdc0af76c47e",
+      "name": "Sr. Edilson Juliano Sandoval Neto",
+      "email": "valentin58@example.com",
+      "phone": "(62) 96839-6248",
+      "created_at": "2025-04-29T22:27:21.000000Z",
+      "updated_at": "2025-04-29T22:27:21.000000Z",
+      "application": {
+        "id": "019683a9-6e9a-702f-b2f6-564a3cbe73b9",
+        "name": "qui ut et aut pariatur",
+        "description": "Est et dolor et odit quo natus.",
+        "logo_url": "https://via.placeholder.com/480x480.png/00ccbb?text=business+aut",
+        "affiliate_link": "",
+        "is_active": true,
+        "links": {
+          "api": "http://board-api.upyex.test/api/affiliate/applications/019683a9-6e9a-702f-b2f6-564a3cbe73b9",
+          "frontend": "http://board.upyex.test/affiliate/applications/019683a9-6e9a-702f-b2f6-564a3cbe73b9"
+        }
+      },
+      "links": {
+        "api": "http://board-api.upyex.test/api/affiliate/customers/019683a9-6eb5-7205-9639-cdc0af76c47e",
+        "frontend": "http://board.upyex.test/affiliate/customers/019683a9-6eb5-7205-9639-cdc0af76c47e"
+      }
+    },
+    "links": {
+      "api": "http://board-api.upyex.test/api/affiliate/sales/019683a9-6f71-73a0-8056-0aedeac96447",
+      "frontend": "http://board.upyex.test/affiliate/sales/019683a9-6f71-73a0-8056-0aedeac96447"
+    }
+  },
+]
+
 // Mock de dados para desenvolvimento
 const MOCK_SALES = [
   {
-    id: "019683a9-6f64-709f-a8c4-532f49082ad5",
-    type: "product",
-    status: "awaiting_payment",
-    payment_method: "pix",
-    token: "TOKEN123",
-    products: [
+    "id": "019683a9-6f64-709f-a8c4-532f49082ad5",
+    "type": "product",
+    "status": "awaiting_payment",
+    "payment_method": "pix",
+    "products": [
       {
-        id: "71baa072-df2f-365d-9551-d242dee44e20",
-        name: "Produto Premium",
-        price: 199.90,
-        amount: 1
+        "id": "71baa072-df2f-365d-9551-d242dee44e20",
+        "name": "ex",
+        "price": 32.33,
+        "amount": 3
+      },
+      {
+        "id": "4d4e2821-8a4a-3b88-b3a1-dfbddcc1f031",
+        "name": "doloribus",
+        "price": 6.1,
+        "amount": 5
       }
     ],
-    platform_fee: "5.05",
-    affiliate_commission: "10.00",
-    created_at: "2024-03-20T22:27:21.000000Z",
-    updated_at: "2024-03-20T22:27:21.000000Z",
-    customer: {
-      id: "019683a9-6eb5-7205-9639-cdc0af76c47e",
-      external_id: "CLI123456",
-      name: "João Silva",
-      email: "joao.silva@exemplo.com",
-      phone: "(11) 98765-4321",
-      document_number: "123.456.789-00"
+    "platform_fee": "5.05",
+    "affiliate_commission": "0.00",
+    "created_at": "2025-04-29T22:27:21.000000Z",
+    "updated_at": "2025-04-29T22:27:21.000000Z",
+    "customer": {
+      "id": "019683a9-6eb5-7205-9639-cdc0af76c47e",
+      "external_id": "a65e1db9-0639-38eb-bd62-aa4a2bce0a49",
+      "name": "Sr. Edilson Juliano Sandoval Neto",
+      "email": "valentin58@example.com",
+      "phone": "(62) 96839-6248",
+      "document_number": "30089750826",
+      "created_at": "2025-04-29T22:27:21.000000Z",
+      "updated_at": "2025-04-29T22:27:21.000000Z",
+      "application": {
+        "id": "019683a9-6e9a-702f-b2f6-564a3cbe73b9",
+        "name": "qui ut et aut pariatur",
+        "description": "Est et dolor et odit quo natus.",
+        "logo_url": "https://via.placeholder.com/480x480.png/00ccbb?text=business+aut",
+        "base_affiliate_link": null,
+        "api_secret": "cNfvbz8eSkAUjsmXN4KlwM05xtB1y554BgycAl3aa5yAUYKbRepzEJjiwJcMJ5TP",
+        "is_active": true,
+        "created_at": "2025-04-29T22:27:21.000000Z",
+        "updated_at": "2025-04-29T22:27:21.000000Z",
+        "links": {
+          "api": "http://board-api.upyex.test/api/manager/applications/019683a9-6e9a-702f-b2f6-564a3cbe73b9",
+          "frontend": "http://board.upyex.test/manager/applications/019683a9-6e9a-702f-b2f6-564a3cbe73b9"
+        }
+      },
+      "affiliate": null,
+      "links": {
+        "api": "http://board-api.upyex.test/api/manager/customers/019683a9-6eb5-7205-9639-cdc0af76c47e",
+        "frontend": "http://board.upyex.test/manager/customers/019683a9-6eb5-7205-9639-cdc0af76c47e"
+      }
+    },
+    "links": {
+      "api": "http://board-api.upyex.test/api/manager/sales/019683a9-6f64-709f-a8c4-532f49082ad5",
+      "frontend": "http://board.upyex.test/manager/sales/019683a9-6f64-709f-a8c4-532f49082ad5"
     }
   },
   {
-    id: "019683a9-6f64-709f-a8c4-532f49082ad6",
-    type: "product",
-    status: "paid",
-    payment_method: "credit_card",
-    token: "TOKEN456",
-    products: [
+    "id": "019683a9-6f71-73a0-8056-0aedeac96447",
+    "type": "product",
+    "status": "awaiting_payment",
+    "payment_method": "pix",
+    "products": [
       {
-        id: "71baa072-df2f-365d-9551-d242dee44e21",
-        name: "Produto Básico",
-        price: 99.90,
-        amount: 2
+        "id": "305117f7-a977-3a22-a7a2-1f25e2fa5af1",
+        "name": "vero",
+        "price": 29.85,
+        "amount": 5
+      },
+      {
+        "id": "f8e3bc8d-f398-314e-b92d-7dfd076d871c",
+        "name": "in",
+        "price": 55.34,
+        "amount": 3
       }
     ],
-    platform_fee: "5.05",
-    affiliate_commission: "5.00",
-    created_at: "2024-03-19T15:30:00.000000Z",
-    updated_at: "2024-03-19T15:35:00.000000Z",
-    customer: {
-      id: "019683a9-6eb5-7205-9639-cdc0af76c47f",
-      external_id: "CLI789012",
-      name: "Maria Santos",
-      email: "maria.santos@exemplo.com",
-      phone: "(11) 91234-5678",
-      document_number: "987.654.321-00"
+    "platform_fee": "7.49",
+    "affiliate_commission": "0.00",
+    "created_at": "2025-04-29T22:27:21.000000Z",
+    "updated_at": "2025-04-29T22:27:21.000000Z",
+    "customer": {
+      "id": "019683a9-6ee2-71f4-934c-dcf91c812e89",
+      "external_id": "9f0df1de-880c-389c-bd3c-60fc1b772642",
+      "name": "Francisco Santana",
+      "email": "meireles.alicia@example.com",
+      "phone": "(74) 4455-2041",
+      "document_number": "18893364986",
+      "created_at": "2025-04-29T22:27:21.000000Z",
+      "updated_at": "2025-04-29T22:27:21.000000Z",
+      "application": {
+        "id": "019683a9-6eda-736b-9eb6-0e554ae4f5f6",
+        "name": "ut distinctio itaque accusantium",
+        "description": "Voluptate suscipit aspernatur reprehenderit enim corrupti et dolorum natus.",
+        "logo_url": "https://via.placeholder.com/480x480.png/002266?text=business+magnam",
+        "base_affiliate_link": null,
+        "api_secret": "LMFE83vXgPY61hMgBr2vqDhVaUMFuUPuSVSwi80zpIKZ4lbt2z0V5Q3WFsZyUXXC",
+        "is_active": true,
+        "created_at": "2025-04-29T22:27:21.000000Z",
+        "updated_at": "2025-04-29T22:27:21.000000Z",
+        "links": {
+          "api": "http://board-api.upyex.test/api/manager/applications/019683a9-6eda-736b-9eb6-0e554ae4f5f6",
+          "frontend": "http://board.upyex.test/manager/applications/019683a9-6eda-736b-9eb6-0e554ae4f5f6"
+        }
+      },
+      "affiliate": null,
+      "links": {
+        "api": "http://board-api.upyex.test/api/manager/customers/019683a9-6ee2-71f4-934c-dcf91c812e89",
+        "frontend": "http://board.upyex.test/manager/customers/019683a9-6ee2-71f4-934c-dcf91c812e89"
+      }
+    },
+    "links": {
+      "api": "http://board-api.upyex.test/api/manager/sales/019683a9-6f71-73a0-8056-0aedeac96447",
+      "frontend": "http://board.upyex.test/manager/sales/019683a9-6f71-73a0-8056-0aedeac96447"
     }
   },
-  {
-    id: "019683a9-6f64-709f-a8c4-532f49082ad7",
-    type: "product",
-    status: "refunded",
-    payment_method: "bank_transfer",
-    token: "TOKEN789",
-    products: [
-      {
-        id: "71baa072-df2f-365d-9551-d242dee44e22",
-        name: "Produto Enterprise",
-        price: 499.90,
-        amount: 1
-      }
-    ],
-    platform_fee: "5.05",
-    affiliate_commission: "15.00",
-    created_at: "2024-03-18T10:15:00.000000Z",
-    updated_at: "2024-03-18T11:20:00.000000Z",
-    customer: {
-      id: "019683a9-6eb5-7205-9639-cdc0af76c480",
-      external_id: "CLI345678",
-      name: "Pedro Oliveira",
-      email: "pedro.oliveira@exemplo.com",
-      phone: "(11) 99876-5432",
-      document_number: "456.789.123-00"
-    }
-  }
 ]
 
 // Função para gerar ID único
@@ -666,7 +821,7 @@ export default defineComponent({
         platform_fee: '0.00'
       },
       isManager: false,
-      useMockData: false // Alterado para false para usar a API real
+      useMockData: true // Alterado para false para usar a API real
     }
   },
   async mounted() {
@@ -687,7 +842,21 @@ export default defineComponent({
 
         if (this.useMockData) {
           // Usa os dados mockados
-          response = { data: MOCK_SALES };
+          response = {}
+
+          if (this.isManager) {
+            response = { data: MOCK_SALES }
+          } else {
+            // Mock para afiliado com campos adicionais
+            response = { 
+              data: AFFILIATE_MOCK_DATA.map(sale => ({
+                ...sale,
+                wallet_id: `WALLET-${sale.id.slice(0, 8)}`,
+                transaction_id: `TRANS-${sale.id.slice(0, 8)}`,
+                token: `TOKEN-${sale.id.slice(0, 8)}`
+              }))
+            }
+          }
         } else {
           // Faz a chamada real à API
           response = await managerService.sales.list({
