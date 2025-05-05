@@ -8,41 +8,47 @@
         <MenuIcon />
       </slot>
     </button>
-    <div v-if="isOpen"
-      class="absolute right-0 rounded-lg shadow-lg z-10"
-      :class="[
-        variant === 'light' 
-          ? 'w-full bg-white border border-[#B8B8B8] shadow-md' 
-          : 'w-48 bg-[#222A3F]'
-      ]"
-      :style="{ top: `${top}px` }">
-      <button 
-        v-for="(option, index) in options" 
-        :key="index"
-        type="button"
-        class="w-full flex items-center gap-[10px] p-3 transition-colors font-inter text-[14px] font-normal leading-[18px] text-left"
-        :class="[
-          variant === 'light'
-            ? ' text-[#222A3F] hover:bg-black hover:bg-opacity-5 active:bg-black active:bg-opacity-10'
-            : 'text-white hover:bg-[#2A2F4C] bg-[#222A3F]'
-        ]"
-        @click="handleOptionClick(option)">
-        <template v-if="option.icon">
-          <component 
-            v-if="typeof option.icon === 'object'"
-            :is="option.icon"
-            class="inline-block"
-          />
-          <i v-else :class="['fas', option.icon]"></i>
-        </template>
-        {{ option.text }}
-      </button>
-    </div>
+    <transition name="dropdown-fade">
+      <teleport to="body">
+        <div v-if="isOpen"
+          ref="dropdownMenu"
+          class="absolute rounded-lg shadow-lg z-10"
+          :class="[
+            variant === 'light' 
+              ? 'bg-white border border-[#B8B8B8] shadow-md' 
+              : 'bg-[#222A3F]'
+          ]"
+          :style="dropdownStyle"
+        >
+          <button 
+            v-for="(option, index) in options" 
+            :key="index"
+            type="button"
+            class="w-full flex items-center gap-[10px] p-3 transition-colors font-inter text-[14px] font-normal leading-[18px] text-left"
+            :class="[
+              variant === 'light'
+                ? ' text-[#222A3F] hover:bg-black hover:bg-opacity-5 active:bg-black active:bg-opacity-10'
+                : 'text-white hover:bg-[#2A2F4C] bg-[#222A3F]'
+            ]"
+            @click="handleOptionClick(option)">
+            <template v-if="option.icon">
+              <component 
+                v-if="typeof option.icon === 'object'"
+                :is="option.icon"
+                class="inline-block"
+              />
+              <i v-else :class="['fas', option.icon]"></i>
+            </template>
+            {{ option.text }}
+          </button>
+        </div>
+      </teleport>
+    </transition>
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue'
+import { defineComponent, ref, nextTick, watch } from 'vue'
 import MenuIcon from '@/components/icons/MenuIcon.vue'
 
 interface DropdownOption {
@@ -75,9 +81,59 @@ export default defineComponent({
     }
   },
   emits: ['update:modelValue', 'select'],
+  setup(props, { emit }) {
+    const isOpen = ref(false)
+    const dropdownRef = ref<HTMLElement | null>(null)
+    const dropdownMenu = ref<HTMLElement | null>(null)
+    const dropdownStyle = ref<Record<string, string>>({})
+
+    const updateDropdownPosition = () => {
+      if (dropdownRef.value && dropdownMenu.value) {
+        const triggerRect = dropdownRef.value.getBoundingClientRect()
+        let left = 0
+        let width = 192 // 12rem = 192px
+        if (props.variant === 'light') {
+          left = triggerRect.left + window.scrollX
+          width = triggerRect.width
+        } else {
+          // Sempre alinhar pelo lado direito do trigger
+          left = triggerRect.right - width + window.scrollX
+        }
+        dropdownStyle.value = {
+          position: 'absolute',
+          top: `${triggerRect.bottom + window.scrollY}px`,
+          left: `${left}px`,
+          width: `${width}px`,
+          zIndex: '9999',
+        }
+      }
+    }
+
+    watch(() => props.modelValue, (newValue) => {
+      isOpen.value = newValue
+    })
+
+    watch(isOpen, (open) => {
+      if (open) {
+        nextTick(updateDropdownPosition)
+        window.addEventListener('scroll', updateDropdownPosition)
+        window.addEventListener('resize', updateDropdownPosition)
+      } else {
+        window.removeEventListener('scroll', updateDropdownPosition)
+        window.removeEventListener('resize', updateDropdownPosition)
+      }
+    })
+
+    return {
+      isOpen,
+      dropdownRef,
+      dropdownMenu,
+      dropdownStyle
+    }
+  },
   data() {
     return {
-      isOpen: false
+      // ...
     }
   },
   watch: {
@@ -110,4 +166,18 @@ export default defineComponent({
     }
   }
 })
-</script> 
+</script>
+
+<style scoped>
+.dropdown-fade-enter-active, .dropdown-fade-leave-active {
+  transition: opacity 0.18s cubic-bezier(.4,0,.2,1), transform 0.18s cubic-bezier(.4,0,.2,1);
+}
+.dropdown-fade-enter-from, .dropdown-fade-leave-to {
+  opacity: 0;
+  transform: translateY(-8px) scaleY(0.98);
+}
+.dropdown-fade-enter-to, .dropdown-fade-leave-from {
+  opacity: 1;
+  transform: translateY(0) scaleY(1);
+}
+</style> 
