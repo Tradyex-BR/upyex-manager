@@ -14,44 +14,43 @@
       </div>
 
       <form class="flex flex-col gap-4 w-full" @submit.prevent="handleSubmit">
-        <div class="flex flex-col gap-1 w-full">
-          <label class="flex items-center gap-0.5 text-sm font-medium text-[rgba(4,13,37,1)]">
-            <span class="text-[#040D25] text-[14px] font-medium leading-5">Senha</span>
-            <span class="text-[#BE3E37] font-inter text-[14px] leading-5 font-medium">*</span>
-          </label>
-          <div class="h-[56px] flex items-center border gap-2 px-3 py-4 rounded-lg border-solid border-[#B8B8B8]">
-            <div>
-              <div v-html="passwordIcon"></div>
-            </div>
-            <input v-model="password" :type="showPassword ? 'text' : 'password'" placeholder="Digite sua senha"
-              class="flex-1 bg-transparent outline-none font-inter text-[#222A3F] leading-5" required
-              :disabled="loading" />
+        <BaseInput
+          v-model="password"
+          label="Senha"
+          :type="showPassword ? 'text' : 'password'"
+          placeholder="Digite sua senha"
+          required
+          :disabled="loading"
+        >
+          <template #prefix>
+            <div v-html="passwordIcon"></div>
+          </template>
+          <template #suffix>
             <PasswordVisibilityIcon 
               :is-visible="showPassword"
               @toggle="showPassword = !showPassword"
             />
-          </div>
-        </div>
+          </template>
+        </BaseInput>
 
-        <div class="flex flex-col gap-1 w-full">
-          <label class="flex items-center gap-0.5 text-sm font-medium text-[rgba(4,13,37,1)]">
-            <span class="text-[#040D25] text-[14px] font-medium leading-5">Confirmar senha</span>
-            <span class="text-[#BE3E37] font-inter text-[14px] leading-5 font-medium">*</span>
-          </label>
-          <div class="h-[56px] flex items-center border gap-2 px-3 py-4 rounded-lg border-solid border-[#B8B8B8]">
-            <div>
-              <div v-html="passwordIcon"></div>
-            </div>
-            <input v-model="confirmPassword" :type="showConfirmPassword ? 'text' : 'password'"
-              placeholder="Digite sua senha"
-              class="flex-1 bg-transparent outline-none font-inter text-[#222A3F] leading-5" required
-              :disabled="loading" />
+        <BaseInput
+          v-model="confirmPassword"
+          label="Confirmar senha"
+          :type="showConfirmPassword ? 'text' : 'password'"
+          placeholder="Digite sua senha"
+          required
+          :disabled="loading"
+        >
+          <template #prefix>
+            <div v-html="passwordIcon"></div>
+          </template>
+          <template #suffix>
             <PasswordVisibilityIcon 
               :is-visible="showConfirmPassword"
               @toggle="showConfirmPassword = !showConfirmPassword"
             />
-          </div>
-        </div>
+          </template>
+        </BaseInput>
 
         <div class="flex flex-col gap-6 w-full max-sm:items-center mt-4">
           <div>
@@ -88,6 +87,7 @@ import { ref, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import BaseButton from '@/components/common/BaseButton.vue'
 import PasswordVisibilityIcon from '@/components/common/icons/PasswordVisibilityIcon.vue'
+import BaseInput from '@/components/common/BaseInput.vue'
 
 const router = useRouter()
 

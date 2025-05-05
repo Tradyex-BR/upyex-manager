@@ -14,15 +14,17 @@
     </div>
 
     <div class="flex flex-col gap-6">
-      <div class="flex flex-col gap-1 text-left">
-        <label class="text-white text-sm font-medium leading-5" for="pix-key">Chave Pix</label>
-        <div class="h-14 flex flex-row items-center bg-transparent px-3 py-4 rounded-lg border border-[#162F65]">
+      <BaseInput
+        v-model="pixKey"
+        label="Chave Pix"
+        placeholder="Digite a chave pix, email, cpf ou telefone"
+        :disabled="loading"
+        variant="dark"
+      >
+        <template #prefix>
           <EmailConfigIcon />
-          <input id="pix-key" v-model="pixKey"
-            class="bg-transparent border-none text-white w-full outline-none text-sm p-2.5 placeholder:text-[#CACACA] placeholder:font-inter placeholder:text-base placeholder:font-normal placeholder:leading-5"
-            placeholder="Digite a chave pix, email, cpf ou telefone" type="text" />
-        </div>
-      </div>
+        </template>
+      </BaseInput>
 
       <BaseButton :disabled="!isAmountValid || !isPixKeyValid || loading" @click="handleSubmit">
         {{ loading ? "Processando Saque..." : "Confirmar Saque" }}
@@ -36,6 +38,7 @@ import { ref, computed } from 'vue'
 import EmailConfigIcon from "@/components/icons/EmailConfigIcon.vue";
 import BaseModal from '@/components/common/BaseModal.vue';
 import BaseButton from '@/components/common/BaseButton.vue';
+import BaseInput from '@/components/common/BaseInput.vue';
 
 const emit = defineEmits(['close', 'submit'])
 const amount = ref('480.00')

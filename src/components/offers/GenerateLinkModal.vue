@@ -3,42 +3,34 @@
     <template #default>
       <div class="flex flex-col gap-6">
         <form v-if="role === 'manager'" @submit.prevent="handleSubmit" class="flex flex-col gap-6">
-          <div class="flex flex-col gap-1 text-left">
-            <label class="text-white text-sm font-medium leading-5" for="name">Nome</label>
-            <div class="h-14 flex flex-row items-center bg-transparent px-3 py-4 rounded-lg border border-[#162F65]">
-              <input id="name" v-model="form.name" type="text" required
-                class="bg-transparent border-none text-white w-full outline-none text-sm p-2.5 placeholder:text-[#CACACA] placeholder:font-inter placeholder:text-base placeholder:font-normal placeholder:leading-5"
-                placeholder="Digite o nome da aplicação" />
-            </div>
-          </div>
+          <BaseInput
+            v-model="form.name"
+            label="Nome"
+            placeholder="Digite o nome da aplicação"
+            required
+          />
 
-          <div class="flex flex-col gap-1 text-left">
-            <label class="text-white text-sm font-medium leading-5" for="description">Descrição</label>
-            <div class="h-14 flex flex-row items-center bg-transparent px-3 py-4 rounded-lg border border-[#162F65]">
-              <input id="description" v-model="form.description" type="text" required
-                class="bg-transparent border-none text-white w-full outline-none text-sm p-2.5 placeholder:text-[#CACACA] placeholder:font-inter placeholder:text-base placeholder:font-normal placeholder:leading-5"
-                placeholder="Digite a descrição da aplicação" />
-            </div>
-          </div>
+          <BaseInput
+            v-model="form.description"
+            label="Descrição"
+            placeholder="Digite a descrição da aplicação"
+            required
+          />
 
-          <div class="flex flex-col gap-1 text-left">
-            <label class="text-white text-sm font-medium leading-5" for="logo_url">URL do Logo</label>
-            <div class="h-14 flex flex-row items-center bg-transparent px-3 py-4 rounded-lg border border-[#162F65]">
-              <input id="logo_url" v-model="form.logo_url" type="url"
-                class="bg-transparent border-none text-white w-full outline-none text-sm p-2.5 placeholder:text-[#CACACA] placeholder:font-inter placeholder:text-base placeholder:font-normal placeholder:leading-5"
-                placeholder="Digite a URL do logo" />
-            </div>
-          </div>
+          <BaseInput
+            v-model="form.logo_url"
+            label="URL do Logo"
+            type="url"
+            placeholder="Digite a URL do logo"
+          />
 
-          <div class="flex flex-col gap-1 text-left">
-            <label class="text-white text-sm font-medium leading-5" for="base_affiliate_link">Link Base de
-              Afiliado</label>
-            <div class="h-14 flex flex-row items-center bg-transparent px-3 py-4 rounded-lg border border-[#162F65]">
-              <input id="base_affiliate_link" v-model="form.base_affiliate_link" type="url" required
-                class="bg-transparent border-none text-white w-full outline-none text-sm p-2.5 placeholder:text-[#CACACA] placeholder:font-inter placeholder:text-base placeholder:font-normal placeholder:leading-5"
-                placeholder="Digite o link base de afiliado" />
-            </div>
-          </div>
+          <BaseInput
+            v-model="form.base_affiliate_link"
+            label="Link Base de Afiliado"
+            type="url"
+            placeholder="Digite o link base de afiliado"
+            required
+          />
         </form>
 
         <!-- Conteúdo para afiliados -->
@@ -79,6 +71,7 @@ import CopyButton from '@/components/common/CopyButton.vue'
 import { managerService } from '@/services/managerService'
 import { useToast } from 'vue-toastification'
 import BaseButton from '@/components/common/BaseButton.vue'
+import BaseInput from '@/components/common/BaseInput.vue'
 
 const props = defineProps({
   role: {

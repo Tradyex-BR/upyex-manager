@@ -13,20 +13,18 @@
       </div>
 
       <form class="flex flex-col gap-4 w-full" @submit.prevent="handleSubmit">
-        <div class="flex flex-col gap-1 w-full">
-          <label class="flex items-center gap-0.5 text-sm font-medium text-[rgba(4,13,37,1)]">
-            <span class="text-[#040D25] text-[14px] font-medium leading-5">Email</span>
-            <span class="text-[#BE3E37] font-inter text-[14px] leading-5 font-medium">*</span>
-          </label>
-          <div class="h-[56px] flex items-center border gap-2 px-3 py-4 rounded-lg border-solid border-[#B8B8B8]">
-            <div>
-              <div v-html="emailIcon"></div>
-            </div>
-            <input v-model="email" type="email" placeholder="Digite seu email"
-              class="flex-1 bg-transparent outline-none font-inter text-[#222A3F] leading-5" required
-              :disabled="loading" />
-          </div>
-        </div>
+        <BaseInput
+          v-model="email"
+          label="Email"
+          type="email"
+          placeholder="Digite seu email"
+          required
+          :disabled="loading"
+        >
+          <template #prefix>
+            <div v-html="emailIcon"></div>
+          </template>
+        </BaseInput>
         
         <div class="flex flex-col gap-1 w-full">
           <label class="flex items-center gap-0.5 text-sm font-medium text-[rgba(4,13,37,1)]">
@@ -87,6 +85,7 @@ import VerticalLines from '@/components/layout/login/VerticalLines.vue'
 import BaseButton from '@/components/common/BaseButton.vue'
 import BaseDropdown from '@/components/common/BaseDropdown.vue'
 import ChevronDownIcon from '@/components/common/icons/ChevronDownIcon.vue'
+import BaseInput from '@/components/common/BaseInput.vue'
 
 const router = useRouter()
 const email = ref('')

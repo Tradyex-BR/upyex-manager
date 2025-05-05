@@ -4,60 +4,71 @@
       <div class="flex flex-col gap-7">
         <!-- Nome e Email -->
         <div class="grid grid-cols-2 gap-5">
-          <div class="flex flex-col gap-2 text-left">
-            <label class="text-white text-sm font-medium leading-5">Nome</label>
-            <div
-              class="h-14 flex flex-row items-center bg-[#131836] px-4 py-4 rounded-lg border border-[#1e2642] focus-within:border-[#3b4167] transition-colors">
+          <BaseInput
+            v-model="form.name"
+            label="Nome"
+            placeholder="Nome completo"
+            required
+            variant="dark"
+          >
+            <template #prefix>
               <FontAwesomeIcon icon="user" class="text-[#e67e22] mr-3" />
-              <input v-model="form.name" type="text" required placeholder="Nome completo"
-                class="bg-[#131836] border-none text-white w-full outline-none text-sm p-2.5 placeholder:text-[#CACACA] placeholder:font-inter placeholder:text-base placeholder:font-normal placeholder:leading-5">
-            </div>
-          </div>
+            </template>
+          </BaseInput>
 
-          <div class="flex flex-col gap-2 text-left">
-            <label class="text-white text-sm font-medium leading-5">Email</label>
-            <div
-              class="h-14 flex flex-row items-center bg-[#131836] px-4 py-4 rounded-lg border border-[#1e2642] focus-within:border-[#3b4167] transition-colors">
+          <BaseInput
+            v-model="form.email"
+            label="Email"
+            type="email"
+            placeholder="email@exemplo.com"
+            required
+            variant="dark"
+          >
+            <template #prefix>
               <FontAwesomeIcon icon="envelope" class="text-[#e67e22] mr-3" />
-              <input v-model="form.email" type="email" required placeholder="email@exemplo.com"
-                class="bg-transparent border-none text-white w-full outline-none text-sm p-2.5 placeholder:text-[#CACACA] placeholder:font-inter placeholder:text-base placeholder:font-normal placeholder:leading-5">
-            </div>
-          </div>
+            </template>
+          </BaseInput>
         </div>
 
         <!-- Telefone e CPF/CNPJ -->
         <div class="grid grid-cols-2 gap-5">
-          <div class="flex flex-col gap-2 text-left">
-            <label class="text-white text-sm font-medium leading-5">Telefone</label>
-            <div
-              class="h-14 flex flex-row items-center bg-[#131836] px-4 py-4 rounded-lg border border-[#1e2642] focus-within:border-[#3b4167] transition-colors">
+          <BaseInput
+            v-model="form.phone"
+            label="Telefone"
+            type="tel"
+            placeholder="(00) 00000-0000"
+            required
+            variant="dark"
+          >
+            <template #prefix>
               <FontAwesomeIcon icon="phone" class="text-[#e67e22] mr-3" />
-              <input v-model="form.phone" type="tel" required placeholder="(00) 00000-0000"
-                class="bg-transparent border-none text-white w-full outline-none text-sm p-2.5 placeholder:text-[#CACACA] placeholder:font-inter placeholder:text-base placeholder:font-normal placeholder:leading-5">
-            </div>
-          </div>
+            </template>
+          </BaseInput>
 
-          <div class="flex flex-col gap-2 text-left">
-            <label class="text-white text-sm font-medium leading-5">CPF/CNPJ</label>
-            <div
-              class="h-14 flex flex-row items-center bg-[#131836] px-4 py-4 rounded-lg border border-[#1e2642] focus-within:border-[#3b4167] transition-colors">
+          <BaseInput
+            v-model="form.document_number"
+            label="CPF/CNPJ"
+            placeholder="000.000.000-00"
+            variant="dark"
+          >
+            <template #prefix>
               <FontAwesomeIcon icon="id-card" class="text-[#e67e22] mr-3" />
-              <input v-model="form.document_number" type="text" placeholder="000.000.000-00"
-                class="bg-transparent border-none text-white w-full outline-none text-sm p-2.5 placeholder:text-[#CACACA] placeholder:font-inter placeholder:text-base placeholder:font-normal placeholder:leading-5">
-            </div>
-          </div>
+            </template>
+          </BaseInput>
         </div>
 
         <!-- Código do Afiliado -->
-        <div class="flex flex-col gap-2 text-left">
-          <label class="text-white text-sm font-medium leading-5">Código do Afiliado</label>
-          <div
-            class="h-14 flex flex-row items-center bg-[#131836] px-4 py-4 rounded-lg border border-[#1e2642] focus-within:border-[#3b4167] transition-colors">
+        <BaseInput
+          v-model="form.affiliate_code"
+          label="Código do Afiliado"
+          placeholder="Código único do afiliado"
+          required
+          variant="dark"
+        >
+          <template #prefix>
             <FontAwesomeIcon icon="hashtag" class="text-[#e67e22] mr-3" />
-            <input v-model="form.affiliate_code" type="text" required placeholder="Código único do afiliado"
-              class="bg-transparent border-none text-white w-full outline-none text-sm p-2.5 placeholder:text-[#CACACA] placeholder:font-inter placeholder:text-base placeholder:font-normal placeholder:leading-5">
-          </div>
-        </div>
+          </template>
+        </BaseInput>
       </div>
 
       <div class="flex gap-5 mt-2">
@@ -79,6 +90,7 @@
 import { ref, computed } from 'vue'
 import BaseModal from '@/components/common/BaseModal.vue'
 import BaseButton from '@/components/common/BaseButton.vue'
+import BaseInput from '@/components/common/BaseInput.vue'
 import { FontAwesomeIcon } from '@/plugins/fontawesome'
 
 interface Props {

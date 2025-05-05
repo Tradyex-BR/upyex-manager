@@ -2,35 +2,35 @@
   <form class="flex flex-col gap-4 w-full" @submit.prevent="handleLogin">
     <div class="flex flex-col gap-8">
       <div class="flex flex-col gap-4">
-        <div class="flex flex-col gap-1 w-full">
-          <label class="flex items-center gap-0.5 text-sm font-medium text-[rgba(4,13,37,1)]">
-            <span class="text-[#040D25] text-[14px] font-medium leading-5">Email</span>
-            <span class="text-[#BE3E37] font-inter text-[14px] leading-5 font-medium">*</span>
-          </label>
-          <div class="h-[56px] flex items-center border gap-2 px-3 py-4 rounded-lg border-solid border-[#B8B8B8]"
-            :class="{ 'border-red-500': emailError }">
-            <div>
-              <EmailIcon></EmailIcon>
-            </div>
-            <input v-model="email" type="email" placeholder="Digite seu email"
-              class="flex-1 bg-transparent outline-none font-inter text-[#222A3F] leading-5" required
-              :disabled="loading" />
-          </div>
-          <span v-if="emailError" class="text-red-500 text-sm">{{ emailError }}</span>
-        </div>
+        <BaseInput
+          v-model="email"
+          label="Email"
+          type="email"
+          placeholder="Digite seu email"
+          required
+          :error="emailError"
+          :disabled="loading"
+        >
+          <template #prefix>
+            <EmailIcon />
+          </template>
+        </BaseInput>
 
-        <div class="flex flex-col gap-1">
-          <label class="text-[14px] font-medium">Senha <span class="text-[#BE3E37]">*</span></label>
-          <div class="h-[56px] flex items-center border gap-2 px-3 py-4 rounded-lg border-solid border-[#B8B8B8]">
-            <div>
-              <PasswordIcon></PasswordIcon>
-            </div>
-            <input v-model="password" :type="showPassword ? 'text' : 'password'" placeholder="Digite sua senha"
-              class="flex-1 bg-transparent outline-none font-inter text-[#222A3F] leading-5" required
-              :disabled="loading" />
+        <BaseInput
+          v-model="password"
+          label="Senha"
+          :type="showPassword ? 'text' : 'password'"
+          placeholder="Digite sua senha"
+          required
+          :disabled="loading"
+        >
+          <template #prefix>
+            <PasswordIcon />
+          </template>
+          <template #suffix>
             <PasswordVisibilityIcon :is-visible="showPassword" @toggle="showPassword = !showPassword" />
-          </div>
-        </div>
+          </template>
+        </BaseInput>
 
         <div class="flex flex-col gap-1">
           <label class="text-[14px] font-medium">Tipo de usuário <span class="text-[#BE3E37]">*</span></label>
@@ -87,6 +87,7 @@ import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import BaseButton from '@/components/common/BaseButton.vue'
 import BaseDropdown from '@/components/common/BaseDropdown.vue'
+import BaseInput from '@/components/common/BaseInput.vue'
 import EmailIcon from '@/components/common/icons/EmailIcon.vue'
 import PasswordIcon from '@/components/common/icons/PasswordIcon.vue'
 import PasswordVisibilityIcon from '@/components/common/icons/PasswordVisibilityIcon.vue'
