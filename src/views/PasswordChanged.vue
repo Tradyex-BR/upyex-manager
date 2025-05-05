@@ -23,11 +23,12 @@ d="M52.1627 19.8508L32.0134 40.0002L21.9414 29.9255" stroke="#01DD56" stroke-wid
 
       <div class="flex flex-col gap-6 w-full max-sm:items-center">
         <div>
-          <router-link
-to="/login"
-            class="bg-[#CF631C] rounded py-2 px-4 group relative w-full flex justify-center text-[#F7F7F8] hover:text-[#F7F7F8] font-inter text-[14px] leading-6 font-bold hover:border-[#CF631C] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary text-center">
+          <BaseButton
+            variant="primary"
+            class="w-full"
+            @click="router.push('/login')">
             Login
-          </router-link>
+          </BaseButton>
         </div>
       </div>
     </div>
@@ -38,6 +39,10 @@ to="/login"
 </template>
 
 <script setup lang="ts">
+import { useRouter } from 'vue-router'
 import LoginBackground from '@/components/layout/login/LoginBackground.vue'
 import VerticalLines from '@/components/layout/login/VerticalLines.vue'
+import BaseButton from '@/components/common/BaseButton.vue'
+
+const router = useRouter()
 </script>
