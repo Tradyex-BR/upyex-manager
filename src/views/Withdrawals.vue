@@ -4,76 +4,70 @@
       <!-- Título e botão sempre visíveis -->
       <div class="flex justify-between items-center mb-6 overflow-visible">
         <p class="text-white text-2xl font-semibold">Withdrawals</p>
-        <BaseButton class="ml-2 " @click="showRequestModal = true">
+<!--         @click="showRequestModal = true"
+ -->        <BaseButton class="ml-2 " @click="showRequestModal = true">
           Novo Saque
         </BaseButton>
       </div>
 
       <!-- Modais -->
       <WithdrawalRequestModal v-if="showRequestModal" @close="showRequestModal = false"
-        @submit="handleWithdrawalRequest" />
+        @submit="handleWithdrawalRequest" :show-footer="false" />
       <WithdrawalSuccessModal v-if="showSuccessModal" :amount="lastWithdrawalAmount" :pix-key="lastWithdrawalPixKey"
-        @close="showSuccessModal = false" />
+        @close="showSuccessModal = false" :show-footer="false" />
 
       <!-- Conteúdo condicional -->
       <div class="flex w-full min-h-[calc(100vh-200px)] justify-center text-gray-400">
         <div v-if="loading" class="flex items-center justify-center py-10">
           <span class="text-white text-lg">Carregando saques...</span>
         </div>
-        <div v-else-if="withdrawals.length === 0" class="flex w-full min-h-[200px] items-center justify-center text-gray-400 text-lg">
+        <div v-else-if="withdrawals.length === 0"
+          class="flex w-full min-h-[200px] items-center justify-center text-gray-400 text-lg">
           Nenhum saque encontrado
         </div>
         <div v-else class="w-full">
-          <BaseTable 
-            :headers="[
-              { key: 'date', label: 'Data', align: 'left' },
-              { key: 'value', label: 'Valor BRL', align: 'center' },
-              { key: 'destination', label: 'Destino (Chave Pix)', align: 'center' },
-              { key: 'type', label: 'Tipo', align: 'center' },
-              { key: 'status', label: 'Status', align: 'center' },
-              { key: 'actions', label: role === 'manager' ? 'Ações' : 'Link', align: 'center' }
-            ]"
-            :items="withdrawals"
-          >
+          <BaseTable :headers="[
+            { key: 'date', label: 'Data', align: 'left' },
+            { key: 'value', label: 'Valor BRL', align: 'center' },
+            { key: 'destination', label: 'Destino (Chave Pix)', align: 'center' },
+            { key: 'type', label: 'Tipo', align: 'center' },
+            { key: 'status', label: 'Status', align: 'center' },
+            { key: 'actions', label: role === 'manager' ? 'Ações' : 'Link', align: 'center' }
+          ]" :items="withdrawals">
             <template #date="{ item }">
               {{ item.date }}
             </template>
-            
+
             <template #value="{ item }">
               {{ item.valueBRL }}
             </template>
-            
+
             <template #destination="{ item }">
               {{ item.destination }}
             </template>
-            
+
             <template #type="{ item }">
               {{ item.type }}
             </template>
-            
+
             <template #status="{ item }">
               <span :class="getStatusClass(item.status)">{{ item.status }}</span>
             </template>
-            
+
             <template #actions="{ item }">
               <template v-if="role === 'manager'">
-                <BaseDropdown 
-                  :options="[
-                    {
-                      text: 'Aprovar',
-                      action: 'approve',
-                      icon: 'fas fa-check'
-                    },
-                    {
-                      text: 'Rejeitar',
-                      action: 'reject',
-                      icon: 'fas fa-times'
-                    }
-                  ]" 
-                  @select="handleDropdownAction($event, item.id)" 
-                  :top="50" 
-                  class="w-min mx-auto" 
-                />
+                <BaseDropdown :options="[
+                  {
+                    text: 'Aprovar',
+                    action: 'approve',
+                    icon: 'fas fa-check'
+                  },
+                  {
+                    text: 'Rejeitar',
+                    action: 'reject',
+                    icon: 'fas fa-times'
+                  }
+                ]" @select="handleDropdownAction($event, item.id)" :top="50" class="w-min mx-auto" />
               </template>
               <template v-else>
                 <a v-if="item.link" :href="item.link" target="_blank" class="flex items-center justify-center">
@@ -261,7 +255,7 @@ export default defineComponent({
 
         if (USE_MOCK_DATA) {
           // Filtra os dados mockados
-          const filteredData = MOCK_WITHDRAWALS.data.filter(item => 
+          const filteredData = MOCK_WITHDRAWALS.data.filter(item =>
             item.destination.toLowerCase().includes(term.toLowerCase()) ||
             item.amount.toString().includes(term) ||
             this.translateStatus(item.status).toLowerCase().includes(term.toLowerCase())

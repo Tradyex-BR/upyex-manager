@@ -1,7 +1,7 @@
 <template>
   <BaseModal
     title="Solicitar saque"
-    :show-footer="true"
+    :show-footer="false"
     @close="$emit('close')"
   >
     <div class="flex flex-col">

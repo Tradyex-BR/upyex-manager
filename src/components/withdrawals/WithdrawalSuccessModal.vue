@@ -1,5 +1,5 @@
   <template>
-    <BaseModal content-class="gap-8" @close="$emit('close')" :show-footer="true">
+    <BaseModal content-class="gap-8" @close="$emit('close')" :show-footer="false">
       <template #icon>
         <BackButton @click="$emit('close')" />
       </template>
