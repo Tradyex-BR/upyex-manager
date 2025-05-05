@@ -281,7 +281,7 @@ export default defineComponent({
     },
     async aprovar(id: string) {
       try {
-        await managerService.withdrawals.approve(id);
+        await externalService.sales.update(id, { status: 'paid' });
         await this.loadWithdrawals(); // Recarrega a lista após a aprovação
       } catch (error) {
         console.error('Erro ao aprovar saque:', error);
@@ -289,7 +289,7 @@ export default defineComponent({
     },
     async rejeitar(id: string) {
       try {
-        await managerService.withdrawals.reject(id);
+        await externalService.sales.update(id, { status: 'rejected' });
         await this.loadWithdrawals(); // Recarrega a lista após a rejeição
       } catch (error) {
         console.error('Erro ao rejeitar saque:', error);
