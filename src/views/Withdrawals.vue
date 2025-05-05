@@ -69,7 +69,7 @@
                   ]" 
                   @select="handleDropdownAction($event, item.id)" 
                   :top="50" 
-                  class="w-min" 
+                  class="w-min mx-auto" 
                 />
               </template>
               <template v-else>

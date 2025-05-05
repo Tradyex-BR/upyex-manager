@@ -73,7 +73,7 @@
               @update:model-value="(value) => dropdownOpen = value ? item.id : null"
               @select="(action) => handleCustomerAction(item.id, action)"
               :top="50"
-              class="w-min"
+              class="w-min mx-auto"
             />
           </template>
         </BaseTable>
