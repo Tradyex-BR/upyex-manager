@@ -1,8 +1,8 @@
 <template>
   <div
-    class="max-w-none flex flex-row w-full h-screen bg-[#010309] mx-auto max-md:max-w-[991px] max-md:flex-col max-sm:max-w-screen-sm"
+    class="max-w-none flex flex-row w-full h-screen bg-[#010309] mx-auto"
   >
-    <div class="flex z-[100] flex-col w-6/12 backdrop-blur-lg items-center gap-8 bg-white p-28 left-[section] max-md:w-full">
+    <div class="flex z-[100] flex-col w-6/12 backdrop-blur-lg items-center justify-center gap-8 bg-white p-28 left-[section]">
       <div class="text-center">
         <h1 class="text-[#040D25] text-[48px] leading-[56px] font-bold mb-4">404</h1>
         <h2 class="text-[#040D25] text-[32px] leading-[40px] font-semibold mb-4">

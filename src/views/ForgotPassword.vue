@@ -56,6 +56,7 @@
             type="submit"
             variant="primary"
             :loading="loading"
+            :disabled="!isEmailValid"
             class="w-full"
             @click="handleSubmit">
             {{ loading ? 'Enviando...' : 'Redefinir' }}
