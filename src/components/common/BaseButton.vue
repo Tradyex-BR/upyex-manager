@@ -2,7 +2,11 @@
   <button :type="type" :disabled="disabled" :class="[
     'flex items-center justify-center gap-3',
     'py-2 px-4 rounded',
-    'font-inter text-sm font-bold leading-6 active:border-none focus:border-none focus:outline-none',
+    'font-inter text-sm font-bold leading-6',
+    'border-0 outline-none ring-0',
+    'active:border-0 active:outline-none active:ring-0',
+    'focus:border-0 focus:outline-none focus:ring-0',
+    'hover:border-0 hover:outline-none hover:ring-0',
     'transition-all duration-200',
     'disabled:bg-[#444c5a] disabled:opacity-50 disabled:cursor-not-allowed',
     loading ? 'cursor-not-allowed' : '',

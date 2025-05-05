@@ -308,7 +308,7 @@ export const managerService = {
       await api.post(`/applications/${id}/reset-secret`);
     },
     generateAffiliateLink: async (applicationId: string): Promise<{ affiliate_link: string }> => {
-      const response = await api.get<{ affiliate_link: string }>(`/affiliate/applications/${applicationId}/affiliate-link`);
+      const response = await api.get<{ affiliate_link: string }>(`/${applicationId}/affiliate-link`);
       return response.data;
     },
   },
