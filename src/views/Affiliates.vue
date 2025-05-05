@@ -78,7 +78,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, onMounted } from 'vue'
+import { defineComponent, ref, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useDashboardStore } from '@/stores/dashboard'
 import { managerService } from '@/services/managerService'
@@ -142,7 +142,7 @@ export default defineComponent({
     BaseDropdown,
     BaseTable
   },
-  setup() {
+  setup(props) {
     const store = useDashboardStore()
     const router = useRouter()
     const loading = ref(true)
@@ -151,6 +151,11 @@ export default defineComponent({
     const showDetailsModal = ref(false)
     const selectedAffiliate = ref<Affiliate | null>(null)
     const searchQuery = ref('')
+
+    // Adicionar watch para searchTerm
+    watch(() => props.searchTerm, (newTerm) => {
+      handleSearch(newTerm)
+    })
 
     const loadAffiliates = async () => {
       try {
@@ -163,7 +168,7 @@ export default defineComponent({
         });
         affiliates.value = (response.data || response) as Affiliate[];
       } catch (e) {
-        // Trate erro se necessário
+        console.error('Erro ao carregar afiliados:', e)
       } finally {
         loading.value = false;
       }
@@ -181,7 +186,7 @@ export default defineComponent({
         });
         affiliates.value = (response.data || response) as Affiliate[];
       } catch (e) {
-        // Trate erro se necessário
+        console.error('Erro ao pesquisar afiliados:', e)
       } finally {
         loading.value = false;
       }
@@ -229,7 +234,16 @@ export default defineComponent({
     }
 
     const handleToggleStatus = async (id: string, is_active: boolean) => {
-      await store.blockAffiliate(id)
+      try {
+        if (is_active) {
+          await managerService.affiliates.approve(id);
+        } else {
+          await managerService.affiliates.block(id);
+        }
+        await loadAffiliates();
+      } catch (e) {
+        console.error('Erro ao alterar status do afiliado:', e);
+      }
     }
 
     const handleResetSecret = () => {

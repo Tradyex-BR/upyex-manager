@@ -63,7 +63,7 @@
   </template>
 
 <script setup lang="ts">
-import { computed, ref, onMounted, onUnmounted } from 'vue'
+import { computed, ref, onMounted, onUnmounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import BaseDropdown from '@/components/common/BaseDropdown.vue'
@@ -75,6 +75,27 @@ const router = useRouter()
 const authStore = useAuthStore()
 const searchQuery = ref('')
 const isDropdownOpen = ref(false)
+
+// Função de debounce
+const debounce = (fn: Function, delay: number) => {
+  let timeoutId: ReturnType<typeof setTimeout>
+  return (...args: any[]) => {
+    clearTimeout(timeoutId)
+    timeoutId = setTimeout(() => fn(...args), delay)
+  }
+}
+
+// Criar versão com debounce do emitSearch
+const debouncedEmitSearch = debounce((value: string) => {
+  if (value.trim() !== '') {
+    emit('search', value.trim())
+  }
+}, 300) // 300ms de delay
+
+// Adicionar watch para searchQuery com debounce
+watch(searchQuery, (newValue) => {
+  debouncedEmitSearch(newValue)
+})
 
 const handleDropdownAction = async (action: string) => {
   if (action === 'logout') {

@@ -665,7 +665,7 @@ export default defineComponent({
         platform_fee: '0.00'
       },
       isManager: false,
-      useMockData: true // Flag para controlar o uso do mock
+      useMockData: false // Alterado para false para usar a API real
     }
   },
   async mounted() {
