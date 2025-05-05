@@ -61,15 +61,32 @@
         <BaseButton
           type="submit"
           variant="primary"
-          :disabled="loading"
+          :disabled="!isFormValid || loading"
           :loading="loading">
           Entrar
         </BaseButton>
 
         <div class="text-center font-inter text-[14px] leading-[18px] text-[#040D25]">
-          <router-link to="/forgot-password" class="text-[#CF631C] hover:underline hover:text-[#CF631C]">
-            Esqueci minha senha
-          </router-link>
+          <div class="relative inline-block group">
+            <router-link 
+              :to="isEmailValid ? '/forgot-password' : '#'"
+              :class="[
+                'text-[#CF631C] hover:underline hover:text-[#CF631C]',
+                !isEmailValid && 'opacity-50 cursor-not-allowed pointer-events-none'
+              ]"
+              @click="handleForgotPassword"
+            >
+              Esqueci minha senha
+            </router-link>
+            <div 
+              v-if="!isEmailValid"
+              class="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-[#222A3F] text-white text-xs rounded-lg whitespace-nowrap invisible group-hover:visible transition-all duration-200 pointer-events-none z-50"
+              style="width: max-content;"
+            >
+              Digite um email válido primeiro
+              <div class="absolute top-full left-1/2 transform -translate-x-1/2 border-4 border-transparent border-t-[#222A3F]"></div>
+            </div>
+          </div>
         </div>
         <div v-if="error" class="text-red-600 text-sm">{{ error }}</div>
       </div>
@@ -78,7 +95,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, watch } from 'vue'
+import { ref, onMounted, watch, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import BaseButton from '@/components/common/BaseButton.vue'
@@ -99,6 +116,21 @@ const roles = [
 const role = ref<'MANAGER' | 'AFFILIATE'>('MANAGER')
 const loading = ref(false)
 const error = ref('')
+
+const isEmailValid = computed(() => {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+  return emailRegex.test(email.value)
+})
+
+const isFormValid = computed(() => {
+  return isEmailValid.value && password.value.length > 0
+})
+
+const handleForgotPassword = () => {
+  if (isEmailValid.value) {
+    window.localStorage.setItem('recoveryEmail', email.value)
+  }
+}
 
 const authStore = useAuthStore()
 

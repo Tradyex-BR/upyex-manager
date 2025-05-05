@@ -79,7 +79,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, watch } from 'vue'
+import { ref, onMounted, watch, onUnmounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import LoginBackground from '@/components/layout/login/LoginBackground.vue'
 import VerticalLines from '@/components/layout/login/VerticalLines.vue'
@@ -98,17 +98,32 @@ const loading = ref(false)
 const error = ref('')
 const message = ref('')
 
-// Carregar o último tipo de usuário selecionado
+const isEmailValid = computed(() => {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+  return emailRegex.test(email.value)
+})
+
+// Carregar o último tipo de usuário selecionado e email
 onMounted(() => {
-  const savedRole = localStorage.getItem('userRole')
+  const savedRole = window.localStorage.getItem('userRole')
   if (savedRole) {
     role.value = savedRole
+  }
+
+  const savedEmail = window.localStorage.getItem('recoveryEmail')
+  if (savedEmail) {
+    email.value = savedEmail
   }
 })
 
 // Salvar o tipo de usuário no localStorage quando alterado
 watch(role, (newRole) => {
-  localStorage.setItem('userRole', newRole)
+  window.localStorage.setItem('userRole', newRole)
+})
+
+// Limpar o email do localStorage quando o componente for desmontado
+onUnmounted(() => {
+  window.localStorage.removeItem('recoveryEmail')
 })
 
 const emailIcon = `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -117,6 +132,11 @@ const emailIcon = `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" x
 </svg>`
 
 const handleSubmit = async () => {
+  if (!isEmailValid.value) {
+    error.value = 'Por favor, insira um email válido'
+    return
+  }
+
   error.value = ''
   message.value = ''
   loading.value = true
