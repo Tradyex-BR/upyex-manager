@@ -31,14 +31,10 @@
               required
               :disabled="loading"
             />
-            <button 
-              type="button" 
-              :aria-label="showPassword ? 'Hide password' : 'Show password'"
-              class="p-0 bg-transparent border-none outline-none transition-all duration-300 hover:bg-[#b8b8b82f]"
-              @click="showPassword = !showPassword"
-            >
-              <EyeIcon></EyeIcon>
-            </button>
+            <PasswordVisibilityIcon 
+              :is-visible="showPassword"
+              @toggle="showPassword = !showPassword"
+            />
           </div>
         </div>
         
@@ -89,7 +85,7 @@ import BaseButton from '@/components/common/BaseButton.vue'
 import BaseDropdown from '@/components/common/BaseDropdown.vue'
 import EmailIcon from '@/components/common/icons/EmailIcon.vue'
 import PasswordIcon from '@/components/common/icons/PasswordIcon.vue'
-import EyeIcon from '@/components/common/icons/EyeIcon.vue'
+import PasswordVisibilityIcon from '@/components/common/icons/PasswordVisibilityIcon.vue'
 import ChevronDownIcon from '@/components/common/icons/ChevronDownIcon.vue'
 
 const router = useRouter()
