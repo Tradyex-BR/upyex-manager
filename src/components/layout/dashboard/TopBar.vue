@@ -25,7 +25,7 @@
                 }
               ]"
               v-model="isDropdownOpen"
-              :top="75"
+              :top="65"
               @select="handleDropdownAction"
               class="flex items-center w-full outline-none border-none focus:outline-none focus:ring-0 p-0"
             >

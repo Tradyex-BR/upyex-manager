@@ -44,10 +44,20 @@
         
         <div class="flex flex-col gap-1">
           <label class="text-[14px] font-medium">Tipo de usuário <span class="text-[#BE3E37]">*</span></label>
-          <select v-model="role" :disabled="loading"
-            class="h-[56px] px-3 py-4 border border-[#B8B8B8] rounded-lg outline-none bg-white">
-            <option v-for="r in roles" :key="r" :value="r">{{ r }}</option>
-          </select>
+          <BaseDropdown
+            :options="roles.map(r => ({ text: r, action: r }))"
+            :model-value="!!role"
+            @select="role = $event"
+            variant="light"
+            :top="60"
+          >
+            <template #trigger>
+              <div class="h-[56px] px-3 py-4 border border-[#B8B8B8] rounded-lg outline-none bg-white flex items-center justify-between">
+                <span class="font-inter text-[#222A3F] leading-5">{{ role }}</span>
+                <ChevronDownIcon class="w-5 h-5 text-[#222A3F]" />
+              </div>
+            </template>
+          </BaseDropdown>
         </div>
       </div>
 
@@ -76,9 +86,11 @@ import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import BaseButton from '@/components/common/BaseButton.vue'
+import BaseDropdown from '@/components/common/BaseDropdown.vue'
 import EmailIcon from '@/components/common/icons/EmailIcon.vue'
 import PasswordIcon from '@/components/common/icons/PasswordIcon.vue'
 import EyeIcon from '@/components/common/icons/EyeIcon.vue'
+import ChevronDownIcon from '@/components/common/icons/ChevronDownIcon.vue'
 
 const router = useRouter()
 const email = ref('')

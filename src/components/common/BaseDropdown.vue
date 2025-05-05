@@ -1,19 +1,31 @@
 <template>
-  <div class="relative" ref="dropdownRef">
+  <div class="relative w-full" ref="dropdownRef">
     <button
-      class="outline-none border-none bg-transparent cursor-pointer w-full focus:outline-none focus:ring-0 ring-0"
+      type="button"
+      class="p-0 outline-none border-none bg-transparent cursor-pointer w-full focus:outline-none focus:ring-0 ring-0"
       @click="toggleDropdown">
       <slot name="trigger">
         <MenuIcon />
       </slot>
     </button>
     <div v-if="isOpen"
-      class="absolute right-0 w-48 bg-[#222A3F] rounded-lg shadow-lg z-10"
+      class="absolute right-0 rounded-lg shadow-lg z-10"
+      :class="[
+        variant === 'light' 
+          ? 'w-full bg-white border border-[#B8B8B8] shadow-md' 
+          : 'w-48 bg-[#222A3F]'
+      ]"
       :style="{ top: `${top}px` }">
       <button 
         v-for="(option, index) in options" 
         :key="index"
-        class="w-full flex items-center gap-[10px] p-3 hover:bg-[#2A2F4C] transition-colors font-inter text-[14px] font-normal leading-[18px] text-white bg-[#222A3F]"
+        type="button"
+        class="w-full flex items-center gap-[10px] p-3 transition-colors font-inter text-[14px] font-normal leading-[18px] text-left"
+        :class="[
+          variant === 'light'
+            ? ' text-[#222A3F] hover:bg-black hover:bg-opacity-5 active:bg-black active:bg-opacity-10'
+            : 'text-white hover:bg-[#2A2F4C] bg-[#222A3F]'
+        ]"
         @click="handleOptionClick(option)">
         <template v-if="option.icon">
           <component 
@@ -56,6 +68,10 @@ export default defineComponent({
     top: {
       type: Number,
       default: 8 // valor padrão de 8px (equivalente ao mt-2 do Tailwind)
+    },
+    variant: {
+      type: String as () => 'default' | 'light',
+      default: 'default'
     }
   },
   emits: ['update:modelValue', 'select'],
