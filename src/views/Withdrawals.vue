@@ -161,6 +161,12 @@ const USE_MOCK_DATA = true
 
 export default defineComponent({
   name: 'Withdrawals',
+  props: {
+    searchTerm: {
+      type: String,
+      default: ''
+    }
+  },
   components: {
     Sidebar,
     TopBar,
@@ -191,6 +197,11 @@ export default defineComponent({
         links: [] as Array<any>
       },
       role
+    }
+  },
+  watch: {
+    searchTerm(newTerm) {
+      this.handleSearch(newTerm);
     }
   },
   async mounted() {
@@ -236,6 +247,59 @@ export default defineComponent({
         }
       } catch (error) {
         console.error('Erro ao carregar saques:', error);
+      } finally {
+        this.loading = false;
+      }
+    },
+    async handleSearch(term: string) {
+      this.loading = true;
+      try {
+        let response;
+
+        if (USE_MOCK_DATA) {
+          // Filtra os dados mockados
+          const filteredData = MOCK_WITHDRAWALS.data.filter(item => 
+            item.destination.toLowerCase().includes(term.toLowerCase()) ||
+            item.amount.toString().includes(term) ||
+            this.translateStatus(item.status).toLowerCase().includes(term.toLowerCase())
+          );
+          response = {
+            data: filteredData,
+            meta: MOCK_WITHDRAWALS.meta
+          };
+        } else {
+          response = await managerService.withdrawals.list({
+            search: term,
+            start_date: '',
+            end_date: '',
+            status: null,
+            method: null,
+            page: 1,
+            per_page: this.pagination.per_page,
+            sort_by: 'created_at',
+            sort_order: 'desc'
+          });
+        }
+
+        this.withdrawals = (response.data || []).map((item: any) => ({
+          id: item.id,
+          date: item.created_at ? new Date(item.created_at).toLocaleString('pt-BR') : '',
+          valueBRL: Number(item.amount).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }),
+          destination: item.destination,
+          type: item.method === 'pix' ? 'PIX' : item.method === 'crypto' ? 'Criptomoeda' : item.method,
+          status: this.translateStatus(item.status),
+          link: item.links?.frontend || ''
+        }));
+
+        if ('meta' in response) {
+          this.pagination.current_page = response.meta.current_page;
+          this.pagination.last_page = response.meta.last_page;
+          this.pagination.per_page = response.meta.per_page;
+          this.pagination.total = response.meta.total;
+          this.pagination.links = response.meta.links;
+        }
+      } catch (error) {
+        console.error('Erro ao pesquisar saques:', error);
       } finally {
         this.loading = false;
       }

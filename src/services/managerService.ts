@@ -109,6 +109,7 @@ export interface ListApplicationsResponse {
 }
 
 export interface ListWithdrawalsParams {
+  search?: string | null;
   start_date: string;
   end_date: string;
   status: string | null;

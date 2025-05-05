@@ -257,6 +257,12 @@ interface Usuario {
 
 export default defineComponent({
   name: 'Customers',
+  props: {
+    searchTerm: {
+      type: String,
+      default: ''
+    }
+  },
   components: {
     Sidebar,
     TopBar,
@@ -289,38 +295,13 @@ export default defineComponent({
       editingCustomer: null as Usuario | null
     }
   },
-  async mounted() {
-    this.loading = true
-    try {
-      const response = await managerService.customers.list({
-        search: null,
-        page: 1,
-        per_page: 10,
-        sort_by: 'created_at',
-        sort_order: 'desc'
-      });
-      this.customers = (response.data || []).map((item: any) => ({
-        id: item.id,
-        nome: item.name || '',
-        email: item.email || '',
-        status: item.application?.is_active ? 'Ativo' : 'Inativo',
-        dataCadastro: item.created_at ? new Date(item.created_at).toLocaleDateString('pt-BR') : '-',
-        ultimoAcesso: item.updated_at ? new Date(item.updated_at).toLocaleDateString('pt-BR') : '-',
-        linkApi: item.links?.api || '',
-        phone: item.phone || '',
-        document_number: item.document_number || '',
-        application: item.application || null,
-        affiliate: item.affiliate || null
-      }));
-    } catch (e) {
-      console.error('Erro ao carregar clientes:', e)
-    } finally {
-      this.loading = false
+  watch: {
+    searchTerm(newTerm) {
+      this.handleSearch(newTerm);
     }
   },
-
-  beforeUnmount() {
-    document.removeEventListener('click', () => { })
+  async mounted() {
+    await this.loadCustomers();
   },
   methods: {
     getStatusClass(status: string): string {
@@ -404,7 +385,35 @@ export default defineComponent({
         console.error('Erro ao criar cliente:', error);
       }
     },
-
+    async handleSearch(term: string) {
+      this.loading = true;
+      try {
+        const response = await managerService.customers.list({
+          search: term,
+          page: 1,
+          per_page: 10,
+          sort_by: 'created_at',
+          sort_order: 'desc'
+        });
+        this.customers = (response.data || []).map((item: any) => ({
+          id: item.id,
+          nome: item.name || '',
+          email: item.email || '',
+          aplicacao: item.application?.name || '',
+          afiliado: item.affiliate?.name || '',
+          status: item.application?.is_active ? 'Ativo' : 'Inativo',
+          dataCadastro: item.created_at ? new Date(item.created_at).toLocaleDateString('pt-BR') : '-',
+          ultimoAcesso: item.updated_at ? new Date(item.updated_at).toLocaleDateString('pt-BR') : '-',
+          linkApi: item.links?.api || '',
+          phone: item.phone || '',
+          document_number: item.document_number || ''
+        }));
+      } catch (e) {
+        console.error('Erro ao pesquisar clientes:', e);
+      } finally {
+        this.loading = false;
+      }
+    },
     async loadCustomers() {
       this.loading = true;
       try {
