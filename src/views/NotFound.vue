@@ -41,4 +41,7 @@
 import LoginBackground from '@/components/layout/login/LoginBackground.vue'
 import VerticalLines from '@/components/layout/login/VerticalLines.vue'
 import BaseButton from '@/components/common/BaseButton.vue'
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
 </script>
