@@ -78,7 +78,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import BaseButton from '@/components/common/BaseButton.vue'
@@ -110,13 +110,15 @@ onMounted(() => {
   }
 })
 
+// Salvar o tipo de usuário no localStorage quando alterado
+watch(role, (newRole) => {
+  localStorage.setItem('userRole', newRole)
+})
+
 const handleLogin = async () => {
   loading.value = true
   error.value = ''
   try {
-    // Salvar o tipo de usuário no localStorage
-    localStorage.setItem('userRole', role.value)
-    
     await authStore.login({
       email: email.value,
       password: password.value,
