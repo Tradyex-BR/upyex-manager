@@ -48,7 +48,8 @@
 
                 <template #token="{ item }">
                   <div class="flex items-center justify-center gap-3">
-                    <img :src="item.customer?.application?.logo_url || `https://ui-avatars.com/api/?name=${item.customer?.application?.name}&background=random`"
+                    <img
+                      :src="item.customer?.application?.logo_url || `https://ui-avatars.com/api/?name=${item.customer?.application?.name}&background=random`"
                       :alt="item.customer?.application?.name" class="w-8 h-8 rounded-full object-cover" />
                     <div class="flex flex-col">
                       <span class="font-inter text-[14px] font-normal leading-[18px] text-white">
@@ -71,7 +72,7 @@
                 </template>
 
                 <template #value="{ item }">
-                  {{ item.products && item.products.length ? item.products[0].price.toFixed(2) : '-' }}
+                  {{ item.products && item.products.length ? `R$ ${item.products[0].price.toFixed(2)}` : '-' }}
                 </template>
 
                 <template #updated_at="{ item }">
@@ -80,13 +81,15 @@
 
                 <template #wallet_id="{ item }">
                   <div class="flex items-center justify-center gap-2">
-                    {{ formatWalletId(item.customer?.application?.id) || '-' }} <CopyButton :stringToCopy="item.customer?.application?.id" />
+                    {{ formatWalletId(item.customer?.application?.id) || '-' }}
+                    <CopyButton :stringToCopy="item.customer?.application?.id" />
                   </div>
                 </template>
 
                 <template #transaction_id="{ item }">
                   <div class="flex items-center justify-center gap-2">
-                    {{ formatTransactionId(item.id) || '-' }} <CopyButton :stringToCopy="item.id" />
+                    {{ formatTransactionId(item.id) || '-' }}
+                    <CopyButton :stringToCopy="item.id" />
                   </div>
                 </template>
               </BaseTable>
@@ -852,7 +855,7 @@ export default defineComponent({
             response = { data: MOCK_SALES }
           } else {
             // Mock para afiliado com campos adicionais
-            response = { 
+            response = {
               data: AFFILIATE_MOCK_DATA.map(sale => ({
                 ...sale,
                 wallet_id: `WALLET-${sale.id.slice(0, 8)}`,
