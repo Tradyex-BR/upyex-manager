@@ -260,6 +260,26 @@ export const managerService = {
       const response = await api.post<Affiliate>(`/affiliates/${id}`, payload);
       return response.data;
     },
+    approve: async (id: string): Promise<Affiliate> => {
+      // Primeiro busca os dados do afiliado
+      const affiliate = await managerService.affiliates.get(id);
+      // Atualiza com todos os dados + is_active true
+      const response = await api.post<Affiliate>(`/affiliates/${id}`, {
+        ...affiliate,
+        is_active: true
+      });
+      return response.data;
+    },
+    block: async (id: string): Promise<Affiliate> => {
+      // Primeiro busca os dados do afiliado
+      const affiliate = await managerService.affiliates.get(id);
+      // Atualiza com todos os dados + is_active false
+      const response = await api.post<Affiliate>(`/affiliates/${id}`, {
+        ...affiliate,
+        is_active: false
+      });
+      return response.data;
+    },
   },
 
   applications: {

@@ -146,10 +146,10 @@ export default defineComponent({
     const store = useDashboardStore()
     const router = useRouter()
     const loading = ref(true)
-    const affiliates = ref([])
+    const affiliates = ref<Affiliate[]>([])
     const showCreateModal = ref(false)
     const showDetailsModal = ref(false)
-    const selectedAffiliate = ref(null)
+    const selectedAffiliate = ref<Affiliate | null>(null)
     const searchQuery = ref('')
 
     const loadAffiliates = async () => {
