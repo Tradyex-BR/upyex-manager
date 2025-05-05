@@ -80,7 +80,6 @@
 <script lang="ts">
 import { defineComponent, ref, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
-import { useDashboardStore } from '@/stores/dashboard'
 import { managerService } from '@/services/managerService'
 import Sidebar from '@/components/layout/dashboard/Sidebar.vue'
 import TopBar from '@/components/layout/dashboard/TopBar.vue'
@@ -143,7 +142,6 @@ export default defineComponent({
     BaseTable
   },
   setup(props) {
-    const store = useDashboardStore()
     const router = useRouter()
     const loading = ref(true)
     const affiliates = ref<Affiliate[]>([])
