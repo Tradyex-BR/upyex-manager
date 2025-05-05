@@ -85,6 +85,7 @@
         <BaseButton
           class="flex-1"
           type="submit"
+          :disabled="!isFormValid || loading"
           :loading="loading">
           {{ loading ? "Criando Cliente..." : "Criar Cliente" }}
         </BaseButton>
@@ -94,7 +95,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import BaseModal from '@/components/common/BaseModal.vue'
 import BaseButton from '@/components/common/BaseButton.vue'
 
@@ -127,7 +128,41 @@ const form = ref<CustomerFormData>({
   affiliate_code: ''
 })
 
+const isFormValid = computed(() => {
+  // Validar campos obrigatórios
+  if (!form.value.name.trim() || 
+      !form.value.email.trim() || 
+      !form.value.phone.trim() || 
+      !form.value.affiliate_code.trim()) {
+    return false
+  }
+
+  // Validar email
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+  if (!emailRegex.test(form.value.email)) {
+    return false
+  }
+
+  // Validar telefone (formato básico: (00) 00000-0000)
+  const phoneRegex = /^\(\d{2}\) \d{5}-\d{4}$/
+  if (!phoneRegex.test(form.value.phone)) {
+    return false
+  }
+
+  // Validar CPF/CNPJ (opcional, mas se preenchido deve ter formato válido)
+  if (form.value.document_number.trim()) {
+    const documentRegex = /^\d{3}\.\d{3}\.\d{3}-\d{2}$|^\d{2}\.\d{3}\.\d{3}\/\d{4}-\d{2}$/
+    if (!documentRegex.test(form.value.document_number)) {
+      return false
+    }
+  }
+
+  return true
+})
+
 const handleSubmit = async () => {
+  if (!isFormValid.value) return
+
   loading.value = true
   try {
     emit('submit', { ...form.value })

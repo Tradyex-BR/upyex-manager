@@ -102,7 +102,7 @@
         <BaseButton
           variant="primary"
           type="submit"
-          :disabled="loading"
+          :disabled="!isFormValid || loading"
           :loading="loading"
           @click="handleSubmit">
           {{ loading ? "Criando..." : "Criar Afiliado" }}
@@ -113,7 +113,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import BaseModal from '@/components/common/BaseModal.vue'
 import BaseButton from '@/components/common/BaseButton.vue'
 
@@ -142,6 +142,27 @@ const form = ref<Form>({
   applications: [
     { id: '', commission_percentage: 0.2, commission_release_days: 7 }
   ]
+})
+
+const isFormValid = computed(() => {
+  // Validar campos básicos
+  if (!form.value.name.trim() || !form.value.email.trim() || !form.value.integration_code.trim()) {
+    return false
+  }
+
+  // Validar email
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+  if (!emailRegex.test(form.value.email)) {
+    return false
+  }
+
+  // Validar aplicações
+  return form.value.applications.every(app => 
+    app.id.trim() && 
+    app.commission_percentage >= 0 && 
+    app.commission_percentage <= 1 && 
+    app.commission_release_days >= 0
+  )
 })
 
 const addApp = () => {
