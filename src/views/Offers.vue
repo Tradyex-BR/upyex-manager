@@ -1,7 +1,10 @@
 <template>
   <AuthenticatedLayout :loading="loading">
-    <div v-if="offers.length === 0" class="w-full min-h-[calc(100vh-200px)] items-center justify-center text-gray-400">
-      Nenhuma oferta encontrada.
+    <div v-if="loading" class="flex items-center justify-center py-10">
+      <span class="text-white text-lg">Carregando ofertas...</span>
+    </div>
+    <div v-else-if="offers.length === 0" class="flex w-full min-h-[200px] items-center justify-center text-gray-400 text-lg">
+      Nenhuma oferta encontrada
     </div>
     <div v-else class="overflow-visible">
       <section class="min-h-[944px] w-full overflow-visible">

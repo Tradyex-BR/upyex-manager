@@ -17,9 +17,12 @@
 
       <!-- Conteúdo condicional -->
       <div class="flex w-full min-h-[calc(100vh-200px)] justify-center text-gray-400">
-        <div v-if="loading" class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500">
+        <div v-if="loading" class="flex items-center justify-center py-10">
+          <span class="text-white text-lg">Carregando saques...</span>
         </div>
-        <div v-else-if="withdrawals.length === 0">Nenhum saque encontrado.</div>
+        <div v-else-if="withdrawals.length === 0" class="flex w-full min-h-[200px] items-center justify-center text-gray-400 text-lg">
+          Nenhum saque encontrado
+        </div>
         <div v-else class="w-full">
           <BaseTable 
             :headers="[
@@ -330,17 +333,17 @@ export default defineComponent({
       const baseClass = 'font-inter text-[14px] font-medium leading-[18px] inline-flex h-6 px-2 justify-center items-center gap-1 rounded-[6px] w-fit mx-auto'
       switch (status) {
         case 'Aprovado':
-          return `${baseClass} bg-green-500/20 text-green-500`
+          return `${baseClass} bg-green-500/20 text-green-500`;
         case 'Rejeitado':
-          return `${baseClass} bg-red-500/20 text-red-500`
+          return `${baseClass} bg-red-500/20 text-red-500`;
         case 'Processado':
-          return `${baseClass} bg-green-500/20 text-green-500`
+          return `${baseClass} bg-green-500/20 text-green-500`;
         case 'Cancelado':
-          return `${baseClass} bg-red-500/20 text-red-500`
+          return `${baseClass} bg-red-500/20 text-red-500`;
         case 'Processando':
-          return `${baseClass} bg-blue-500/20 text-blue-500`
+          return `${baseClass} bg-blue-500/20 text-blue-500`;
         default: // Solicitação
-          return `${baseClass} bg-yellow-500/20 text-yellow-500`
+          return `${baseClass} bg-yellow-500/20 text-yellow-500`;
       }
     },
     async aprovar(id: string) {

@@ -22,6 +22,7 @@
                 Nenhuma venda encontrada
               </div>
               <BaseTable 
+                v-else
                 :headers="[
                   { key: 'date', label: 'Data', align: 'left' },
                   { key: 'customer', label: 'Cliente', align: 'center' },
