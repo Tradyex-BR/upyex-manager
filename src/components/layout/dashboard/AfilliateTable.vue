@@ -7,64 +7,41 @@
       <div class="self-stretch flex w-6 shrink-0 h-6 my-auto" />
     </div>
     <div class="flex w-full text-sm text-white leading-none mt-6 max-md:max-w-full">
-      <div class="font-normal whitespace-nowrap w-[50px]">
-        <div class="self-stretch w-full gap-2.5 font-medium px-2 py-3 border-[rgba(41,51,76,1)] border-b">
-          Rank
-        </div>
-        <div
-          v-for="affiliate in affiliates"
-          :key="affiliate.rank"
-          :class="['min-h-[60px] w-full text-center px-2 py-[21px]', affiliate.rank > 1 ? 'border-[rgba(34,42,63,1)] border-t' : '']"
-        >
-          {{ affiliate.rank }}
-        </div>
-      </div>
-      <div class="flex-1 shrink basis-[0%]">
-        <div class="self-stretch w-full gap-2.5 font-medium whitespace-nowrap px-4 py-3 border-[rgba(41,51,76,1)] border-b">
-          Afiliados
-        </div>
-        <div
-          v-for="affiliate in affiliates"
-          :key="affiliate.rank"
-          :class="['flex w-full flex-col justify-center pl-3 py-3', affiliate.rank > 1 ? 'border-[rgba(34,42,63,1)] border-t' : '']"
-        >
+      <BaseTable 
+        :headers="[
+          { key: 'rank', label: 'Rank', align: 'center' },
+          { key: 'name', label: 'Afiliados', align: 'left' },
+          { key: 'volume', label: 'Volume', align: 'center' },
+          { key: 'total_value', label: 'Valor total', align: 'center' }
+        ]"
+        :items="affiliates"
+      >
+        <template #rank="{ item }">
+          {{ item.rank }}
+        </template>
+        
+        <template #name="{ item }">
           <div class="flex items-center gap-3">
             <img
-              :src="affiliate.avatar"
+              :src="item.avatar"
               class="aspect-[1] object-contain w-8 self-stretch shrink-0 my-auto"
-              :alt="affiliate.name"
+              :alt="item.name"
             />
             <div class="self-stretch w-[99px] my-auto">
-              <div class="font-medium">{{ affiliate.name }}</div>
-              <div class="font-normal">{{ affiliate.username }}</div>
+              <div class="font-medium">{{ item.name }}</div>
+              <div class="font-normal">{{ item.username }}</div>
             </div>
           </div>
-        </div>
-      </div>
-      <div class="font-normal flex-1 shrink basis-[0%]">
-        <div class="text-center self-stretch w-full gap-2.5 font-medium whitespace-nowrap px-4 py-3 border-[rgba(41,51,76,1)] border-b">
-          Volume
-        </div>
-        <div
-          v-for="affiliate in affiliates"
-          :key="affiliate.rank"
-          :class="['min-h-[60px] w-full text-center px-3 py-[21px]', affiliate.rank > 1 ? 'border-[rgba(34,42,63,1)] border-t' : '']"
-        >
-          {{ affiliate.volume }}
-        </div>
-      </div>
-      <div class="font-normal flex-1 shrink basis-[0%]">
-        <div class="text-center self-stretch w-full gap-2.5 font-medium px-4 py-3 border-[rgba(41,51,76,1)] border-b">
-          Valor total
-        </div>
-        <div
-          v-for="affiliate in affiliates"
-          :key="affiliate.rank"
-          :class="['min-h-[60px] w-full text-center px-3 py-[21px]', affiliate.rank > 1 ? 'border-[rgba(34,42,63,1)] border-t' : '']"
-        >
-          {{ affiliate.totalValue }}
-        </div>
-      </div>
+        </template>
+        
+        <template #volume="{ item }">
+          {{ item.volume }}
+        </template>
+        
+        <template #total_value="{ item }">
+          {{ item.totalValue }}
+        </template>
+      </BaseTable>
     </div>
   </div>
 </template>

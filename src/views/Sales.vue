@@ -21,96 +21,57 @@
                 class="flex w-full min-h-[200px] items-center justify-center text-gray-400 text-lg">
                 Nenhuma venda encontrada
               </div>
-              <table v-else class="w-full text-white border-collapse">
-                <thead>
-                  <tr class="bg-[#1A1F3C]">
-                    <template v-if="isManager">
-                      <th class="p-4 text-left font-inter text-[14px] font-medium leading-[18px] text-white">Data</th>
-                      <th class="p-4 text-center font-inter text-[14px] font-medium leading-[18px] text-white">Cliente</th>
-                      <th class="p-4 text-center font-inter text-[14px] font-medium leading-[18px] text-white">Token</th>
-                      <th class="p-4 text-center font-inter text-[14px] font-medium leading-[18px] text-white">Status</th>
-                      <th class="p-4 text-center font-inter text-[14px] font-medium leading-[18px] text-white">Método de Pagamentos</th>
-                      <th class="p-4 text-center font-inter text-[14px] font-medium leading-[18px] text-white">Volume</th>
-                      <th class="p-4 text-center font-inter text-[14px] font-medium leading-[18px] text-white">Valor BRL</th>
-                    </template>
-                    <template v-else>
-                      <th class="p-4 text-left font-inter text-[14px] font-medium leading-[18px] text-white">Data</th>
-                      <th class="p-4 text-center font-inter text-[14px] font-medium leading-[18px] text-white">Token</th>
-                      <th class="p-4 text-center font-inter text-[14px] font-medium leading-[18px] text-white">Última Atualização</th>
-                      <th class="p-4 text-center font-inter text-[14px] font-medium leading-[18px] text-white">Valor BRL</th>
-                      <th class="p-4 text-center font-inter text-[14px] font-medium leading-[18px] text-white">Status</th>
-                      <th class="p-4 text-center font-inter text-[14px] font-medium leading-[18px] text-white">Carteira</th>
-                      <th class="p-4 text-center font-inter text-[14px] font-medium leading-[18px] text-white">ID Transação</th>
-                    </template>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr v-for="sale in sales" :key="sale.id" class="border-b border-[#1A1F3C]">
-                    <template v-if="isManager">
-                      <td class="p-4 font-inter text-[14px] font-normal leading-[18px] text-white">{{ new
-                        Date(sale.created_at).toLocaleDateString('pt-BR') }}</td>
-                      <td class="p-4 text-center font-inter text-[14px] font-normal leading-[18px] text-white">{{
-                        sale.customer?.name }}</td>
-                      <td class="p-4 text-center">
-                        <div class="flex items-center justify-center gap-3">
-                          <img
-                            :src="sale.token ? `https://ui-avatars.com/api/?name=${sale.token}&background=random` : ''"
-                            :alt="sale.token" class="w-8 h-w-8 rounded-full object-cover" />
-                          <div class="flex flex-col">
-                            <span class="font-inter text-[14px] font-normal leading-[18px] text-white">{{ sale.token ||
-                              '-' }}</span>
-                          </div>
-                        </div>
-                      </td>
-                      <td class="p-4 text-center">
-                        <span :class="getStatusClass(sale.status)">{{ mapStatus(sale.status) }}</span>
-                      </td>
-                      <td class="p-4 text-center font-inter text-[14px] font-normal leading-[18px] text-white">{{
-                        sale.payment_method }}</td>
-                      <td class="p-4 text-center font-inter text-[14px] font-normal leading-[18px] text-white">{{
-                        sale.products && sale.products.length ? sale.products[0].amount : '-' }}</td>
-                      <td class="p-4 text-center font-inter text-[14px] font-normal leading-[18px] text-white">R$ {{
-                        sale.products && sale.products.length ? sale.products[0].price.toFixed(2) : '-' }}</td>
-                    </template>
-                    <template v-else>
-                      <td class="p-4 font-inter text-[14px] font-normal leading-[18px] text-white">{{ new
-                        Date(sale.created_at).toLocaleDateString('pt-BR') }}</td>
-                      <td class="p-4 text-center">
-                        <div class="flex items-center justify-center gap-3">
-                          <img
-                            :src="sale.token ? `https://ui-avatars.com/api/?name=${sale.token}&background=random` : ''"
-                            :alt="sale.token" class="w-8 h-8 rounded-full object-cover" />
-                          <div class="flex flex-col">
-                            <span class="font-inter text-[14px] font-normal leading-[18px] text-white">{{ sale.token ||
-                              '-' }}</span>
-                          </div>
-                        </div>
-                      </td>
-                      <td class="p-4 text-center font-inter text-[14px] font-normal leading-[18px] text-white">{{ new
-                        Date(sale.updated_at).toLocaleDateString('pt-BR') }}</td>
-                      <td class="p-4 text-center font-inter text-[14px] font-normal leading-[18px] text-white">R$ {{
-                        sale.products && sale.products.length ? sale.products[0].price.toFixed(2) : '-' }}</td>
-                      <td class="p-4 text-center">
-                        <span :class="getStatusClass(sale.status)">{{ mapStatus(sale.status) }}</span>
-                      </td>
-                      <td class="p-4 text-center">
-                        <div class="flex items-center justify-center gap-2">
-                          <span class="font-inter text-[14px] font-normal leading-[18px] text-white">{{
-                            formatWalletId(sale.customer?.external_id) || '-' }}</span>
-                          <CopyButton v-if="sale.customer?.external_id" :stringToCopy="sale.customer.external_id" />
-                        </div>
-                      </td>
-                      <td class="p-4 text-center">
-                        <div class="flex items-center justify-center gap-2">
-                          <span class="font-inter text-[14px] font-normal leading-[18px] text-white">{{
-                            formatTransactionId(sale.id) }}</span>
-                          <CopyButton :stringToCopy="sale.id" />
-                        </div>
-                      </td>
-                    </template>
-                  </tr>
-                </tbody>
-              </table>
+              <BaseTable 
+                :headers="[
+                  { key: 'date', label: 'Data', align: 'left' },
+                  { key: 'customer', label: 'Cliente', align: 'center' },
+                  { key: 'token', label: 'Token', align: 'center' },
+                  { key: 'status', label: 'Status', align: 'center' },
+                  { key: 'payment_method', label: 'Método de Pagamentos', align: 'center' },
+                  { key: 'volume', label: 'Volume', align: 'center' },
+                  { key: 'value', label: 'Valor BRL', align: 'center' }
+                ]"
+                :items="sales"
+              >
+                <template #date="{ item }">
+                  {{ new Date(item.created_at).toLocaleDateString('pt-BR') }}
+                </template>
+                
+                <template #customer="{ item }">
+                  {{ item.customer?.name }}
+                </template>
+                
+                <template #token="{ item }">
+                  <div class="flex items-center justify-center gap-3">
+                    <img
+                      :src="item.token ? `https://ui-avatars.com/api/?name=${item.token}&background=random` : ''"
+                      :alt="item.token" 
+                      class="w-8 h-w-8 rounded-full object-cover" 
+                    />
+                    <div class="flex flex-col">
+                      <span class="font-inter text-[14px] font-normal leading-[18px] text-white">
+                        {{ item.token || '-' }}
+                      </span>
+                    </div>
+                  </div>
+                </template>
+                
+                <template #status="{ item }">
+                  <span :class="getStatusClass(item.status)">{{ mapStatus(item.status) }}</span>
+                </template>
+                
+                <template #payment_method="{ item }">
+                  {{ item.payment_method }}
+                </template>
+                
+                <template #volume="{ item }">
+                  {{ item.products && item.products.length ? item.products[0].amount : '-' }}
+                </template>
+                
+                <template #value="{ item }">
+                  {{ item.products && item.products.length ? item.products[0].price.toFixed(2) : '-' }}
+                </template>
+              </BaseTable>
             </div>
           </section>
         </div>
@@ -523,6 +484,7 @@ import MenuIcon from '@/components/icons/MenuIcon.vue'
 import CopyIcon from '@/components/icons/CopyIcon.vue'
 import CopyButton from '@/components/common/CopyButton.vue'
 import { formatWalletId as formatWalletIdUtil, formatTransactionId as formatTransactionIdUtil } from '@/utils/formatters'
+import BaseTable from '@/components/common/BaseTable.vue'
 
 // Mock de dados para desenvolvimento
 const MOCK_SALES = [
@@ -631,7 +593,8 @@ export default defineComponent({
     BaseButton,
     MenuIcon,
     CopyIcon,
-    CopyButton
+    CopyButton,
+    BaseTable
   },
   setup() {
     const store = useDashboardStore()

@@ -12,86 +12,43 @@
           </BaseButton>
         </div>
         <div>
-          <table class="w-full text-white border-collapse">
-            <thead>
-              <tr class="bg-[#1A1F3C]">
-                <template v-if="role === 'manager'">
-                  <th class="p-4 text-left font-inter text-[14px] font-medium leading-[18px] text-white">Nome</th>
-                  <th class="p-4 text-center font-inter text-[14px] font-medium leading-[18px] text-white">ID de
-                    Afiliado</th>
-                  <th class="p-4 text-center font-inter text-[14px] font-medium leading-[18px] text-white">Data de
-                    Cadastro</th>
-                  <th class="p-4 text-center font-inter text-[14px] font-medium leading-[18px] text-white">Status</th>
-                </template>
-                <template v-else>
-                  <th class="p-4 text-left font-inter text-[14px] font-medium leading-[18px] text-white">Nome</th>
-                  <th class="p-4 text-center font-inter text-[14px] font-medium leading-[18px] text-white">Status</th>
-                  <th class="p-4 text-center font-inter text-[14px] font-medium leading-[18px] text-white">Link direto
-                  </th>
-                </template>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="offer in offers" :key="offer.id"
-                class="border-b border-[#1A1F3C] hover:bg-[#2A2F4C] transition-colors">
-                <template v-if="role === 'manager'">
-                  <td class="p-4">
-                    <div class="flex items-center gap-3">
-                      <img :src="offer.logo_url || `https://ui-avatars.com/api/?name=${offer.name}&background=random`"
-                        :alt="offer.name" class="w-8 h-8 rounded-full object-cover" />
-                      <div class="flex flex-col">
-                        <span class="font-inter text-[14px] font-normal leading-[18px] text-white">{{ offer.name
-                          }}</span>
-                      </div>
-                    </div>
-                  </td>
-                  <td class="p-4 text-center">
-                    <span class="font-inter text-[14px] font-normal leading-[18px] text-white">{{ offer.id }}</span>
-                  </td>
-                  <td class="p-4 text-center">
-                    <div class="flex items-center justify-center gap-2">
-                      <i class="fas fa-calendar text-[#CF631C]"></i>
-                      <span class="font-inter text-[14px] font-normal leading-[18px] text-white">{{ new
-                        Date(offer.created_at).toLocaleDateString('pt-BR') }}</span>
-                    </div>
-                  </td>
-                  <td class="p-4 text-center">
-                    <span :class="getStatusClass(offer.is_active)">
-                      <i :class="['fas mr-2', offer.is_active ? 'fa-check-circle' : 'fa-ban']"></i>
-                      {{ offer.is_active ? 'Ativa' : 'Inativa' }}
-                    </span>
-                  </td>
-                </template>
-                <template v-else>
-                  <td class="p-4">
-                    <div class="flex items-center gap-3">
-                      <img :src="offer.logo_url || `https://ui-avatars.com/api/?name=${offer.name}&background=random`"
-                        :alt="offer.name" class="w-8 h-8 rounded-full object-cover" />
-                      <div class="flex flex-col">
-                        <span class="font-inter text-[14px] font-normal leading-[18px] text-white">{{ offer.name
-                          }}</span>
-                        <span class="font-inter text-[14px] font-normal leading-[18px] text-white">{{
-                          offer.description }}</span>
-                      </div>
-                    </div>
-                  </td>
-                  <td class="p-4 text-center">
-                    <span :class="getStatusClass(offer.is_active)">
-                      {{ offer.is_active ? 'Ativa' : 'Inativa' }}
-                    </span>
-                  </td>
-                  <td class="p-4 text-center">
-                    <div class="flex items-center justify-center gap-2">
-                      <span
-                        class="font-inter text-[14px] font-normal leading-[18px] text-white truncate max-w-[200px]">{{
-                          formatLink(offer.affiliate_link) }}</span>
-                      <CopyButton :stringToCopy="offer.affiliate_link" />
-                    </div>
-                  </td>
-                </template>
-              </tr>
-            </tbody>
-          </table>
+          <BaseTable 
+            :headers="[
+              { key: 'name', label: 'Nome', align: 'left' },
+              { key: 'status', label: 'Status', align: 'center' },
+              { key: 'link', label: 'Link direto', align: 'center' }
+            ]"
+            :items="offers"
+          >
+            <template #name="{ item }">
+              <div class="flex items-center gap-3">
+                <img 
+                  :src="item.logo_url || `https://ui-avatars.com/api/?name=${item.name}&background=random`"
+                  :alt="item.name" 
+                  class="w-8 h-8 rounded-full object-cover" 
+                />
+                <div class="flex flex-col">
+                  <span class="font-inter text-[14px] font-normal leading-[18px] text-white">{{ item.name }}</span>
+                  <span class="font-inter text-[14px] font-normal leading-[18px] text-white">{{ item.description }}</span>
+                </div>
+              </div>
+            </template>
+            
+            <template #status="{ item }">
+              <span :class="getStatusClass(item.is_active)">
+                {{ item.is_active ? 'Ativa' : 'Inativa' }}
+              </span>
+            </template>
+            
+            <template #link="{ item }">
+              <div class="flex items-center justify-center gap-2">
+                <span class="font-inter text-[14px] font-normal leading-[18px] text-white truncate max-w-[200px]">
+                  {{ formatLink(item.affiliate_link) }}
+                </span>
+                <CopyButton :stringToCopy="item.affiliate_link" />
+              </div>
+            </template>
+          </BaseTable>
         </div>
       </section>
     </div>  
@@ -257,6 +214,7 @@ import { useRouter } from 'vue-router'
 import { useToast } from 'vue-toastification'
 import CopyButton from '@/components/common/CopyButton.vue'
 import { formatLink } from '@/utils/formatters'
+import BaseTable from '@/components/common/BaseTable.vue'
 
 export default defineComponent({
   props: {
@@ -270,7 +228,8 @@ export default defineComponent({
     AuthenticatedLayout,
     BaseButton,
     CopyButton,
-    GenerateLinkModal
+    GenerateLinkModal,
+    BaseTable
   },
   setup() {
     const store = useDashboardStore()

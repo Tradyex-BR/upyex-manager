@@ -102,44 +102,38 @@
             </h2>
             <span class="text-gray-400">{{ offer?.affiliates?.length || 0 }} afiliados</span>
           </div>
-          <div class="overflow-x-auto">
-            <table class="w-full text-white">
-              <thead>
-                <tr class="bg-[#1a1a2a]">
-                  <th class="p-4 text-left">Nome</th>
-                  <th class="p-4 text-left">Email</th>
-                  <th class="p-4 text-left">Código</th>
-                  <th class="p-4 text-left">Status</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-for="affiliate in offer?.affiliates" :key="affiliate.id" class="border-b border-[#2A2F4C]">
-                  <td class="p-4">
-                    <div class="flex items-center gap-3">
-                      <img 
-                        :src="affiliate.avatar_path || `https://ui-avatars.com/api/?name=${affiliate.name}&background=random`" 
-                        :alt="affiliate.name" 
-                        class="w-8 h-8 rounded-full object-cover"
-                      />
-                      <span>{{ affiliate.name }}</span>
-                    </div>
-                  </td>
-                  <td class="p-4">{{ affiliate.email }}</td>
-                  <td class="p-4">{{ affiliate.integration_code }}</td>
-                  <td class="p-4">
-                    <span :class="[
-                      'px-2 py-1 rounded-full text-sm',
-                      affiliate.is_active 
-                        ? 'bg-green-500/20 text-green-500' 
-                        : 'bg-red-500/20 text-red-500'
-                    ]">
-                      {{ affiliate.is_active ? 'Ativo' : 'Inativo' }}
-                    </span>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+          <BaseTable 
+            :headers="[
+              { key: 'name', label: 'Nome', align: 'left' },
+              { key: 'email', label: 'Email', align: 'left' },
+              { key: 'code', label: 'Código', align: 'left' },
+              { key: 'status', label: 'Status', align: 'left' }
+            ]"
+            :items="offer?.affiliates || []"
+          >
+            <template #name="{ item }">
+              {{ item.name }}
+            </template>
+            
+            <template #email="{ item }">
+              {{ item.email }}
+            </template>
+            
+            <template #code="{ item }">
+              {{ item.integration_code }}
+            </template>
+            
+            <template #status="{ item }">
+              <span :class="[
+                'px-2 py-1 rounded-full text-sm',
+                item.is_active 
+                  ? 'bg-green-500/20 text-green-500' 
+                  : 'bg-red-500/20 text-red-500'
+              ]">
+                {{ item.is_active ? 'Ativo' : 'Inativo' }}
+              </span>
+            </template>
+          </BaseTable>
         </div>
 
         <!-- Botões de Ação -->
@@ -164,9 +158,13 @@
 import { defineComponent, ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { managerService } from '@/services/managerService'
+import BaseTable from '@/components/BaseTable.vue'
 
 export default defineComponent({
   name: 'EditOffer',
+  components: {
+    BaseTable
+  },
   setup() {
     const route = useRoute()
     const router = useRouter()

@@ -13,60 +13,70 @@
           class="flex w-full min-h-[200px] items-center justify-center text-gray-400 text-lg">
           Nenhum cliente encontrado
         </div>
-        <table v-else class="w-full text-white border-collapse">
-          <thead>
-            <tr class="bg-[#1A1F3C]">
-              <th class="p-4 text-left font-inter text-[14px] font-medium leading-[18px] text-white">Nome</th>
-              <th class="p-4 text-center font-inter text-[14px] font-medium leading-[18px] text-white">Email</th>
-              <th class="p-4 text-center font-inter text-[14px] font-medium leading-[18px] text-white">Status</th>
-              <th class="p-4 text-center font-inter text-[14px] font-medium leading-[18px] text-white">Data de cadastro</th>
-              <th class="p-4 text-center font-inter text-[14px] font-medium leading-[18px] text-white">Último acesso</th>
-              <th class="p-4 text-center font-inter text-[14px] font-medium leading-[18px] text-white">Ações</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="usuario in customers" :key="usuario.id" class="border-b border-[#1A1F3C]">
-              <td class="p-4 font-inter text-[14px] font-normal leading-[18px] text-white">{{ usuario.nome }}</td>
-              <td class="p-4 text-center font-inter text-[14px] font-normal leading-[18px] text-white">{{ usuario.email }}</td>
-              <td class="p-4 text-center">
-                <span :class="getStatusClass(usuario.status)">{{ usuario.status }}</span>
-              </td>
-              <td class="p-4 text-center font-inter text-[14px] font-normal leading-[18px] text-white">{{ usuario.dataCadastro }}</td>
-              <td class="p-4 text-center font-inter text-[14px] font-normal leading-[18px] text-white">{{ usuario.ultimoAcesso }}</td>
-              <td class="p-4 flex items-center justify-center text-center ">
-                <BaseDropdown
-                  :options="[
-                    {
-                      text: usuario.status === 'Ativo' ? 'Bloquear' : 'Desbloquear',
-                      icon: 'fa-ban',
-                      action: 'bloquear'
-                    },
-                    {
-                      text: 'Editar Permissão',
-                      icon: 'fa-key',
-                      action: 'editar_permissao'
-                    },
-                    {
-                      text: 'Resetar Senha',
-                      icon: 'fa-key',
-                      action: 'resetar_senha'
-                    },
-                    {
-                      text: 'Excluir',
-                      icon: 'fa-trash-alt',
-                      action: 'excluir'
-                    }
-                  ]"
-                  :model-value="dropdownOpen === usuario.id"
-                  @update:model-value="(value) => dropdownOpen = value ? usuario.id : null"
-                  @select="(action) => handleCustomerAction(usuario.id, action)"
-                  :top="50"
-                  class="w-min"
-                />
-              </td>
-            </tr>
-          </tbody>
-        </table>
+        <BaseTable 
+          v-else
+          :headers="[
+            { key: 'name', label: 'Nome', align: 'left' },
+            { key: 'email', label: 'Email', align: 'center' },
+            { key: 'status', label: 'Status', align: 'center' },
+            { key: 'created_at', label: 'Data de cadastro', align: 'center' },
+            { key: 'last_access', label: 'Último acesso', align: 'center' },
+            { key: 'actions', label: 'Ações', align: 'center' }
+          ]"
+          :items="customers"
+        >
+          <template #name="{ item }">
+            {{ item.nome }}
+          </template>
+          
+          <template #email="{ item }">
+            {{ item.email }}
+          </template>
+          
+          <template #status="{ item }">
+            <span :class="getStatusClass(item.status)">{{ item.status }}</span>
+          </template>
+          
+          <template #created_at="{ item }">
+            {{ item.dataCadastro }}
+          </template>
+          
+          <template #last_access="{ item }">
+            {{ item.ultimoAcesso }}
+          </template>
+          
+          <template #actions="{ item }">
+            <BaseDropdown
+              :options="[
+                {
+                  text: item.status === 'Ativo' ? 'Bloquear' : 'Desbloquear',
+                  icon: 'fa-ban',
+                  action: 'bloquear'
+                },
+                {
+                  text: 'Editar Permissão',
+                  icon: 'fa-key',
+                  action: 'editar_permissao'
+                },
+                {
+                  text: 'Resetar Senha',
+                  icon: 'fa-key',
+                  action: 'resetar_senha'
+                },
+                {
+                  text: 'Excluir',
+                  icon: 'fa-trash-alt',
+                  action: 'excluir'
+                }
+              ]"
+              :model-value="dropdownOpen === item.id"
+              @update:model-value="(value) => dropdownOpen = value ? item.id : null"
+              @select="(action) => handleCustomerAction(item.id, action)"
+              :top="50"
+              class="w-min"
+            />
+          </template>
+        </BaseTable>
       </div>
     </section>
 
@@ -221,6 +231,7 @@ import CreateCustomerModal from '@/components/customers/CreateCustomerModal.vue'
 import { useRouter } from 'vue-router'
 import MenuIcon from '@/components/icons/MenuIcon.vue'
 import BaseDropdown from '@/components/common/BaseDropdown.vue'
+import BaseTable from '@/components/common/BaseTable.vue'
 // Função para gerar ID único
 function generateUniqueId(): string {
   return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
@@ -254,7 +265,8 @@ export default defineComponent({
     BaseModal,
     CreateCustomerModal,
     MenuIcon,
-    BaseDropdown
+    BaseDropdown,
+    BaseTable
   },
   setup() {
     const router = useRouter()

@@ -72,14 +72,6 @@ const routes: Array<RouteRecordRaw> = [
     }
   },
   {
-    path: '/offers/:id/edit',
-    name: 'edit-offer',
-    component: EditOffer,
-    meta: {
-      requiresAuth: true
-    }
-  },
-  {
     path: '/withdrawals',
     name: 'Withdrawals',
     component: () => import('../views/Withdrawals.vue'),
@@ -89,24 +81,6 @@ const routes: Array<RouteRecordRaw> = [
     path: '/customers',
     name: 'Customers',
     component: () => import('../views/Customers.vue'),
-    meta: { requiresAuth: true }
-  },
-  {
-    path: '/customers/:id',
-    name: 'CustomerDetail',
-    component: () => import('../views/CustomerDetail.vue'),
-    meta: { requiresAuth: true }
-  },
-  {
-    path: '/customers/:id/edit',
-    name: 'edit-customer',
-    component: EditCustomer,
-    meta: { requiresAuth: true }
-  },
-  {
-    path: '/affiliates/:id/edit',
-    name: 'edit-affiliate',
-    component: EditAffiliate,
     meta: { requiresAuth: true }
   },
   {

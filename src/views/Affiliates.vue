@@ -14,57 +14,61 @@
         <div v-if="affiliates.length === 0" class="flex w-full h-full items-center justify-center text-gray-400">
           Nenhum afiliado encontrado.
         </div>
-        <table v-else class="w-full text-white border-collapse">
-          <thead>
-            <tr class="bg-[#1A1F3C]">
-              <th class="p-4 text-left font-inter text-[14px] font-medium leading-[18px] text-white">Nome</th>
-              <th class="p-4 text-center font-inter text-[14px] font-medium leading-[18px] text-white">ID de Afiliado
-              </th>
-              <th class="p-4 text-center font-inter text-[14px] font-medium leading-[18px] text-white">Data de cadastro
-              </th>
-              <th class="p-4 text-center font-inter text-[14px] font-medium leading-[18px] text-white">Status</th>
-              <th class="p-4 text-center font-inter text-[14px] font-medium leading-[18px] text-white">Ações</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="affiliate in affiliates" :key="affiliate.id" class="border-b border-[#1A1F3C]">
-              <td class="p-4 flex items-center gap-2">
-                <img :src="`https://ui-avatars.com/api/?name=${affiliate.name}&background=random`" :alt="affiliate.name"
-                  class="w-8 h-w-8 rounded-full" />
-                <p class="font-inter text-[14px] font-normal leading-[18px] text-white">{{ affiliate.name }}</p>
-              </td>
-              <td class="p-4 text-center">
-                <span class="font-inter text-[14px] font-normal leading-[18px] text-white">{{ affiliate.id }}</span>
-              </td>
-              <td class="p-4 text-center font-inter text-[14px] font-normal leading-[18px] text-white">{{ new
-                Date(affiliate.created_at).toLocaleDateString('pt-BR') }}</td>
-              <td class="p-4 text-center">
-                <span :class="getStatusClass(affiliate.is_active ? 'Ativo' : 'Inativo')">
-                  {{ affiliate.is_active ? 'Ativo' : 'Inativo' }}
-                </span>
-              </td>
-              <td class="p-4 text-center flex items-center justify-center">
-                <BaseDropdown
-                  :options="[
-                    {
-                      text: 'Aprovar',
-                      action: 'aprovar',
-                      icon: 'fas fa-check-circle'
-                    },
-                    {
-                      text: 'Bloquear',
-                      action: 'bloquear',
-                      icon: 'fas fa-ban'
-                    }
-                  ]"
-                  @select="handleAction($event, affiliate.id)"
-                  :top="50"
-                  class="w-min"
-                />
-              </td>
-            </tr>
-          </tbody>
-        </table>
+        <BaseTable 
+          :headers="[
+            { key: 'name', label: 'Nome', align: 'left' },
+            { key: 'id', label: 'ID de Afiliado', align: 'center' },
+            { key: 'created_at', label: 'Data de cadastro', align: 'center' },
+            { key: 'status', label: 'Status', align: 'center' },
+            { key: 'actions', label: 'Ações', align: 'center' }
+          ]"
+          :items="affiliates"
+        >
+          <template #name="{ item }">
+            <div class="flex items-center gap-2">
+              <img 
+                :src="`https://ui-avatars.com/api/?name=${item.name}&background=random`" 
+                :alt="item.name"
+                class="w-8 h-w-8 rounded-full" 
+              />
+              <p class="font-inter text-[14px] font-normal leading-[18px] text-white">{{ item.name }}</p>
+            </div>
+          </template>
+          
+          <template #id="{ item }">
+            <span class="font-inter text-[14px] font-normal leading-[18px] text-white">{{ item.id }}</span>
+          </template>
+          
+          <template #created_at="{ item }">
+            {{ new Date(item.created_at).toLocaleDateString('pt-BR') }}
+          </template>
+          
+          <template #status="{ item }">
+            <span :class="getStatusClass(item.is_active ? 'Ativo' : 'Inativo')">
+              {{ item.is_active ? 'Ativo' : 'Inativo' }}
+            </span>
+          </template>
+          
+          <template #actions="{ item }">
+            <BaseDropdown
+              :options="[
+                {
+                  text: 'Aprovar',
+                  action: 'aprovar',
+                  icon: 'fas fa-check-circle'
+                },
+                {
+                  text: 'Bloquear',
+                  action: 'bloquear',
+                  icon: 'fas fa-ban'
+                }
+              ]"
+              @select="handleAction($event, item.id)"
+              :top="50"
+              class="w-min"
+            />
+          </template>
+        </BaseTable>
       </div>
     </section>
 
@@ -86,6 +90,7 @@ import AuthenticatedLayout from '@/components/layout/AuthenticatedLayout.vue'
 import CreateAffiliateModal from '@/components/affiliates/CreateAffiliateModal.vue'
 import MenuIcon from '@/components/icons/MenuIcon.vue'
 import BaseDropdown from '@/components/common/BaseDropdown.vue'
+import BaseTable from '@/components/common/BaseTable.vue'
 
 interface Application {
   id: string;
@@ -134,7 +139,8 @@ export default defineComponent({
     BaseButton,
     CreateAffiliateModal,
     MenuIcon,
-    BaseDropdown
+    BaseDropdown,
+    BaseTable
   },
   setup() {
     const store = useDashboardStore()

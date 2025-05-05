@@ -21,64 +21,64 @@
         </div>
         <div v-else-if="withdrawals.length === 0">Nenhum saque encontrado.</div>
         <div v-else class="w-full">
-          <table class="w-full text-white border-collapse">
-            <thead>
-              <tr class="bg-[#1A1F3C]">
-                <th class="p-4 text-left font-inter text-[14px] font-medium leading-[18px] text-white">Data</th>
-                <th class="p-4 text-center font-inter text-[14px] font-medium leading-[18px] text-white">Valor BRL</th>
-                <th class="p-4 text-center font-inter text-[14px] font-medium leading-[18px] text-white">Destino (Chave
-                  Pix)</th>
-                <th class="p-4 text-center font-inter text-[14px] font-medium leading-[18px] text-white">Tipo</th>
-                <th class="p-4 text-center font-inter text-[14px] font-medium leading-[18px] text-white">Status</th>
-                <template v-if="role === 'manager'">
-                  <th class="p-4 text-center font-inter text-[14px] font-medium leading-[18px] text-white">Ações</th>
-                </template>
-                <template v-else>
-                  <th class="p-4 text-center font-inter text-[14px] font-medium leading-[18px] text-white">Link</th>
-                </template>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="withdrawal in withdrawals" :key="withdrawal.id" class="border-b border-[#1A1F3C]">
-                <td class="p-4 font-inter text-[14px] font-normal leading-[18px] text-white">{{ withdrawal.date }}</td>
-                <td class="p-4 text-center font-inter text-[14px] font-normal leading-[18px] text-white">{{
-                  withdrawal.valueBRL }}
-                </td>
-                <td class="p-4 text-center font-inter text-[14px] font-normal leading-[18px] text-white">{{
-                  withdrawal.destination
-                }}</td>
-                <td class="p-4 text-center font-inter text-[14px] font-normal leading-[18px] text-white">{{
-                  withdrawal.type }}</td>
-                <td class="p-4 text-center">
-                  <span :class="getStatusClass(withdrawal.status)">{{ withdrawal.status }}</span>
-                </td>
-                <template v-if="role === 'manager'">
-                  <td class="p-4 text-center flex items-center justify-center">
-                    <BaseDropdown :options="[
-                      {
-                        text: 'Aprovar',
-                        action: 'approve',
-                        icon: 'fas fa-check'
-                      },
-                      {
-                        text: 'Rejeitar',
-                        action: 'reject',
-                        icon: 'fas fa-times'
-                      }
-                    ]" @select="handleDropdownAction($event, withdrawal.id)" :top="50" class="w-min" />
-                  </td>
-                </template>
-                <template v-else>
-                  <td class="p-4 text-center">
-                    <a v-if="withdrawal.link" :href="withdrawal.link" target="_blank"
-                      class="flex items-center justify-center">
-                      <RedirectIcon />
-                    </a>
-                  </td>
-                </template>
-              </tr>
-            </tbody>
-          </table>
+          <BaseTable 
+            :headers="[
+              { key: 'date', label: 'Data', align: 'left' },
+              { key: 'value', label: 'Valor BRL', align: 'center' },
+              { key: 'destination', label: 'Destino (Chave Pix)', align: 'center' },
+              { key: 'type', label: 'Tipo', align: 'center' },
+              { key: 'status', label: 'Status', align: 'center' },
+              { key: 'actions', label: role === 'manager' ? 'Ações' : 'Link', align: 'center' }
+            ]"
+            :items="withdrawals"
+          >
+            <template #date="{ item }">
+              {{ item.date }}
+            </template>
+            
+            <template #value="{ item }">
+              {{ item.valueBRL }}
+            </template>
+            
+            <template #destination="{ item }">
+              {{ item.destination }}
+            </template>
+            
+            <template #type="{ item }">
+              {{ item.type }}
+            </template>
+            
+            <template #status="{ item }">
+              <span :class="getStatusClass(item.status)">{{ item.status }}</span>
+            </template>
+            
+            <template #actions="{ item }">
+              <template v-if="role === 'manager'">
+                <BaseDropdown 
+                  :options="[
+                    {
+                      text: 'Aprovar',
+                      action: 'approve',
+                      icon: 'fas fa-check'
+                    },
+                    {
+                      text: 'Rejeitar',
+                      action: 'reject',
+                      icon: 'fas fa-times'
+                    }
+                  ]" 
+                  @select="handleDropdownAction($event, item.id)" 
+                  :top="50" 
+                  class="w-min" 
+                />
+              </template>
+              <template v-else>
+                <a v-if="item.link" :href="item.link" target="_blank" class="flex items-center justify-center">
+                  <RedirectIcon />
+                </a>
+              </template>
+            </template>
+          </BaseTable>
         </div>
       </div>
 
@@ -111,6 +111,7 @@ import WithdrawalSuccessModal from '@/components/withdrawals/WithdrawalSuccessMo
 import RedirectIcon from '@/components/icons/RedirectIcon.vue'
 import MenuIcon from '@/components/icons/MenuIcon.vue'
 import BaseDropdown from '@/components/common/BaseDropdown.vue'
+import BaseTable from '@/components/common/BaseTable.vue'
 
 const loading = ref(true)
 const withdrawalsSuccess = ref(false)
@@ -169,7 +170,8 @@ export default defineComponent({
     WithdrawalSuccessModal,
     RedirectIcon,
     MenuIcon,
-    BaseDropdown
+    BaseDropdown,
+    BaseTable
   },
   data() {
     const role = localStorage.getItem('role')

@@ -58,24 +58,26 @@
 
             <div class="bg-[#23263a] rounded-lg p-6">
               <h3 class="text-white text-lg font-semibold mb-4">Aplicações</h3>
-              <div class="overflow-x-auto">
-                <table class="w-full text-white border-collapse">
-                  <thead>
-                    <tr class="bg-[#1A1F3C]">
-                      <th class="p-4 text-left">ID da Aplicação</th>
-                      <th class="p-4 text-left">% Comissão</th>
-                      <th class="p-4 text-left">Dias para Liberação</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr v-for="app in affiliate.applications" :key="app.id" class="border-b border-[#1A1F3C]">
-                      <td class="p-4">{{ app.id }}</td>
-                      <td class="p-4">{{ (app.commission_percentage * 100).toFixed(2) }}%</td>
-                      <td class="p-4">{{ app.commission_release_days }} dias</td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
+              <BaseTable 
+                :headers="[
+                  { key: 'id', label: 'ID da Aplicação', align: 'left' },
+                  { key: 'commission', label: '% Comissão', align: 'left' },
+                  { key: 'release_days', label: 'Dias para Liberação', align: 'left' }
+                ]"
+                :items="affiliate.applications"
+              >
+                <template #id="{ item }">
+                  {{ item.id }}
+                </template>
+                
+                <template #commission="{ item }">
+                  {{ (item.commission_percentage * 100).toFixed(2) }}%
+                </template>
+                
+                <template #release_days="{ item }">
+                  {{ item.commission_release_days }} dias
+                </template>
+              </BaseTable>
             </div>
           </section>
         </div>
@@ -147,11 +149,13 @@
 import { defineComponent } from 'vue'
 import { managerService } from '@/services/managerService'
 import BaseButton from '@/components/common/BaseButton.vue'
+import BaseTable from '@/components/common/BaseTable.vue'
 
 export default defineComponent({
   name: 'AffiliateDetail',
   components: {
-    BaseButton
+    BaseButton,
+    BaseTable
   },
   data() {
     return {
