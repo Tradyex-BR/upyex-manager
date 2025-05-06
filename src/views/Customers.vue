@@ -13,89 +13,79 @@
           class="flex w-full min-h-[200px] items-center justify-center text-gray-400 text-lg">
           Nenhum cliente encontrado
         </div>
-        <BaseTable 
-          v-else
-          :headers="[
-            { key: 'name', label: 'Nome', align: 'left' },
-            { key: 'email', label: 'Email', align: 'center' },
-            { key: 'status', label: 'Status', align: 'center' },
-            { key: 'created_at', label: 'Data de cadastro', align: 'center' },
-            { key: 'last_access', label: 'Último acesso', align: 'center' },
-            { key: 'actions', label: 'Ações', align: 'center' }
-          ]"
-          :items="customers"
-        >
+        <BaseTable v-else :headers="[
+          { key: 'name', label: 'Nome', align: 'left' },
+          { key: 'email', label: 'Email', align: 'center' },
+          { key: 'status', label: 'Status', align: 'center' },
+          { key: 'created_at', label: 'Data de cadastro', align: 'center' },
+          { key: 'last_access', label: 'Último acesso', align: 'center' },
+          { key: 'actions', label: 'Ações', align: 'center' }
+        ]" :items="customers">
           <template #name="{ item }">
             {{ item.nome }}
           </template>
-          
+
           <template #email="{ item }">
             {{ item.email }}
           </template>
-          
+
           <template #status="{ item }">
             <span :class="getStatusClass(item.status)">{{ item.status }}</span>
           </template>
-          
+
           <template #created_at="{ item }">
             {{ item.dataCadastro }}
           </template>
-          
+
           <template #last_access="{ item }">
             {{ item.ultimoAcesso }}
           </template>
-          
+
           <template #actions="{ item }">
-            <BaseDropdown
-              :options="[
-                {
-                  text: item.status === 'Ativo' ? 'Bloquear' : 'Desbloquear',
-                  icon: 'fa-ban',
-                  action: 'bloquear'
-                },
-                {
-                  text: 'Editar Permissão',
-                  icon: 'fa-key',
-                  action: 'editar_permissao'
-                },
-                {
-                  text: 'Resetar Senha',
-                  icon: 'fa-key',
-                  action: 'resetar_senha'
-                },
-                {
-                  text: 'Excluir',
-                  icon: 'fa-trash-alt',
-                  action: 'excluir'
-                }
-              ]"
-              :model-value="dropdownOpen === item.id"
+            <BaseDropdown :options="[
+              {
+                text: item.status === 'Ativo' ? 'Bloquear' : 'Desbloquear',
+                icon: 'fa-ban',
+                action: 'bloquear'
+              },
+              {
+                text: 'Editar Permissão',
+                icon: 'fa-key',
+                action: 'editar_permissao'
+              },
+              {
+                text: 'Resetar Senha',
+                icon: 'fa-key',
+                action: 'resetar_senha'
+              },
+              {
+                text: 'Excluir',
+                icon: 'fa-trash-alt',
+                action: 'excluir'
+              }
+            ]" :model-value="dropdownOpen === item.id"
               @update:model-value="(value) => dropdownOpen = value ? item.id : null"
-              @select="(action) => handleCustomerAction(item.id, action)"
-              :top="50"
-              class="w-min mx-auto"
-            />
+              @select="(action) => handleCustomerAction(item.id, action)" :top="50" class="w-min mx-auto" />
           </template>
         </BaseTable>
       </div>
     </section>
 
     <!-- Modal de visualização/edição de cliente -->
-    <CustomerDetailModal 
-      :show="showDetailModal" 
-      :customer="editingCustomer"
-      @close="showDetailModal = false"
-      @action="handleCustomerAction"
-    />
+    <CustomerDetailModal :show="showDetailModal" :customer="editingCustomer" @close="showDetailModal = false"
+      @action="handleCustomerAction" />
 
     <!-- Modal de Criação de Cliente -->
     <CreateCustomerModal :show="showCreateModal" @close="showCreateModal = false" @submit="handleCreateCustomer" />
+
+    <!-- Modal de Exclusão de Cliente -->
+    <DeleteCustomerModal v-if="showDeleteModal" :client-info="deletingCustomer" @close="showDeleteModal = false"
+      @confirm="handleDeleteCustomer" />
   </AuthenticatedLayout>
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue'
-import { useDashboardStore } from '@/stores/dashboard'
 import { managerService } from '@/services/managerService'
 import { externalService } from '@/services/externalService'
 import Sidebar from '@/components/layout/dashboard/Sidebar.vue'
@@ -105,6 +95,7 @@ import BaseModal from '@/components/common/BaseModal.vue'
 import AuthenticatedLayout from '@/components/layout/AuthenticatedLayout.vue'
 import CreateCustomerModal from '@/components/customers/CreateCustomerModal.vue'
 import CustomerDetailModal from '@/components/customers/CustomerDetailModal.vue'
+import DeleteCustomerModal from '@/components/customers/DeleteCustomerModal.vue'
 import { useRouter } from 'vue-router'
 import MenuIcon from '@/components/icons/MenuIcon.vue'
 import BaseDropdown from '@/components/common/BaseDropdown.vue'
@@ -150,7 +141,8 @@ export default defineComponent({
     CustomerDetailModal,
     MenuIcon,
     BaseDropdown,
-    BaseTable
+    BaseTable,
+    DeleteCustomerModal
   },
   setup() {
     const router = useRouter()
@@ -170,7 +162,9 @@ export default defineComponent({
       loading: true,
       showDetailModal: false,
       showCreateModal: false,
-      editingCustomer: null as Usuario | null
+      showDeleteModal: false,
+      editingCustomer: null as Usuario | null,
+      deletingCustomer: null as Usuario | null
     }
   },
   watch: {
@@ -217,14 +211,24 @@ export default defineComponent({
             // Implementar lógica de reset de senha
             break;
           case 'excluir':
-            if (confirm('Tem certeza que deseja excluir este cliente?')) {
-              // Implementar lógica de exclusão
-              await this.loadCustomers();
-            }
+            this.deletingCustomer = customer;
+            this.showDeleteModal = true;
             break;
         }
       } catch (e) {
         console.error(`Erro ao executar ação ${action}:`, e)
+      }
+    },
+    async handleDeleteCustomer() {
+      if (!this.deletingCustomer) return;
+
+      try {
+        await externalService.customers.delete(this.deletingCustomer.id);
+        await this.loadCustomers();
+        this.showDeleteModal = false;
+        this.deletingCustomer = null;
+      } catch (error) {
+        console.error('Erro ao excluir cliente:', error);
       }
     },
     goToCustomerDetail(id: string) {

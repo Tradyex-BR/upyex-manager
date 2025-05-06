@@ -71,5 +71,11 @@ export const externalService = {
       });
       return response.data;
     },
+    delete: async (id: string): Promise<any> => {
+      const response = await api.delete(`${EXTERNAL_BASE}/customers/${id}`, {
+        headers: { 'X-Api-Key': applicationApiKey },
+      });
+      return response.data;
+    },
   },
 };
