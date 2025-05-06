@@ -37,6 +37,7 @@ export const useAuthStore = defineStore('auth', {
         })
         const token = response.auth_token
         // Buscar dados do usuário logado
+        localStorage.removeItem('userRole')
         localStorage.setItem('role', credentials.role.toLowerCase())
         const user = await managerService.auth.current()
         user.role = 'MANAGER'
@@ -61,6 +62,7 @@ export const useAuthStore = defineStore('auth', {
         // Limpar o localStorage
         localStorage.removeItem('token')
         localStorage.removeItem('user')
+        localStorage.removeItem('userRole')
         localStorage.removeItem('role')
 
         // Chamar o serviço de logout

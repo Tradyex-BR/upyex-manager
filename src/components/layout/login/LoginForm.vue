@@ -2,28 +2,15 @@
   <form class="flex flex-col gap-4 w-full" @submit.prevent="handleLogin">
     <div class="flex flex-col gap-8">
       <div class="flex flex-col gap-4">
-        <BaseInput
-          v-model="email"
-          label="Email"
-          type="email"
-          placeholder="Digite seu email"
-          required
-          :error="emailError"
-          :disabled="loading"
-        >
+        <BaseInput v-model="email" label="Email" type="email" placeholder="Digite seu email" required
+          :error="emailError" :disabled="loading">
           <template #prefix>
             <EmailIcon />
           </template>
         </BaseInput>
 
-        <BaseInput
-          v-model="password"
-          label="Senha"
-          :type="showPassword ? 'text' : 'password'"
-          placeholder="Digite sua senha"
-          required
-          :disabled="loading"
-        >
+        <BaseInput v-model="password" label="Senha" :type="showPassword ? 'text' : 'password'"
+          placeholder="Digite sua senha" required :disabled="loading">
           <template #prefix>
             <PasswordIcon />
           </template>
@@ -54,15 +41,11 @@
 
         <div class="text-center font-inter text-[14px] leading-[18px] text-[#040D25]">
           <div class="relative inline-block group">
-            <router-link 
-              :to="isEmailValid ? '/forgot-password' : '#'"
-              :class="[
-                isEmailValid 
-                  ? 'text-[#CF631C] hover:underline hover:text-[#CF631C]'
-                  : 'text-[#444c5a] opacity-50 cursor-not-allowed pointer-events-none'
-              ]"
-              @click="handleForgotPassword"
-            >
+            <router-link :to="isEmailValid ? '/forgot-password' : '#'" :class="[
+              isEmailValid
+                ? 'text-[#CF631C] hover:underline hover:text-[#CF631C]'
+                : 'text-[#444c5a] opacity-50 cursor-not-allowed pointer-events-none'
+            ]" @click="handleForgotPassword">
               Esqueci minha senha
             </router-link>
             <div v-if="!isEmailValid"
@@ -139,9 +122,15 @@ const authStore = useAuthStore()
 // Carregar o último tipo de usuário selecionado
 onMounted(() => {
   const savedRole = localStorage.getItem('userRole')
+
   if (savedRole) {
     role.value = savedRole as 'MANAGER' | 'AFFILIATE'
   }
+
+  if (!savedRole) {
+    localStorage.setItem('userRole', role.value)
+  }
+
 })
 
 // Salvar o tipo de usuário no localStorage quando alterado
@@ -170,4 +159,5 @@ const handleLogin = async () => {
     loading.value = false
   }
 }
+
 </script>
