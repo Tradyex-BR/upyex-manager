@@ -315,7 +315,7 @@ export default defineComponent({
     <section class="min-h-[944px] w-full overflow-visible">
       <!-- Título e botão sempre visíveis -->
       <div class="flex justify-between items-center mb-6 overflow-visible">
-        <p class="text-white text-2xl font-semibold">Withdrawals</p>
+        <p class="text-white text-2xl font-semibold">Saques</p>
         <!--         @click="showRequestModal = true"
  -->
         <BaseButton class="ml-2 " @click="showRequestModal = true">
