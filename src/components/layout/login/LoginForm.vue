@@ -3,14 +3,14 @@
     <div class="flex flex-col gap-8">
       <div class="flex flex-col gap-4">
         <BaseInput v-model="email" label="Email" type="email" placeholder="Digite seu email" required
-          :error="emailError" :disabled="loading">
+          :error="emailError" :disabled="loading || isFingerprintLoading">
           <template #prefix>
             <EmailIcon />
           </template>
         </BaseInput>
 
         <BaseInput v-model="password" label="Senha" :type="showPassword ? 'text' : 'password'"
-          placeholder="Digite sua senha" required :disabled="loading">
+          placeholder="Digite sua senha" required :disabled="loading || isFingerprintLoading">
           <template #prefix>
             <PasswordIcon />
           </template>
@@ -22,7 +22,7 @@
         <div class="flex flex-col gap-1">
           <label class="text-[14px] font-medium">Tipo de usuário <span class="text-[#BE3E37]">*</span></label>
           <BaseDropdown :options="roles.map(r => ({ text: r.label, action: r.value }))" :model-value="!!role"
-            @select="role = $event" variant="light" :top="60">
+            @select="role = $event" variant="light" :top="60" :disabled="loading || isFingerprintLoading">
             <template #trigger>
               <div
                 class="h-[56px] px-3 py-4 border border-[#B8B8B8] rounded-lg outline-none bg-white flex items-center justify-between">
@@ -35,8 +35,8 @@
       </div>
 
       <div class="flex flex-col gap-4">
-        <BaseButton type="submit" variant="primary" class="h-[40px]" :disabled="!isFormValid" :loading="loading">
-          Entrar
+        <BaseButton type="submit" variant="primary" class="h-[40px]" :disabled="!isFormValid" :loading="loading || isFingerprintLoading">
+          {{ isFingerprintLoading ? 'Carregando...' : 'Entrar' }}
         </BaseButton>
 
         <div class="text-center font-inter text-[14px] leading-[18px] text-[#040D25]">
@@ -68,6 +68,7 @@
 import { ref, onMounted, watch, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
+import { useVisitorData } from '@fingerprintjs/fingerprintjs-pro-vue-v3'
 import BaseButton from '@/components/common/BaseButton.vue'
 import BaseDropdown from '@/components/common/BaseDropdown.vue'
 import BaseInput from '@/components/common/BaseInput.vue'
@@ -75,6 +76,7 @@ import EmailIcon from '@/components/common/icons/EmailIcon.vue'
 import PasswordIcon from '@/components/common/icons/PasswordIcon.vue'
 import PasswordVisibilityIcon from '@/components/common/icons/PasswordVisibilityIcon.vue'
 import ChevronDownIcon from '@/components/common/icons/ChevronDownIcon.vue'
+import type { LoginRequest } from '@/types/auth'
 
 const router = useRouter()
 const email = ref('')
@@ -88,6 +90,13 @@ const roles = [
 const role = ref<'MANAGER' | 'AFFILIATE'>('MANAGER')
 const loading = ref(false)
 const error = ref('')
+
+const { data: visitorData, error: fingerprintError, isLoading: isFingerprintLoading, getData: getFingerprint } = useVisitorData(
+  { extendedResult: true },
+  { immediate: true }
+)
+
+const visitorId = computed(() => visitorData.value?.visitorId || '')
 
 const isEmailValid = computed(() => {
   if (!email.value) return false
@@ -108,7 +117,14 @@ watch(email, (newValue) => {
 })
 
 const isFormValid = computed(() => {
-  return isEmailValid.value && password.value.length > 0
+  const valid = isEmailValid.value && password.value.length > 0 && !isFingerprintLoading.value && visitorId.value !== ''
+  console.log('isFormValid:', valid, {
+    isEmailValid: isEmailValid.value,
+    hasPassword: password.value.length > 0,
+    isFingerprintLoading: isFingerprintLoading.value,
+    hasVisitorId: visitorId.value !== ''
+  })
+  return valid
 })
 
 const handleForgotPassword = () => {
@@ -119,8 +135,8 @@ const handleForgotPassword = () => {
 
 const authStore = useAuthStore()
 
-// Carregar o último tipo de usuário selecionado
-onMounted(() => {
+onMounted(async () => {
+  console.log('Iniciando obtenção do fingerprint...')
   const savedRole = localStorage.getItem('userRole')
 
   if (savedRole) {
@@ -131,14 +147,26 @@ onMounted(() => {
     localStorage.setItem('userRole', role.value)
   }
 
+  try {
+    console.log('Obtendo dados do visitante...')
+    await getFingerprint({ ignoreCache: true })
+    console.log('Dados do visitante obtidos:', visitorData.value)
+  } catch (error: any) {
+    console.error('Erro ao obter fingerprint:', error)
+    error.value = 'Não foi possível obter o identificador do dispositivo. Por favor, desative temporariamente seu bloqueador de anúncios e tente novamente.'
+  }
 })
 
-// Salvar o tipo de usuário no localStorage quando alterado
 watch(role, (newRole) => {
   localStorage.setItem('userRole', newRole)
 })
 
 const handleLogin = async () => {
+  if (!visitorId.value) {
+    error.value = 'Erro ao obter identificador do dispositivo. Por favor, tente novamente.'
+    return
+  }
+
   loading.value = true
   error.value = ''
   try {
@@ -146,7 +174,7 @@ const handleLogin = async () => {
       email: email.value,
       password: password.value,
       role: role.value,
-      fingerprint: 'Qg0JCu3FzrLMH3tPTWIP'
+      fingerprint: visitorId.value
     })
     router.push('/dashboard')
   } catch (err: any) {
