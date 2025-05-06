@@ -65,7 +65,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, watch, computed } from 'vue'
+import { ref, onMounted, watch, computed, inject } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useVisitorData } from '@fingerprintjs/fingerprintjs-pro-vue-v3'
@@ -91,12 +91,14 @@ const role = ref<'MANAGER' | 'AFFILIATE'>('MANAGER')
 const loading = ref(false)
 const error = ref('')
 
-const { data: visitorData, error: fingerprintError, isLoading: isFingerprintLoading, getData: getFingerprint } = useVisitorData(
+const isDev = import.meta.env.DEV
+const mockFingerprint = isDev ? inject('fingerprint') as { getData: () => Promise<{ visitorId: string }> } : null
+const { data: visitorData, error: fingerprintError, isLoading: isFingerprintLoading, getData: getFingerprint } = !isDev ? useVisitorData(
   { extendedResult: true },
   { immediate: true }
-)
+) : { data: ref(null), error: ref(null), isLoading: ref(false), getData: async () => {} }
 
-const visitorId = computed(() => visitorData.value?.visitorId || '')
+const visitorId = ref('')
 
 const isEmailValid = computed(() => {
   if (!email.value) return false
@@ -148,12 +150,26 @@ onMounted(async () => {
   }
 
   try {
-    console.log('Obtendo dados do visitante...')
-    await getFingerprint({ ignoreCache: true })
-    console.log('Dados do visitante obtidos:', visitorData.value)
+    if (isDev) {
+      console.log('Ambiente de desenvolvimento: usando mock do fingerprint')
+      const mockData = await mockFingerprint?.getData()
+      console.log('Dados do mock:', mockData)
+      if (mockData) {
+        visitorId.value = mockData.visitorId
+      }
+    } else {
+      console.log('Obtendo dados do visitante...')
+      await getFingerprint({ ignoreCache: true })
+      console.log('Dados do visitante obtidos:', visitorData.value)
+      if (visitorData.value) {
+        visitorId.value = visitorData.value.visitorId
+      }
+    }
   } catch (error: any) {
     console.error('Erro ao obter fingerprint:', error)
     error.value = 'Não foi possível obter o identificador do dispositivo. Por favor, desative temporariamente seu bloqueador de anúncios e tente novamente.'
+  } finally {
+    isFingerprintLoading.value = false
   }
 })
 
