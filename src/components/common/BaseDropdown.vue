@@ -33,11 +33,10 @@
             @click="handleOptionClick(option)">
             <template v-if="option.icon">
               <component 
-                v-if="typeof option.icon === 'object'"
                 :is="option.icon"
+                v-bind="option.iconProps || {}"
                 class="inline-block"
               />
-              <i v-else :class="['fas', option.icon]"></i>
             </template>
             {{ option.text }}
           </button>
@@ -53,7 +52,8 @@ import MenuIcon from '@/components/icons/MenuIcon.vue'
 
 interface DropdownOption {
   text: string
-  icon?: string | object
+  icon?: any
+  iconProps?: Record<string, any>
   action: string
 }
 

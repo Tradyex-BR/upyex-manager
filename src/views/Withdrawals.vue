@@ -1,101 +1,5 @@
-<template>
-  <AuthenticatedLayout :loading="loading">
-    <section class="min-h-[944px] w-full overflow-visible">
-      <!-- Título e botão sempre visíveis -->
-      <div class="flex justify-between items-center mb-6 overflow-visible">
-        <p class="text-white text-2xl font-semibold">Withdrawals</p>
-<!--         @click="showRequestModal = true"
- -->        <BaseButton class="ml-2 " @click="showRequestModal = true">
-          Novo Saque
-        </BaseButton>
-      </div>
-
-      <!-- Modais -->
-      <WithdrawalRequestModal v-if="showRequestModal" @close="showRequestModal = false"
-        @submit="handleWithdrawalRequest" :show-footer="false" />
-      <WithdrawalSuccessModal v-if="showSuccessModal" :amount="lastWithdrawalAmount" :pix-key="lastWithdrawalPixKey"
-        @close="showSuccessModal = false" :show-footer="false" />
-
-      <!-- Conteúdo condicional -->
-      <div class="flex w-full min-h-[calc(100vh-200px)] justify-center text-gray-400">
-        <div v-if="loading" class="flex items-center justify-center py-10">
-          <span class="text-white text-lg">Carregando saques...</span>
-        </div>
-        <div v-else-if="withdrawals.length === 0"
-          class="flex w-full min-h-[200px] items-center justify-center text-gray-400 text-lg">
-          Nenhum saque encontrado
-        </div>
-        <div v-else class="w-full">
-          <BaseTable :headers="[
-            { key: 'date', label: 'Data', align: 'left' },
-            { key: 'value', label: 'Valor BRL', align: 'center' },
-            { key: 'destination', label: 'Destino (Chave Pix)', align: 'center' },
-            { key: 'type', label: 'Tipo', align: 'center' },
-            { key: 'status', label: 'Status', align: 'center' },
-            { key: 'actions', label: role === 'manager' ? 'Ações' : 'Link', align: 'center' }
-          ]" :items="withdrawals">
-            <template #date="{ item }">
-              {{ item.date }}
-            </template>
-
-            <template #value="{ item }">
-              {{ item.valueBRL }}
-            </template>
-
-            <template #destination="{ item }">
-              {{ item.destination }}
-            </template>
-
-            <template #type="{ item }">
-              {{ item.type }}
-            </template>
-
-            <template #status="{ item }">
-              <span :class="getStatusClass(item.status)">{{ item.status }}</span>
-            </template>
-
-            <template #actions="{ item }">
-              <template v-if="role === 'manager'">
-                <BaseDropdown :options="[
-                  {
-                    text: 'Aprovar',
-                    action: 'approve',
-                    icon: 'fas fa-check'
-                  },
-                  {
-                    text: 'Rejeitar',
-                    action: 'reject',
-                    icon: 'fas fa-times'
-                  }
-                ]" @select="handleDropdownAction($event, item.id)" :top="50" class="w-min mx-auto" />
-              </template>
-              <template v-else>
-                <a v-if="item.link" :href="item.link" target="_blank" class="flex items-center justify-center">
-                  <RedirectIcon />
-                </a>
-              </template>
-            </template>
-          </BaseTable>
-        </div>
-      </div>
-
-      <!-- Paginação -->
-      <!--  <div v-if="pagination && pagination.links && pagination.links.length > 1" class="flex justify-center mt-6">
-                <button
-                  v-for="link in pagination.links"
-                  :key="link.label"
-                  :disabled="!link.url"
-                  @click="goToPageByUrl(link.url)"
-                  :class="['mx-1 px-3 py-1 rounded', link.active ? 'bg-blue-600 text-white' : 'bg-gray-700 text-gray-300', !link.url ? 'opacity-50 cursor-not-allowed' : 'hover:bg-blue-800']"
-                  v-html="link.label"
-                />
-              </div> -->
-    </section>
-  </AuthenticatedLayout>
-</template>
-
 <script lang="ts">
-import { defineComponent, ref } from 'vue'
+import { defineAsyncComponent, defineComponent, ref } from 'vue'
 import { useDashboardStore } from '@/stores/dashboard'
 import { managerService } from '@/services/managerService'
 import { externalService } from '@/services/externalService'
@@ -109,6 +13,9 @@ import RedirectIcon from '@/components/icons/RedirectIcon.vue'
 import MenuIcon from '@/components/icons/MenuIcon.vue'
 import BaseDropdown from '@/components/common/BaseDropdown.vue'
 import BaseTable from '@/components/common/BaseTable.vue'
+
+const CheckIcon = defineAsyncComponent(() => import('@/components/icons/CheckIcon.vue'))
+const XIcon = defineAsyncComponent(() => import('@/components/icons/XIcon.vue'))
 
 const loading = ref(true)
 const withdrawalsSuccess = ref(false)
@@ -193,7 +100,19 @@ export default defineComponent({
         total: 0,
         links: [] as Array<any>
       },
-      role
+      role,
+      dropdownOptions: [
+        {
+          text: 'Aprovar',
+          action: 'aprovar',
+          icon: CheckIcon
+        },
+        {
+          text: 'Bloquear',
+          action: 'bloquear',
+          icon: XIcon
+        }
+      ]
     }
   },
   watch: {
@@ -390,3 +309,90 @@ export default defineComponent({
   }
 })
 </script>
+
+<template>
+  <AuthenticatedLayout :loading="loading">
+    <section class="min-h-[944px] w-full overflow-visible">
+      <!-- Título e botão sempre visíveis -->
+      <div class="flex justify-between items-center mb-6 overflow-visible">
+        <p class="text-white text-2xl font-semibold">Withdrawals</p>
+        <!--         @click="showRequestModal = true"
+ -->
+        <BaseButton class="ml-2 " @click="showRequestModal = true">
+          Novo Saque
+        </BaseButton>
+      </div>
+
+      <!-- Modais -->
+      <WithdrawalRequestModal v-if="showRequestModal" @close="showRequestModal = false"
+        @submit="handleWithdrawalRequest" :show-footer="false" />
+      <WithdrawalSuccessModal v-if="showSuccessModal" :amount="lastWithdrawalAmount" :pix-key="lastWithdrawalPixKey"
+        @close="showSuccessModal = false" :show-footer="false" />
+
+      <!-- Conteúdo condicional -->
+      <div class="flex w-full min-h-[calc(100vh-200px)] justify-center text-gray-400">
+        <div v-if="loading" class="flex items-center justify-center py-10">
+          <span class="text-white text-lg">Carregando saques...</span>
+        </div>
+        <div v-else-if="withdrawals.length === 0"
+          class="flex w-full min-h-[200px] items-center justify-center text-gray-400 text-lg">
+          Nenhum saque encontrado
+        </div>
+        <div v-else class="w-full">
+          <BaseTable :headers="[
+            { key: 'date', label: 'Data', align: 'left' },
+            { key: 'value', label: 'Valor BRL', align: 'center' },
+            { key: 'destination', label: 'Destino (Chave Pix)', align: 'center' },
+            { key: 'type', label: 'Tipo', align: 'center' },
+            { key: 'status', label: 'Status', align: 'center' },
+            { key: 'actions', label: role === 'manager' ? 'Ações' : 'Link', align: 'center' }
+          ]" :items="withdrawals">
+            <template #date="{ item }">
+              {{ item.date }}
+            </template>
+
+            <template #value="{ item }">
+              {{ item.valueBRL }}
+            </template>
+
+            <template #destination="{ item }">
+              {{ item.destination }}
+            </template>
+
+            <template #type="{ item }">
+              {{ item.type }}
+            </template>
+
+            <template #status="{ item }">
+              <span :class="getStatusClass(item.status)">{{ item.status }}</span>
+            </template>
+
+            <template #actions="{ item }">
+              <template v-if="role === 'manager'">
+                <BaseDropdown :options="dropdownOptions" @select="handleDropdownAction($event, item.id)" :top="50"
+                  class="w-min mx-auto" />
+              </template>
+              <template v-else>
+                <a v-if="item.link" :href="item.link" target="_blank" class="flex items-center justify-center">
+                  <RedirectIcon />
+                </a>
+              </template>
+            </template>
+          </BaseTable>
+        </div>
+      </div>
+
+      <!-- Paginação -->
+      <!--  <div v-if="pagination && pagination.links && pagination.links.length > 1" class="flex justify-center mt-6">
+                <button
+                  v-for="link in pagination.links"
+                  :key="link.label"
+                  :disabled="!link.url"
+                  @click="goToPageByUrl(link.url)"
+                  :class="['mx-1 px-3 py-1 rounded', link.active ? 'bg-blue-600 text-white' : 'bg-gray-700 text-gray-300', !link.url ? 'opacity-50 cursor-not-allowed' : 'hover:bg-blue-800']"
+                  v-html="link.label"
+                />
+              </div> -->
+    </section>
+  </AuthenticatedLayout>
+</template>

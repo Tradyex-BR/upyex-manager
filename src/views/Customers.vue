@@ -1,91 +1,5 @@
-<template>
-  <AuthenticatedLayout :loading="loading">
-
-    <section class=" min-h-[944px] w-full overflow-visible">
-      <div class="flex justify-between items-center mb-6">
-        <p class="text-white text-2xl font-semibold">Clientes</p>
-        <BaseButton class="ml-2" @click="showCreateModal = true">
-          Novo Cliente
-        </BaseButton>
-      </div>
-      <div>
-        <div v-if="customers.length === 0"
-          class="flex w-full min-h-[200px] items-center justify-center text-gray-400 text-lg">
-          Nenhum cliente encontrado
-        </div>
-        <BaseTable v-else :headers="[
-          { key: 'name', label: 'Nome', align: 'left' },
-          { key: 'email', label: 'Email', align: 'center' },
-          { key: 'status', label: 'Status', align: 'center' },
-          { key: 'created_at', label: 'Data de cadastro', align: 'center' },
-          { key: 'last_access', label: 'Último acesso', align: 'center' },
-          { key: 'actions', label: 'Ações', align: 'center' }
-        ]" :items="customers">
-          <template #name="{ item }">
-            {{ item.nome }}
-          </template>
-
-          <template #email="{ item }">
-            {{ item.email }}
-          </template>
-
-          <template #status="{ item }">
-            <span :class="getStatusClass(item.status)">{{ item.status }}</span>
-          </template>
-
-          <template #created_at="{ item }">
-            {{ item.dataCadastro }}
-          </template>
-
-          <template #last_access="{ item }">
-            {{ item.ultimoAcesso }}
-          </template>
-
-          <template #actions="{ item }">
-            <BaseDropdown :options="[
-              {
-                text: item.status === 'Ativo' ? 'Bloquear' : 'Desbloquear',
-                icon: 'fa-ban',
-                action: 'bloquear'
-              },
-              {
-                text: 'Editar Permissão',
-                icon: 'fa-key',
-                action: 'editar_permissao'
-              },
-              {
-                text: 'Resetar Senha',
-                icon: 'fa-key',
-                action: 'resetar_senha'
-              },
-              {
-                text: 'Excluir',
-                icon: 'fa-trash-alt',
-                action: 'excluir'
-              }
-            ]" :model-value="dropdownOpen === item.id"
-              @update:model-value="(value) => dropdownOpen = value ? item.id : null"
-              @select="(action) => handleCustomerAction(item.id, action)" :top="50" class="w-min mx-auto" />
-          </template>
-        </BaseTable>
-      </div>
-    </section>
-
-    <!-- Modal de visualização/edição de cliente -->
-    <CustomerDetailModal :show="showDetailModal" :customer="editingCustomer" @close="showDetailModal = false"
-      @action="handleCustomerAction" />
-
-    <!-- Modal de Criação de Cliente -->
-    <CreateCustomerModal :show="showCreateModal" @close="showCreateModal = false" @submit="handleCreateCustomer" />
-
-    <!-- Modal de Exclusão de Cliente -->
-    <DeleteCustomerModal v-if="showDeleteModal" :client-info="deletingCustomer" @close="showDeleteModal = false"
-      @confirm="handleDeleteCustomer" />
-  </AuthenticatedLayout>
-</template>
-
 <script lang="ts">
-import { defineComponent } from 'vue'
+import { defineAsyncComponent, defineComponent } from 'vue'
 import { managerService } from '@/services/managerService'
 import { externalService } from '@/services/externalService'
 import Sidebar from '@/components/layout/dashboard/Sidebar.vue'
@@ -100,6 +14,13 @@ import { useRouter } from 'vue-router'
 import MenuIcon from '@/components/icons/MenuIcon.vue'
 import BaseDropdown from '@/components/common/BaseDropdown.vue'
 import BaseTable from '@/components/common/BaseTable.vue'
+
+const XIcon = defineAsyncComponent(() => import('@/components/icons/XIcon.vue'))
+const PenIcon = defineAsyncComponent(() => import('@/components/icons/PenIcon.vue'))
+const KeyIcon = defineAsyncComponent(() => import('@/components/icons/KeyIcon.vue'))
+const TrashIcon = defineAsyncComponent(() => import('@/components/icons/TrashIcon.vue'))
+
+
 // Função para gerar ID único
 function generateUniqueId(): string {
   return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
@@ -151,8 +72,32 @@ export default defineComponent({
       router.push(`/customers/${customer.id}/edit`)
     }
 
+    const dropdownOptions = [
+      {
+        text: 'Bloquear',
+        action: 'bloquear',
+        icon: XIcon
+      },
+      {
+        text: 'Editar Permissão',
+        action: 'editar_permissao',
+        icon: PenIcon
+      },
+      {
+        text: 'Resetar Senha',
+        action: 'resetar_senha',
+        icon: KeyIcon
+      },
+      {
+        text: 'Excluir',
+        action: 'excluir',
+        icon: TrashIcon
+      }
+    ]
+
     return {
-      navigateToEdit
+      navigateToEdit,
+      dropdownOptions
     }
   },
   data() {
@@ -320,3 +265,68 @@ export default defineComponent({
   }
 })
 </script>
+
+<template>
+  <AuthenticatedLayout :loading="loading">
+
+    <section class=" min-h-[944px] w-full overflow-visible">
+      <div class="flex justify-between items-center mb-6">
+        <p class="text-white text-2xl font-semibold">Clientes</p>
+        <BaseButton class="ml-2" @click="showCreateModal = true">
+          Novo Cliente
+        </BaseButton>
+      </div>
+      <div>
+        <div v-if="customers.length === 0"
+          class="flex w-full min-h-[200px] items-center justify-center text-gray-400 text-lg">
+          Nenhum cliente encontrado
+        </div>
+        <BaseTable v-else :headers="[
+          { key: 'name', label: 'Nome', align: 'left' },
+          { key: 'email', label: 'Email', align: 'center' },
+          { key: 'status', label: 'Status', align: 'center' },
+          { key: 'created_at', label: 'Data de cadastro', align: 'center' },
+          { key: 'last_access', label: 'Último acesso', align: 'center' },
+          { key: 'actions', label: 'Ações', align: 'center' }
+        ]" :items="customers">
+          <template #name="{ item }">
+            {{ item.nome }}
+          </template>
+
+          <template #email="{ item }">
+            {{ item.email }}
+          </template>
+
+          <template #status="{ item }">
+            <span :class="getStatusClass(item.status)">{{ item.status }}</span>
+          </template>
+
+          <template #created_at="{ item }">
+            {{ item.dataCadastro }}
+          </template>
+
+          <template #last_access="{ item }">
+            {{ item.ultimoAcesso }}
+          </template>
+
+          <template #actions="{ item }">
+            <BaseDropdown :options="dropdownOptions" :model-value="dropdownOpen === item.id"
+              @update:model-value="(value) => dropdownOpen = value ? item.id : null"
+              @select="(action) => handleCustomerAction(item.id, action)" :top="50" class="w-min mx-auto" />
+          </template>
+        </BaseTable>
+      </div>
+    </section>
+
+    <!-- Modal de visualização/edição de cliente -->
+    <CustomerDetailModal :show="showDetailModal" :customer="editingCustomer" @close="showDetailModal = false"
+      @action="handleCustomerAction" />
+
+    <!-- Modal de Criação de Cliente -->
+    <CreateCustomerModal :show="showCreateModal" @close="showCreateModal = false" @submit="handleCreateCustomer" />
+
+    <!-- Modal de Exclusão de Cliente -->
+    <DeleteCustomerModal v-if="showDeleteModal" :client-info="deletingCustomer" @close="showDeleteModal = false"
+      @confirm="handleDeleteCustomer" />
+  </AuthenticatedLayout>
+</template>

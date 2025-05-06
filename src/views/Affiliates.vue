@@ -1,84 +1,5 @@
-<template>
-  <AuthenticatedLayout :loading="loading">
-
-    <section class=" min-h-[944px] w-full overflow-visible">
-      <div class="flex justify-between items-center mb-6">
-        <p class="text-white text-2xl font-semibold">Afiliados</p>
-        <BaseButton
-          variant="primary"
-          @click="openCreateModal">
-          Novo Afiliado
-        </BaseButton>
-      </div>
-      <div>
-        <div v-if="affiliates.length === 0" class="flex w-full h-full items-center justify-center text-gray-400">
-          Nenhum afiliado encontrado.
-        </div>
-        <BaseTable 
-          :headers="[
-            { key: 'name', label: 'Nome', align: 'left' },
-            { key: 'id', label: 'ID de Afiliado', align: 'center' },
-            { key: 'created_at', label: 'Data de cadastro', align: 'center' },
-            { key: 'status', label: 'Status', align: 'center' },
-            { key: 'actions', label: 'Ações', align: 'center' }
-          ]"
-          :items="affiliates"
-        >
-          <template #name="{ item }">
-            <div class="flex items-center gap-2">
-              <img 
-                :src="`https://ui-avatars.com/api/?name=${item.name}&background=random`" 
-                :alt="item.name"
-                class="w-8 h-w-8 rounded-full" 
-              />
-              <p class="font-inter text-[14px] font-normal leading-[18px] text-white">{{ item.name }}</p>
-            </div>
-          </template>
-          
-          <template #id="{ item }">
-            <span class="font-inter text-[14px] font-normal leading-[18px] text-white">{{ item.id }}</span>
-          </template>
-          
-          <template #created_at="{ item }">
-            {{ new Date(item.created_at).toLocaleDateString('pt-BR') }}
-          </template>
-          
-          <template #status="{ item }">
-            <span :class="getStatusClass(item.is_active ? 'Ativo' : 'Inativo')">
-              {{ item.is_active ? 'Ativo' : 'Inativo' }}
-            </span>
-          </template>
-          
-          <template #actions="{ item }">
-            <BaseDropdown
-              :options="[
-                {
-                  text: 'Aprovar',
-                  action: 'aprovar',
-                  icon: 'fas fa-check-circle'
-                },
-                {
-                  text: 'Bloquear',
-                  action: 'bloquear',
-                  icon: 'fas fa-ban'
-                }
-              ]"
-              @select="handleAction($event, item.id)"
-              :top="50"
-              class="w-min mx-auto"
-            />
-          </template>
-        </BaseTable>
-      </div>
-    </section>
-
-    <!-- Modal de criação de afiliado -->
-    <CreateAffiliateModal v-if="showCreateModal" @close="closeCreateModal" @submit="handleCreate" />
-  </AuthenticatedLayout>
-</template>
-
 <script lang="ts">
-import { defineComponent, ref, onMounted, watch } from 'vue'
+import { defineComponent, ref, onMounted, watch, defineAsyncComponent } from 'vue'
 import { useRouter } from 'vue-router'
 import { managerService } from '@/services/managerService'
 import Sidebar from '@/components/layout/dashboard/Sidebar.vue'
@@ -90,6 +11,9 @@ import CreateAffiliateModal from '@/components/affiliates/CreateAffiliateModal.v
 import MenuIcon from '@/components/icons/MenuIcon.vue'
 import BaseDropdown from '@/components/common/BaseDropdown.vue'
 import BaseTable from '@/components/common/BaseTable.vue'
+
+const CheckIcon = defineAsyncComponent(() => import('@/components/icons/CheckIcon.vue'))
+const XIcon = defineAsyncComponent(() => import('@/components/icons/XIcon.vue'))
 
 interface Application {
   id: string;
@@ -139,7 +63,9 @@ export default defineComponent({
     CreateAffiliateModal,
     MenuIcon,
     BaseDropdown,
-    BaseTable
+    BaseTable,
+    CheckIcon,
+    XIcon
   },
   setup(props) {
     const router = useRouter()
@@ -149,6 +75,19 @@ export default defineComponent({
     const showDetailsModal = ref(false)
     const selectedAffiliate = ref<Affiliate | null>(null)
     const searchQuery = ref('')
+
+    const dropdownOptions = [
+      {
+        text: 'Aprovar',
+        action: 'aprovar',
+        icon: CheckIcon
+      },
+      {
+        text: 'Bloquear',
+        action: 'bloquear',
+        icon: XIcon
+      }
+    ]
 
     // Adicionar watch para searchTerm
     watch(() => props.searchTerm, (newTerm) => {
@@ -342,6 +281,7 @@ export default defineComponent({
       showDetailsModal,
       selectedAffiliate,
       searchQuery,
+      dropdownOptions,
       loadAffiliates,
       handleSearch,
       openCreateModal,
@@ -370,6 +310,62 @@ export default defineComponent({
   }
 })
 </script>
+
+<template>
+  <AuthenticatedLayout :loading="loading">
+
+    <section class=" min-h-[944px] w-full overflow-visible">
+      <div class="flex justify-between items-center mb-6">
+        <p class="text-white text-2xl font-semibold">Afiliados</p>
+        <BaseButton variant="primary" @click="openCreateModal">
+          Novo Afiliado
+        </BaseButton>
+      </div>
+      <div>
+        <div v-if="affiliates.length === 0" class="flex w-full h-full items-center justify-center text-gray-400">
+          Nenhum afiliado encontrado.
+        </div>
+        <BaseTable :headers="[
+          { key: 'name', label: 'Nome', align: 'left' },
+          { key: 'id', label: 'ID de Afiliado', align: 'center' },
+          { key: 'created_at', label: 'Data de cadastro', align: 'center' },
+          { key: 'status', label: 'Status', align: 'center' },
+          { key: 'actions', label: 'Ações', align: 'center' }
+        ]" :items="affiliates">
+          <template #name="{ item }">
+            <div class="flex items-center gap-2">
+              <img :src="`https://ui-avatars.com/api/?name=${item.name}&background=random`" :alt="item.name"
+                class="w-8 h-w-8 rounded-full" />
+              <p class="font-inter text-[14px] font-normal leading-[18px] text-white">{{ item.name }}</p>
+            </div>
+          </template>
+
+          <template #id="{ item }">
+            <span class="font-inter text-[14px] font-normal leading-[18px] text-white">{{ item.id }}</span>
+          </template>
+
+          <template #created_at="{ item }">
+            {{ new Date(item.created_at).toLocaleDateString('pt-BR') }}
+          </template>
+
+          <template #status="{ item }">
+            <span :class="getStatusClass(item.is_active ? 'Ativo' : 'Inativo')">
+              {{ item.is_active ? 'Ativo' : 'Inativo' }}
+            </span>
+          </template>
+
+          <template #actions="{ item }">
+            <BaseDropdown :options="dropdownOptions" @select="handleAction($event, item.id)" :top="50" class="w-min mx-auto" />
+          </template>
+        </BaseTable>
+      </div>
+    </section>
+
+    <!-- Modal de criação de afiliado -->
+    <CreateAffiliateModal v-if="showCreateModal" @close="closeCreateModal" @submit="handleCreate" />
+  </AuthenticatedLayout>
+</template>
+
 
 <style scoped>
 /* Estilos específicos para Affiliates.vue */

@@ -17,6 +17,7 @@
       <BaseInput
         v-model="pixKey"
         label="Chave Pix"
+        
         placeholder="Digite a chave pix, email, cpf ou telefone"
         :disabled="loading"
         variant="dark"

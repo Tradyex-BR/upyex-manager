@@ -10,7 +10,10 @@ import {
   faHashtag,
   faPlus,
   faTrashAlt,
-  faExclamationCircle
+  faExclamationCircle,
+  faRightFromBracket,
+  faCheck,
+  faXmark
 } from '@fortawesome/free-solid-svg-icons'
 
 library.add(
@@ -23,7 +26,10 @@ library.add(
   faHashtag,
   faPlus,
   faTrashAlt,
-  faExclamationCircle
+  faExclamationCircle,
+  faRightFromBracket,
+  faCheck,
+  faXmark
 )
 
 export { FontAwesomeIcon } 

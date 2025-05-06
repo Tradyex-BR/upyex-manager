@@ -20,7 +20,8 @@
               :options="[
                 {
                   text: 'Sair',
-                  icon: 'fa-sign-out-alt',
+                  icon: FontAwesomeIcon,
+                  iconProps: { icon: faRightFromBracket },
                   action: 'logout'
                 }
               ]"
@@ -67,6 +68,8 @@ import { computed, ref, onMounted, onUnmounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import BaseDropdown from '@/components/common/BaseDropdown.vue'
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
+import { faRightFromBracket } from '@fortawesome/free-solid-svg-icons'
 
 const route = useRoute()
 const searchDisabled = computed(() => route.path === '/dashboard') // ajuste para o path correto se necessário
