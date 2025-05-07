@@ -1,8 +1,9 @@
 <template>
   <div
     class="max-w-none flex flex-row w-full h-screen bg-[#010309] mx-auto max-md:max-w-[991px] max-md:flex-col max-sm:max-w-screen-sm">
-    <div class="z-[100] flex flex-col justify-center w-6/12 backdrop-blur-lg items-start gap-8 bg-white bg-[url('/png/static-neon.png')] bg-no-repeat bg-top bg-center p-28 left-[section] max-md:w-full">
-      
+    <div
+      class="z-[100] flex flex-col justify-center w-6/12 backdrop-blur-lg items-start gap-8 bg-white bg-[url('/png/static-neon.png')] bg-no-repeat bg-top bg-center p-28 left-[section] max-md:w-full">
+
       <div>
         <h1 class="text-[#040D25] text-[32px] leading-[40px] font-semibold">
           Boas vindas ao TradyEx
@@ -12,13 +13,14 @@
         </div>
       </div>
 
-     <!--  <SocialLogin /> -->
+      <!--  <SocialLogin /> -->
 
-        <LoginForm />
+      <LoginForm />
     </div>
 
-<!--     <div class="darker-gradient-background"></div>
- -->    <LoginBackground />
+    <!--     <div class="darker-gradient-background"></div>
+ -->
+    <LoginBackground />
     <VerticalLines />
   </div>
 </template>
@@ -30,36 +32,6 @@ import { useAuthStore } from '@/stores/auth'
 import LoginForm from '@/components/layout/login/LoginForm.vue'
 import LoginBackground from '@/components/layout/login/LoginBackground.vue'
 import VerticalLines from '@/components/layout/login/VerticalLines.vue'
-
-const router = useRouter()
-const authStore = useAuthStore()
-
-const email = ref('')
-const password = ref('')
-const role = ref<'MANAGER' | 'AFFILIATE'>('MANAGER')
-
-const loading = ref(false)
-const error = ref('')
-
-const login = async () => {
-  try {
-    loading.value = true
-    error.value = ''
-
-    await authStore.login({
-      email: email.value,
-      password: password.value,
-      role: role.value,
-      fingerprint: 'Qg0JCu3FzrLMH3tPTWIP'
-    })
-
-    router.push('/dashboard')
-  } catch (err: any) {
-    error.value = err.response?.data?.message || 'Ocorreu um erro ao fazer login'
-  } finally {
-    loading.value = false
-  }
-}
 </script>
 
 <style scoped>
