@@ -197,15 +197,22 @@ const form = ref<Form>({
 const positions = new Map()
 
 const getDropdownOptions = (currentAppId: string) => {
-  return availableApplications.value.map(app => ({
-    text: app.name,
-    action: app.id,
-    icon: 'img',
-    iconProps: {
-      src: app.logo_url || `https://ui-avatars.com/api/?name=${app.name}&background=random`,
-      class: 'w-6 h-6 rounded-full object-cover'
-    }
-  }))
+  return availableApplications.value
+    .filter(app => {
+      // Se for a aplicação atual, mantém ela na lista
+      if (app.id === currentAppId) return true;
+      // Verifica se a aplicação já está selecionada em outra posição
+      return !form.value.applications.some(selectedApp => selectedApp.id === app.id);
+    })
+    .map(app => ({
+      text: app.name,
+      action: app.id,
+      icon: 'img',
+      iconProps: {
+        src: app.logo_url || `https://ui-avatars.com/api/?name=${app.name}&background=random`,
+        class: 'w-6 h-6 rounded-full object-cover'
+      }
+    }))
 }
 
 const handleApplicationSelect = (appIndex: number, appId: string) => {
@@ -236,6 +243,14 @@ const isFormValid = computed(() => {
   }
 
   // Validar aplicações
+  const hasDuplicateApps = form.value.applications.some((app, index) => 
+    form.value.applications.findIndex(a => a.id === app.id) !== index
+  );
+
+  if (hasDuplicateApps) {
+    return false;
+  }
+
   return form.value.applications.every(app =>
     app.id.trim() &&
     app.commission_percentage >= 0 &&

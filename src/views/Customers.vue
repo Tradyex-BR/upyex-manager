@@ -311,11 +311,11 @@ export default defineComponent({
               year: 'numeric', hour: '2-digit', minute: '2-digit' }) : '-' }} 
           </template>
 
-          <template #actions="{ item }">
+          <!-- <template #actions="{ item }">
             <BaseDropdown :options="dropdownOptions" :model-value="dropdownOpen === item.id"
               @update:model-value="(value) => dropdownOpen = value ? item.id : null"
               @select="(action) => handleCustomerAction(item.id, action)" :top="50" class="w-min mx-auto" />
-          </template>
+          </template> -->
         </BaseTable>
       </div>
     </section>
