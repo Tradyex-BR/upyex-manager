@@ -272,10 +272,22 @@ const removeApp = (idx: number) => {
   }
 }
 
-const handleSubmit = () => {
+const handleSubmit = async () => {
   loading.value = true
   error.value = ''
-  emit('submit', form.value)
+  try {
+    await emit('submit', form.value)
+  } catch (e: any) {
+    if (e.response?.data?.message) {
+      error.value = e.response.data.message
+    } else if (e.message) {
+      error.value = e.message
+    } else {
+      error.value = 'Ocorreu um erro ao criar o afiliado'
+    }
+  } finally {
+    loading.value = false
+  }
 }
 
 const tabs = [

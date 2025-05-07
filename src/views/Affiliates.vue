@@ -166,7 +166,7 @@
           await handleSearch('')
           closeCreateModal()
         } catch (e) {
-          console.error('Erro ao criar afiliado:', e)
+          throw e // Propaga o erro para o componente filho
         }
       }
 

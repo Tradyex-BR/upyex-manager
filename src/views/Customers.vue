@@ -306,7 +306,9 @@ export default defineComponent({
           </template>
 
           <template #last_access="{ item }">
-            {{ item.ultimoAcesso }}
+            {{ item.affiliate?.latest_login_at ? new Date(item.affiliate.latest_login_at).toLocaleString('pt-BR', {
+              day: '2-digit', month: '2-digit',
+              year: 'numeric', hour: '2-digit', minute: '2-digit' }) : '-' }} 
           </template>
 
           <template #actions="{ item }">
