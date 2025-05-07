@@ -1,5 +1,5 @@
 <template>
-  <div class="animate-fade-in">
+  <div class="animate-fade-in w-full">
     <table class="w-full text-white border-collapse">
       <thead>
         <tr class="bg-[#1A1F3C]">

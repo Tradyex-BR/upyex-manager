@@ -13,8 +13,7 @@
           <div class="self-stretch flex flex-col justify-start gap-6">
             <template v-for="(item, index) in menuItems" :key="index">
               <router-link v-slot="{ navigate }" :to="item.route" v-if="item.visible" custom>
-                <li
-:class="{
+                <li :class="{
                   'bg-[rgba(207,99,28,0.16)] text-[#CF631C]': isCurrentRoute(item.route),
                   'bg-transparent text-[#DEE4EE]': !isCurrentRoute(item.route),
                   'flex w-full items-center': true,
@@ -74,42 +73,42 @@ export default defineComponent({
 
     return {
       menuItems: [
-        { 
-          text: 'Dashboard', 
+        {
+          text: 'Dashboard',
           route: '/dashboard',
           icon: 'svg-dashboard',
           visible: true
         },
 
-        { 
-          text: 'Afiliados', 
+        {
+          text: 'Afiliados',
           route: '/affiliates',
-          icon: 'svg-vendas',
+          icon: 'svg-affiliates',
           visible: role === 'manager'
         },
-        { 
-          text: 'Vendas', 
+        {
+          text: 'Aplicações',
+          route: '/applications',
+          icon: 'svg-applications',
+          visible: true
+        },
+        {
+          text: 'Vendas',
           route: '/sales',
           icon: 'svg-ofertas',
           visible: true
         },
-        { 
-          text: 'Aplicações', 
-          route: '/applications',
-          icon: 'svg-ofertas',
-          visible: role === 'affiliate'
-        },
-        { 
-          text: 'Saques', 
+        {
+          text: 'Saques',
           route: '/withdrawals',
           icon: 'svg-saques',
           visible: true
         },
-     
-        { 
-          text: 'Usuários', 
+
+        {
+          text: 'Usuários',
           route: '/customers',
-          icon: 'svg-users',
+          icon: 'svg-vendas',
           visible: role === 'manager'
         }
       ] as MenuItem[]
