@@ -84,6 +84,7 @@ const email = ref('')
 const password = ref('')
 const showPassword = ref(false)
 const emailError = ref('')
+const isDropdownOpen = ref(false)
 const roles = [
   { value: 'MANAGER', label: 'Administrador' },
   { value: 'AFFILIATE', label: 'Afiliado' }
@@ -200,3 +201,13 @@ const handleLogin = async () => {
 }
 
 </script>
+
+<style scoped>
+.chevron-icon {
+  transition: transform 0.2s ease-in-out;
+}
+
+.chevron-icon.open {
+  transform: rotate(180deg);
+}
+</style>

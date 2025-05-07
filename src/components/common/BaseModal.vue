@@ -1,7 +1,7 @@
 <template>
   <div class="fixed inset-0 bg-black/60 flex items-center justify-center z-[999]" @click.self="$emit('close')">
-    <div class="bg-[#040D25] w-[560px] rounded-2xl shadow-[0_10px_40px_rgba(0,0,0,0.4)] text-white">
-      <div class="flex flex-col p-6 pb-10" :class="contentClass">
+    <div class="bg-[#040D25] m-6 w-[560px] max-h-[calc(100vh-48px)] rounded-2xl shadow-[0_10px_40px_rgba(0,0,0,0.4)] text-white">
+      <div class="flex flex-col p-6 pb-10" :class="[contentClass, `gap-${gapY}`]">
         <div class="flex justify-between items-center relative h-8">
           <div class="flex items-center gap-2">
             <slot name="icon"></slot>
@@ -44,7 +44,12 @@ defineProps({
   },
   contentClass: {
     type: String,
-    default: 'gap-16'
+    default: ''
+  },
+  gapY: {
+    type: String,
+    default: '16',
+    validator: (value: string) => ['0', '1', '2', '3', '4', '5', '6', '8', '10', '12', '16', '20', '24', '32', '40', '48', '56', '64'].includes(value)
   }
 })
 

@@ -7,14 +7,15 @@
       <span v-if="required" class="text-[#BE3E37] font-inter text-[14px] leading-5 font-medium">*</span>
     </label>
     <div 
-      class="h-[56px] flex items-center border gap-2 px-3 py-4 rounded-lg"
+      class="flex items-center border gap-2 px-3 py-4 rounded-lg"
       :class="[
         variant === 'dark' 
           ? 'bg-[#131836] border-[#1e2642] focus-within:border-[#3b4167]' 
           : variant === 'darker'
             ? 'bg-[#0a0e1c] border-[#1e2642] focus-within:border-[#3b4167]'
             : 'border-solid border-[#B8B8B8]',
-        { 'border-red-500': error }
+        { 'border-red-500': error },
+        customClass
       ]"
     >
       <slot name="prefix"></slot>
@@ -72,6 +73,10 @@ defineProps({
     type: String,
     default: 'light',
     validator: (value: string) => ['light', 'dark', 'darker'].includes(value)
+  },
+  customClass: {
+    type: String,
+    default: 'h-[56px]'
   }
 })
 

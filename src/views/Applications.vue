@@ -201,15 +201,15 @@ export default defineComponent({
         if (!customer) return; */
 
         switch (action) {
-          case 'bloquear':
+          case 'ativar_desativar':
             break;
-          case 'editar_permissao':
+          case 'copiar_chave':
             // Implementar lógica de edição de permissão
             break;
-          case 'resetar_senha':
+          case 'edição':
             // Implementar lógica de reset de senha
             break;
-          case 'excluir':
+          case 'resetar':
             break;
         }
       } catch (e) {

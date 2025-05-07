@@ -16,7 +16,9 @@
           :class="[
             variant === 'light' 
               ? 'bg-white border border-[#B8B8B8] shadow-md' 
-              : 'bg-[#222A3F]'
+              : variant === 'full'
+                ? 'bg-[#222A3F] w-full'
+                : 'bg-[#222A3F]'
           ]"
           :style="dropdownStyle"
         >
@@ -76,7 +78,7 @@ export default defineComponent({
       default: 8 // valor padrão de 8px (equivalente ao mt-2 do Tailwind)
     },
     variant: {
-      type: String as () => 'default' | 'light',
+      type: String as () => 'default' | 'light' | 'full',
       default: 'default'
     }
   },
@@ -92,7 +94,7 @@ export default defineComponent({
         const triggerRect = dropdownRef.value.getBoundingClientRect()
         let left = 0
         let width = 192 // 12rem = 192px
-        if (props.variant === 'light') {
+        if (props.variant === 'light' || props.variant === 'full') {
           left = triggerRect.left + window.scrollX
           width = triggerRect.width
         } else {
