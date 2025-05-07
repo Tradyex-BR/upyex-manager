@@ -10,7 +10,7 @@
           @keyup.enter="emitSearch" :disabled="searchDisabled" />
       </div>
       <div
-        class="font-inter cursor-not-allowed text-[14px] leading-5 self-stretch flex min-w-60 items-center gap-[30px] text-white my-auto">
+        class="justify-end font-inter cursor-not-allowed text-[14px] leading-5 self-stretch flex min-w-60 items-center gap-[30px] text-white my-auto">
         <!-- <img
           src="https://cdn.builder.io/api/v1/image/assets/7f72b52c1e064ab59dcec351fcad2273/af02ba544c49dcfe6925b9408f10a84e26e396f2?placeholderIfAbsent=true"
           class="aspect-[2.44] object-contain w-[83px] self-stretch shrink-0" alt="Notifications" /> -->
