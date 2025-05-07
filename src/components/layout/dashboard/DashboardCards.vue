@@ -1,15 +1,15 @@
 <template>
   <div class="flex flex-row h-full" :class="{ 'flex-col': vertical }" :style="{ gap: `${gap}px` }">
     <template v-if="vertical">
-      <div class="flex flex-col gap-4">
+      <div class="flex flex-col gap-2">
         <StatCard v-for="(card, index) in managerListCards" :key="index" :value="card.value" :label="card.label"
           :border="card.border" :class="$attrs.class" :index="index" />
       </div>
     </template>
     <template v-else>
-      <div class="flex flex-row gap-4">
+      <div class="w-full flex flex-row gap-6">
         <StatCard v-for="(card, index) in (role === 'manager' ? managerCards : affiliateCards)" :key="index"
-          :value="card.value" :label="card.label" :border="card.border" :class="$attrs.class, 'flex-1'" :index="index" />
+          :value="card.value" :label="card.label" :border="card.border" :class="$attrs.class" :index="index" />
       </div>
     </template>
   </div>
