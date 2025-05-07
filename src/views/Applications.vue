@@ -1,78 +1,90 @@
-<template>
-  <AuthenticatedLayout :loading="loading">
-    <div v-if="loading" class="flex items-center justify-center py-10">
-      <span class="text-white text-lg">Carregando ofertas...</span>
-    </div>
-    <div v-else-if="offers.length === 0" class="flex w-full min-h-[200px] items-center justify-center text-gray-400 text-lg">
-      Nenhuma oferta encontrada
-    </div>
-    <div v-else class="overflow-visible">
-      <section class="min-h-[944px] w-full overflow-visible">
-        <div class="flex justify-between items-center mb-6">
-          <p class="text-white text-2xl font-semibold">Aplicações</p>
-          <!-- <BaseButton class="ml-2" @click="handleGenerateLink">
-            Gerar link genérico
-          </BaseButton> -->
-        </div>
-        <div>
-          <BaseTable 
-            :headers="[
+  <template>
+    <AuthenticatedLayout :loading="loading">
+      <div v-if="loading" class="flex items-center justify-center py-10">
+        <span class="text-white text-lg">Carregando ofertas...</span>
+      </div>
+      <div v-else-if="offers.length === 0"
+        class="flex w-full min-h-[200px] items-center justify-center text-gray-400 text-lg">
+        Nenhuma oferta encontrada
+      </div>
+      <div v-else class="overflow-visible">
+        <section class="min-h-[944px] w-full overflow-visible">
+          <div class="flex justify-between items-center mb-6">
+            <p class="text-white text-2xl font-semibold">Aplicações</p>
+            <!-- <BaseButton class="ml-2" @click="handleGenerateLink">
+              Gerar link genérico
+            </BaseButton> -->
+          </div>
+          <div>
+
+            <BaseTable :headers="isManager ? [
+              { key: 'name', label: 'Nome', align: 'left' },
+              { key: 'status', label: 'Status', align: 'center' },
+              { key: 'base_affiliate_link', label: 'Link direto', align: 'center' },
+              { key: 'actions', label: 'Ações', align: 'center' }
+            ] : [
               { key: 'name', label: 'Nome', align: 'left' },
               { key: 'status', label: 'Status', align: 'center' },
               { key: 'link', label: 'Link direto', align: 'center' }
-            ]"
-            :items="offers"
-          >
-            <template #name="{ item }">
-              <div class="flex items-center gap-3">
-                <img 
-                  :src="item.logo_url || `https://ui-avatars.com/api/?name=${item.name}&background=random`"
-                  :alt="item.name" 
-                  class="w-8 h-8 rounded-full object-cover" 
-                />
-                <div class="flex flex-col">
-                  <span class="font-inter text-[14px] font-normal leading-[18px] text-white">{{ item.name }}</span>
-                  <span class="font-inter text-[14px] font-normal leading-[18px] text-white">{{ item.description }}</span>
+            ]" :items="offers">
+              <template #name="{ item }">
+                <div class="flex items-center gap-3">
+                  <img :src="item.logo_url || `https://ui-avatars.com/api/?name=${item.name}&background=random`"
+                    :alt="item.name" class="w-8 h-8 rounded-full object-cover" />
+                  <div class="flex flex-col">
+                    <span class="font-inter text-[14px] font-normal leading-[18px] text-white">{{ item.name }}</span>
+                    <span class="font-inter text-[14px] font-normal leading-[18px] text-white">{{ item.description
+                    }}</span>
+                  </div>
                 </div>
-              </div>
-            </template>
-            
-            <template #status="{ item }">
-              <span :class="getStatusClass(item.is_active)">
-                {{ item.is_active ? 'Ativa' : 'Inativa' }}
-              </span>
-            </template>
-            
-            <template #link="{ item }">
-              <div class="flex items-center justify-center gap-2">
-                <span class="font-inter text-[14px] font-normal leading-[18px] text-white truncate max-w-[200px]">
-                  {{ formatLink(item.affiliate_link) }}
+              </template>
+
+              <template #status="{ item }">
+                <span :class="getStatusClass(item.is_active)">
+                  {{ item.is_active ? 'Ativa' : 'Inativa' }}
                 </span>
-                <CopyButton :stringToCopy="item.affiliate_link" />
-              </div>
-            </template>
-          </BaseTable>
-        </div>
-      </section>
-    </div>  
+              </template>
 
-    <!-- Modal de Detalhes da Oferta -->
-<!--     <OfferDetailsModal
-      :show="showDetailsModal"
-      :offer="selectedOffer"
-      @close="showDetailsModal = false"
-    /> -->
+              <template #base_affiliate_link="{ item }">
+                <div class="flex items-center justify-center gap-2">
+                  <span class="font-inter text-[14px] font-normal leading-[18px] text-white truncate max-w-[200px]">
+                    {{ item.base_affiliate_link }}
+                  </span>
+                  <CopyButton :stringToCopy="item.base_affiliate_link" />
+                </div>
+              </template>
 
-    <!-- Modal de Criação de Aplicação -->
-    <GenerateLinkModal
-      v-if="showCreateModal"
-      :show="showCreateModal"
-      :application-id="selectedOffer?.id"
-      @close="showCreateModal = false"
-      @submit="handleCreateApplication"
-    />
-  </AuthenticatedLayout>
-</template>
+              <template #link="{ item }">
+                <div class="flex items-center justify-center gap-2">
+                  <span class="font-inter text-[14px] font-normal leading-[18px] text-white truncate max-w-[200px]">
+                    {{ formatLink(item.affiliate_link) }}
+                  </span>
+                  <CopyButton :stringToCopy="item.affiliate_link" />
+                </div>
+              </template>
+
+              <template #actions="{ item }">
+                <BaseDropdown :options="dropdownOptions" :model-value="dropdownOpen === item.id"
+                  @update:model-value="(value) => handleDropdownToggle(item.id, value)"
+                  @select="(action) => handleApplicationAction(item.id, action)" :top="50" class="w-min mx-auto" />
+              </template>
+            </BaseTable>
+          </div>
+        </section>
+      </div>
+
+      <!-- Modal de Detalhes da Oferta -->
+      <!--     <OfferDetailsModal
+        :show="showDetailsModal"
+        :offer="selectedOffer"
+        @close="showDetailsModal = false"
+      /> -->
+
+      <!-- Modal de Criação de Aplicação -->
+      <GenerateLinkModal v-if="showCreateModal" :show="showCreateModal" :application-id="selectedOffer?.id"
+        @close="showCreateModal = false" @submit="handleCreateApplication" />
+    </AuthenticatedLayout>
+  </template>
 
 <script lang="ts">
 import { defineComponent, ref } from 'vue'
@@ -87,6 +99,11 @@ import { useToast } from 'vue-toastification'
 import CopyButton from '@/components/common/CopyButton.vue'
 import { formatLink } from '@/utils/formatters'
 import BaseTable from '@/components/common/BaseTable.vue'
+import XIcon from '@/components/icons/XIcon.vue'
+import PenIcon from '@/components/icons/PenIcon.vue'
+import KeyIcon from '@/components/icons/KeyIcon.vue'
+import TrashIcon from '@/components/icons/TrashIcon.vue'
+import BaseDropdown from '@/components/common/BaseDropdown.vue'
 
 export default defineComponent({
   props: {
@@ -95,21 +112,44 @@ export default defineComponent({
       default: ''
     }
   },
-  name: 'Offers',
+  name: 'Applications',
   components: {
     AuthenticatedLayout,
     BaseButton,
     CopyButton,
     GenerateLinkModal,
     OfferDetailsModal,
-    BaseTable
+    BaseTable,
+    BaseDropdown
   },
   setup() {
     const store = useDashboardStore()
     const loading = ref(true)
     const router = useRouter()
     const toast = useToast()
-    return { store, loading, router, toast }
+    const dropdownOptions = [
+      {
+        text: 'Bloquear',
+        action: 'bloquear',
+        icon: XIcon
+      },
+      {
+        text: 'Editar Permissão',
+        action: 'editar_permissao',
+        icon: PenIcon
+      },
+      {
+        text: 'Resetar Senha',
+        action: 'resetar_senha',
+        icon: KeyIcon
+      },
+      {
+        text: 'Excluir',
+        action: 'excluir',
+        icon: TrashIcon
+      }
+    ]
+    return { store, loading, router, toast, dropdownOptions }
   },
   data() {
     return {
@@ -117,10 +157,13 @@ export default defineComponent({
       loading: true,
       showCreateModal: false,
       showDetailsModal: false,
-      selectedOffer: null as any
+      selectedOffer: null as any,
+      isManager: false,
+      dropdownOpen: null as string | null
     }
   },
   async mounted() {
+    this.isManager = localStorage.getItem('role') === 'manager'
     await this.handleSearch('');
   },
   watch: {
@@ -147,6 +190,30 @@ export default defineComponent({
         // Trate erro se necessário
       } finally {
         this.loading = false;
+      }
+    },
+    handleDropdownToggle(id: string, value: boolean) {
+      this.dropdownOpen = value ? id : null;
+    },
+    async handleApplicationAction(id: string, action: string) {
+      try {
+        /* const customer = this.customers.find(c => c.id === id);
+        if (!customer) return; */
+
+        switch (action) {
+          case 'bloquear':
+            break;
+          case 'editar_permissao':
+            // Implementar lógica de edição de permissão
+            break;
+          case 'resetar_senha':
+            // Implementar lógica de reset de senha
+            break;
+          case 'excluir':
+            break;
+        }
+      } catch (e) {
+        console.error(`Erro ao executar ação ${action}:`, e)
       }
     },
     getStatusClass(isActive: boolean): string {

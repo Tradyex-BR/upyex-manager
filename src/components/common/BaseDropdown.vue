@@ -159,7 +159,9 @@ export default defineComponent({
     },
     handleClickOutside(event: MouseEvent) {
       const dropdownRef = this.$refs.dropdownRef as HTMLElement
-      if (dropdownRef && !dropdownRef.contains(event.target as Node)) {
+      const dropdownMenu = this.$refs.dropdownMenu as HTMLElement
+      if (dropdownRef && !dropdownRef.contains(event.target as Node) && 
+          dropdownMenu && !dropdownMenu.contains(event.target as Node)) {
         this.isOpen = false
         this.$emit('update:modelValue', false)
       }

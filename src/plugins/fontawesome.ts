@@ -13,7 +13,8 @@ import {
   faExclamationCircle,
   faRightFromBracket,
   faCheck,
-  faXmark
+  faXmark,
+  faExclamationTriangle
 } from '@fortawesome/free-solid-svg-icons'
 
 library.add(
@@ -29,7 +30,8 @@ library.add(
   faExclamationCircle,
   faRightFromBracket,
   faCheck,
-  faXmark
+  faXmark,
+  faExclamationTriangle
 )
 
 export { FontAwesomeIcon } 
