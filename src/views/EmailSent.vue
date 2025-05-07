@@ -29,7 +29,7 @@
           <div class="text-center font-inter text-[14px] leading-[18px] text-[#040D25]">
             <span>Lembrou sua senha? </span>
             <router-link 
-              to="/login" 
+              :to="route.meta.role === 'MANAGER' ? '/login/manager' : '/login/affiliate'" 
               class="text-[#CF631C] hover:underline hover:text-[#CF631C]"
               @click="handleLogin"
             >
@@ -47,13 +47,16 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 import LoginBackground from '@/components/layout/login/LoginBackground.vue'
 import VerticalLines from '@/components/layout/login/VerticalLines.vue'
 import BaseButton from '@/components/common/BaseButton.vue'
 import PaperPlaneIcon from '@/components/icons/PaperPlaneIcon.vue'
-const router = useRouter()
+import { useAuthContextStore } from '@/stores/auth-context'
 
+const router = useRouter()
+const route = useRoute()
+const authContextStore = useAuthContextStore()
 const loading = ref(false)
 
 const handleLogin = () => {
@@ -63,10 +66,11 @@ const handleLogin = () => {
 const handleBack = async () => {
   try {
     loading.value = true
-    // Aqui você implementará a lógica de reenvio do email de recuperação
-    // await authStore.resendForgotPasswordEmail(email.value)
-    // Após o envio bem-sucedido, você pode redirecionar ou mostrar uma mensagem
-    router.push('/forgot-password')
+    if (authContextStore.userRole === 'AFFILIATE') {
+      router.push('/forgot-password/affiliate')
+    } else {
+      router.push('/forgot-password/manager')
+    }
   } catch (error) {
     console.error('Erro ao solicitar reenvio do email:', error)
   } finally {

@@ -1,5 +1,5 @@
 <template>
-  <BaseModal title="Criar Afiliado" @close="$emit('close')" gap="8">
+  <BaseModal title="Criar Afiliado" @close="$emit('close')" content-class="gap-8">
     <div class="flex flex-col h-full max-h-[calc(100vh-100px)]">
       <!-- Tabs -->
       <div class="flex items-center justify-start gap-4 mb-4">

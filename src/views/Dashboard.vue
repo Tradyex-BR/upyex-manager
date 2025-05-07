@@ -75,6 +75,39 @@ import EmptyChart from '@/components/layout/dashboard/EmptyChart.vue'
 const currentView = ref('cards')
 const role = localStorage.getItem('role') || 'manager'
 
+const translateLabel = (label: string): string => {
+  const translations: Record<string, string> = {
+    // Status de pagamento
+    'paid': 'Pago',
+    'payment_pending': 'Pendente',
+    'payment_failed': 'Falhou',
+    'payment_refunded': 'Reembolsado',
+    'payment_canceled': 'Cancelado',
+
+    // Métodos de pagamento
+    'credit_card': 'Cartão de Crédito',
+    'pix': 'PIX',
+    'bank_transfer': 'Transferência Bancária',
+    'payment_link': 'Link de Pagamento',
+    'debit_card': 'Cartão de Débito',
+    'other': 'Outros',
+
+    // Status de saque
+    'completed': 'Concluído',
+    'processing': 'Processando',
+    'failed': 'Falhou',
+    'pending': 'Pendente',
+    'canceled': 'Cancelado',
+    'approved': 'Aprovado',
+    'rejected': 'Rejeitado',
+    'requested': 'Solicitado',
+    'processed': 'Processado',
+    'cancelled': 'Cancelado',
+  }
+
+  return translations[label] || label
+}
+
 const {
   data,
   loading,
@@ -97,7 +130,7 @@ const formattedPaymentMethodData = computed(() => {
   return {
     data: {
       methods: Object.entries(methods).map(([method, value]) => ({
-        label: method,
+        label: translateLabel(method),
         value: Number(value),
         icon: (method === 'credit_card' ? 'card' :
           method === 'pix' ? 'pix' :
@@ -112,16 +145,12 @@ const formattedPaymentMethodData = computed(() => {
 
 const formattedWithdrawalsData = computed(() => ({
   data: Object.entries(data.value?.withdrawals?.by_status || {}).map(([label, value]) => ({
-    label,
+    label: translateLabel(label),
     value: Number(value)
   }))
 }))
 
 onMounted(() => {
   fetchData()
-})
-
-watch(data, () => {
-  console.log('Withdrawals Data:', formattedWithdrawalsData.value)
 })
 </script>

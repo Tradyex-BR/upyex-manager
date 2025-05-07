@@ -25,27 +25,6 @@
             <div v-html="emailIcon"></div>
           </template>
         </BaseInput>
-        
-        <div class="flex flex-col gap-1 w-full">
-          <label class="flex items-center gap-0.5 text-sm font-medium text-[rgba(4,13,37,1)]">
-            <span class="text-[#040D25] text-[14px] font-medium leading-5">Tipo de usuário</span>
-            <span class="text-[#BE3E37] font-inter text-[14px] leading-5 font-medium">*</span>
-          </label>
-          <BaseDropdown
-            :options="roles.map(r => ({ text: r.label, action: r.value }))"
-            :model-value="!!role"
-            @select="role = $event"
-            variant="light"
-            :top="60"
-          >
-            <template #trigger>
-              <div class="h-[56px] px-3 py-4 border border-[#B8B8B8] rounded-lg outline-none bg-white flex items-center justify-between">
-                <span class="font-inter text-[#222A3F] leading-5">{{ roles.find(r => r.value === role)?.label }}</span>
-                <ChevronDownIcon class="w-5 h-5 text-[#222A3F]" />
-              </div>
-            </template>
-          </BaseDropdown>
-        </div>
       </form>
 
       <div class="flex flex-col gap-6 w-full max-sm:items-center">
@@ -63,7 +42,7 @@
 
         <div class="text-center font-inter text-[14px] leading-[18px] text-[#040D25]">
           <span>Lembrou sua senha? </span>
-          <router-link to="/login" class="text-[#CF631C] hover:underline hover:text-[#CF631C]">
+          <router-link :to="route.meta.role === 'MANAGER' ? '/login/manager' : '/login/affiliate'" class="text-[#CF631C] hover:underline hover:text-[#CF631C]">
             Faça login
           </router-link>
         </div>
@@ -79,21 +58,17 @@
 
 <script setup lang="ts">
 import { ref, onMounted, watch, computed } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 import LoginBackground from '@/components/layout/login/LoginBackground.vue'
 import VerticalLines from '@/components/layout/login/VerticalLines.vue'
 import BaseButton from '@/components/common/BaseButton.vue'
-import BaseDropdown from '@/components/common/BaseDropdown.vue'
-import ChevronDownIcon from '@/components/common/icons/ChevronDownIcon.vue'
 import BaseInput from '@/components/common/BaseInput.vue'
+import { useAuthContextStore } from '@/stores/auth-context'
 
 const router = useRouter()
+const route = useRoute()
+const authContextStore = useAuthContextStore()
 const email = ref('')
-const role = ref('MANAGER')
-const roles = [
-  { value: 'MANAGER', label: 'Administrador' },
-  { value: 'AFFILIATE', label: 'Afiliado' }
-]
 const loading = ref(false)
 const error = ref('')
 const message = ref('')
@@ -103,22 +78,16 @@ const isEmailValid = computed(() => {
   return emailRegex.test(email.value)
 })
 
-// Carregar o último tipo de usuário selecionado e email
+// Carregar o email salvo
 onMounted(() => {
-  const savedRole = window.localStorage.getItem('userRole')
-  if (savedRole) {
-    role.value = savedRole
-  }
-
   const savedEmail = window.localStorage.getItem('recoveryEmail')
   if (savedEmail) {
     email.value = savedEmail
   }
-})
-
-// Salvar o tipo de usuário no localStorage quando alterado
-watch(role, (newRole) => {
-  window.localStorage.setItem('userRole', newRole)
+  // Salva o papel do usuário no store
+  if (route.meta.role) {
+    authContextStore.setUserRole(route.meta.role as 'MANAGER' | 'AFFILIATE')
+  }
 })
 
 const emailIcon = `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -140,12 +109,7 @@ const handleSubmit = async () => {
   window.localStorage.setItem('recoveryEmail', email.value)
 
   try {
-    let endpoint = ''
-    if (role.value === 'MANAGER') {
-      endpoint = '/manager/auth/password/forgot'
-    } else if (role.value === 'AFFILIATE') {
-      endpoint = '/affiliate/auth/password/forgot'
-    }
+    const endpoint = authContextStore.userRole === 'MANAGER' ? '/manager/auth/password/forgot' : '/affiliate/auth/password/forgot'
     const url = `${import.meta.env.VITE_API_BASE_URL}${endpoint}?email=${encodeURIComponent(email.value.trim())}`
     const res = await fetch(url, {
       method: 'GET'
@@ -155,7 +119,7 @@ const handleSubmit = async () => {
       throw new Error(data.message || 'Erro ao solicitar recuperação de senha')
     }
     message.value = data.message || 'Email enviado com instruções para redefinir a senha.'
-    setTimeout(() => router.push('/email-sent'), 1200)
+    setTimeout(() => router.push(`/email-sent/${authContextStore.userRole.toLowerCase()}`), 1200)
   } catch (err: any) {
     error.value = err.message || 'Erro ao solicitar recuperação de senha'
   } finally {

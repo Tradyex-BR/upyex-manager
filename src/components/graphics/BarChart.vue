@@ -33,24 +33,11 @@ const axisFontFamily = 'Lato, sans-serif'
 const axisFontSize = 14
 const axisLabelColor = '#B8B8B8'
 
-// Mock de dados para visualização local
-const mockBarData = {
-  data: [
-    { label: 'Seg', value: 120 },
-    { label: 'Ter', value: 180 },
-    { label: 'Qua', value: 150 },
-    { label: 'Qui', value: 200 },
-    { label: 'Sex', value: 220 },
-    { label: 'Sáb', value: 190 },
-    { label: 'Dom', value: 160 }
-  ]
-}
-
 const createOrUpdateChart = () => {
   if (!chartCanvas.value) return
 
   // Usa os dados das props se disponíveis, senão usa o mock
-  const chartInput = props.data || mockBarData
+  const chartInput = props.data;
 
   const labels = chartInput.data.map(item => item.label)
   const values = chartInput.data.map(item => item.value)

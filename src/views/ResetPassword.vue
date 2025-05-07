@@ -67,7 +67,7 @@
 
           <div class="text-center font-inter text-[14px] leading-[18px] text-[#040D25]">
             <span>Lembrou sua senha? </span>
-            <router-link to="/login" class="text-[#CF631C] hover:underline hover:text-[#CF631C]">
+            <router-link :to="route.meta.role === 'MANAGER' ? '/login/manager' : '/login/affiliate'" class="text-[#CF631C] hover:underline hover:text-[#CF631C]">
               Faça login
             </router-link>
           </div>
@@ -83,19 +83,29 @@
 <script setup lang="ts">
 import LoginBackground from '@/components/layout/login/LoginBackground.vue'
 import VerticalLines from '@/components/layout/login/VerticalLines.vue'
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import BaseButton from '@/components/common/BaseButton.vue'
 import PasswordVisibilityIcon from '@/components/common/icons/PasswordVisibilityIcon.vue'
 import BaseInput from '@/components/common/BaseInput.vue'
+import { useAuthContextStore } from '@/stores/auth-context'
 
 const router = useRouter()
+const route = useRoute()
+const authContextStore = useAuthContextStore()
 
 const password = ref('')
 const confirmPassword = ref('')
 const showPassword = ref(false)
 const showConfirmPassword = ref(false)
 const loading = ref(false)
+
+onMounted(() => {
+  // Salva o papel do usuário no store
+  if (route.meta.role) {
+    authContextStore.setUserRole(route.meta.role as 'MANAGER' | 'AFFILIATE')
+  }
+})
 
 const passwordIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
 <path d="M13 3H14C15.105 3 16 3.895 16 5C16 3.895 16.895 3 18 3H19" stroke="#85B1FF" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
@@ -118,10 +128,12 @@ const handleSubmit = async () => {
 
   try {
     loading.value = true
+    const endpoint = authContextStore.userRole === 'MANAGER' ? '/manager/auth/password/reset' : '/affiliate/auth/password/reset'
+    const token = route.query.token as string
+    
     // Aqui você implementará a lógica de redefinição de senha
-    // const token = route.query.token as string
     // await authStore.resetPassword(token, password.value)
-    // Após a redefinição bem-sucedida, você pode redirecionar ou mostrar uma mensagem
+    
     router.push('/password-changed')
   } catch (error) {
     console.error('Erro ao redefinir senha:', error)

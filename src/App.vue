@@ -4,13 +4,23 @@ import { computed } from 'vue';
 import Sidebar from './components/layout/dashboard/Sidebar.vue';
 import TopBar from './components/layout/dashboard/TopBar.vue';
 
-const pagesThatDontHaveSidebar = ['/login', '/forgot-password', '/email-sent', '/reset-password', '/password-changed'];
+const pagesThatDontHaveSidebar = [
+  '/login/manager',
+  '/login/affiliate',
+  '/forgot-password/manager',
+  '/forgot-password/affiliate',
+  '/email-sent/manager',
+  '/email-sent/affiliate',
+  '/reset-password/manager',
+  '/reset-password/affiliate',
+  '/password-changed'
+];
 
 const route = useRoute();
 import { ref } from 'vue'
 
 const thisPageHaveSidebar = computed(() =>
-  pagesThatDontHaveSidebar.includes(route.path) || route.name === 'NotFound'
+  pagesThatDontHaveSidebar.includes(route.path) || route.name === 'NotFoundAffiliate' || route.name === 'NotFoundManager'
 );
 
 const searchTerm = ref('')

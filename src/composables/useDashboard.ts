@@ -44,7 +44,7 @@ export function useDashboard() {
   })
   const loading = ref(true)
   const error = ref('')
-  const useMockData = ref(true)
+  const useMockData = ref(false)
 
   const role = computed(() => {
     return localStorage.getItem('role') || 'manager'
@@ -55,10 +55,10 @@ export function useDashboard() {
       cards: {
         by_status: {
           awaiting_payment: 10,
-          paid: 0,
-          refunded: 0,
-          cancelled: 0,
-          failed: 0
+          paid: 312,
+          refunded: 42,
+          cancelled: 42,
+          failed: 4
         },
         by_payment_method: {
           bank_transfer: 5,
@@ -93,13 +93,13 @@ export function useDashboard() {
     },
     withdrawals: {
       by_status: {
-        requested: 0,
-        approved: 0,
-        rejected: 0,
-        processing: 0,
-        processed: 0,
-        cancelled: 0,
-        failed: 0
+        requested: 312,
+        approved: 32,
+        rejected: 31,
+        processing: 41,
+        processed: 12,
+        cancelled: 31,
+        failed: 412
       }
     },
     customers: {

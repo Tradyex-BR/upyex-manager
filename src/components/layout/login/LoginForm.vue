@@ -18,20 +18,6 @@
             <PasswordVisibilityIcon :is-visible="showPassword" @toggle="showPassword = !showPassword" />
           </template>
         </BaseInput>
-
-        <div class="flex flex-col gap-1">
-          <label class="text-[14px] font-medium">Tipo de usuário <span class="text-[#BE3E37]">*</span></label>
-          <BaseDropdown :options="roles.map(r => ({ text: r.label, action: r.value }))" :model-value="!!role"
-            @select="role = $event" variant="light" :top="60" :disabled="loading || isFingerprintLoading">
-            <template #trigger>
-              <div
-                class="h-[56px] px-3 py-4 border border-[#B8B8B8] rounded-lg outline-none bg-white flex items-center justify-between">
-                <span class="font-inter text-[#222A3F] leading-5">{{roles.find(r => r.value === role)?.label}}</span>
-                <ChevronDownIcon class="w-5 h-5 text-[#222A3F]" />
-              </div>
-            </template>
-          </BaseDropdown>
-        </div>
       </div>
 
       <div class="flex flex-col gap-4">
@@ -42,7 +28,7 @@
 
         <div class="text-center font-inter text-[14px] leading-[18px] text-[#040D25]">
           <div class="relative inline-block group">
-            <router-link :to="isEmailValid ? '/forgot-password' : '#'" :class="[
+            <router-link :to="isEmailValid ? forgotPasswordRoute : '#'" :class="[
               isEmailValid
                 ? 'text-[#CF631C] hover:underline hover:text-[#CF631C]'
                 : 'text-[#444c5a] opacity-50 cursor-not-allowed pointer-events-none'
@@ -67,31 +53,26 @@
 
 <script setup lang="ts">
 import { ref, onMounted, watch, computed, inject } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useVisitorData } from '@fingerprintjs/fingerprintjs-pro-vue-v3'
 import BaseButton from '@/components/common/BaseButton.vue'
-import BaseDropdown from '@/components/common/BaseDropdown.vue'
 import BaseInput from '@/components/common/BaseInput.vue'
 import EmailIcon from '@/components/common/icons/EmailIcon.vue'
 import PasswordIcon from '@/components/common/icons/PasswordIcon.vue'
 import PasswordVisibilityIcon from '@/components/common/icons/PasswordVisibilityIcon.vue'
-import ChevronDownIcon from '@/components/common/icons/ChevronDownIcon.vue'
 import type { LoginRequest } from '@/types/auth'
 
 const router = useRouter()
+const route = useRoute()
 const email = ref('')
 const password = ref('')
 const showPassword = ref(false)
 const emailError = ref('')
-const isDropdownOpen = ref(false)
-const roles = [
-  { value: 'MANAGER', label: 'Administrador' },
-  { value: 'AFFILIATE', label: 'Afiliado' }
-]
-const role = ref<'MANAGER' | 'AFFILIATE'>('MANAGER')
 const loading = ref(false)
 const error = ref('')
+
+const role = computed(() => route.meta.role as 'MANAGER' | 'AFFILIATE')
 
 const isDev = import.meta.env.DEV
 const mockFingerprint = isDev ? inject('fingerprint') as { getData: () => Promise<{ visitorId: string }> } : null
@@ -125,6 +106,10 @@ const isFormValid = computed(() => {
   return valid
 })
 
+const forgotPasswordRoute = computed(() => {
+  return role.value === 'MANAGER' ? '/forgot-password/manager' : '/forgot-password/affiliate'
+})
+
 const handleForgotPassword = () => {
   if (isEmailValid.value) {
     window.localStorage.setItem('recoveryEmail', email.value)
@@ -135,16 +120,6 @@ const authStore = useAuthStore()
 
 onMounted(async () => {
   console.log('Iniciando obtenção do fingerprint...')
-  const savedRole = localStorage.getItem('userRole')
-
-  if (savedRole) {
-    role.value = savedRole as 'MANAGER' | 'AFFILIATE'
-  }
-
-  if (!savedRole) {
-    localStorage.setItem('userRole', role.value)
-  }
-
   try {
     if (isDev) {
       console.log('Ambiente de desenvolvimento: usando mock do fingerprint')
@@ -167,10 +142,6 @@ onMounted(async () => {
   } finally {
     isFingerprintLoading.value = false
   }
-})
-
-watch(role, (newRole) => {
-  localStorage.setItem('userRole', newRole)
 })
 
 const handleLogin = async () => {

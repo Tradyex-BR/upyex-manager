@@ -141,6 +141,11 @@ export interface WithdrawalResponse {
   id: string;
   status: string;
   message: string;
+  minimum_amount?: number;
+  maximum_amount?: number;
+  daily_limit?: number;
+  withdrawals_today?: number;
+  current_balance?: number;
 }
 
 export interface ListWithdrawalsResponse {
@@ -226,7 +231,7 @@ export const managerService = {
      * Login do manager. Salva o token no localStorage.
      */
     login: async (credentials: ManagerLoginCredentials): Promise<ManagerLoginResponse> => {
-      const response = await api.post<ManagerLoginResponse>(credentials.role.toLowerCase()+  '/auth', credentials);
+      const response = await api.post<ManagerLoginResponse>(credentials.role.toLowerCase() + '/auth', credentials);
       if (response.data?.auth_token) {
         setToken(response.data.auth_token);
       }
@@ -388,6 +393,14 @@ export const managerService = {
       const response = await api.post<WithdrawalResponse>(`/external/sales/${id}`, {
         status: 'rejected'
       });
+      return response.data;
+    },
+
+    /**
+     * Resgata o valor do saque
+     */
+    information: async (): Promise<WithdrawalResponse> => {
+      const response = await api.get<WithdrawalResponse>(`/withdrawals/information`);
       return response.data;
     }
   },

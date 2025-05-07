@@ -14,17 +14,18 @@ import MenuIcon from '@/components/icons/MenuIcon.vue'
 import BaseDropdown from '@/components/common/BaseDropdown.vue'
 import BaseTable from '@/components/common/BaseTable.vue'
 
+import { ListWithdrawalsResponse } from '@/services/managerService'
+
 const CheckIcon = defineAsyncComponent(() => import('@/components/icons/CheckIcon.vue'))
 const XIcon = defineAsyncComponent(() => import('@/components/icons/XIcon.vue'))
 
 const loading = ref(true)
-const withdrawalsSuccess = ref(false)
 
 // Dados mockados para testes
-const MOCK_WITHDRAWALS = {
+const MOCK_WITHDRAWALS: ListWithdrawalsResponse = {
   data: [
     {
-      id: 1,
+      id: '1',
       created_at: '2024-03-20T10:00:00Z',
       amount: 1500.00,
       destination: 'chave.pix@exemplo.com',
@@ -33,7 +34,7 @@ const MOCK_WITHDRAWALS = {
       links: { frontend: 'https://exemplo.com/saque/1' }
     },
     {
-      id: 2,
+      id: '2',
       created_at: '2024-03-19T15:30:00Z',
       amount: 2500.00,
       destination: '0x1234...5678',
@@ -42,7 +43,7 @@ const MOCK_WITHDRAWALS = {
       links: { frontend: 'https://exemplo.com/saque/2' }
     },
     {
-      id: 3,
+      id: '3',
       created_at: '2024-03-18T09:15:00Z',
       amount: 800.00,
       destination: 'chave.pix@outro.com',
@@ -51,13 +52,9 @@ const MOCK_WITHDRAWALS = {
       links: { frontend: 'https://exemplo.com/saque/3' }
     }
   ],
-  meta: {
-    current_page: 1,
-    last_page: 1,
-    per_page: 20,
-    total: 3,
-    links: []
-  }
+  total: 3,
+  page: 1,
+  per_page: 20
 }
 
 // Flag para controlar se usa dados mockados
@@ -92,6 +89,13 @@ export default defineComponent({
       lastWithdrawalAmount: '',
       lastWithdrawalPixKey: '',
       loading: true,
+      withdrawalInfo: {
+        minimum_amount: 0,
+        maximum_amount: 0,
+        daily_limit: 0,
+        withdrawals_today: 0,
+        current_balance: 0
+      },
       withdrawals: [] as Array<any>,
       pagination: {
         current_page: 1,
@@ -122,12 +126,13 @@ export default defineComponent({
   },
   async mounted() {
     await this.loadWithdrawals();
+    await this.loadWithdrawalInfo();
   },
   methods: {
     async loadWithdrawals() {
       this.loading = true;
       try {
-        let response;
+        let response: ListWithdrawalsResponse;
 
         if (USE_MOCK_DATA) {
           response = MOCK_WITHDRAWALS;
@@ -144,7 +149,7 @@ export default defineComponent({
           });
         }
 
-        this.withdrawals = (response.data || []).map((item: any) => ({
+        this.withdrawals = response.data.map((item) => ({
           id: item.id,
           date: item.created_at ? new Date(item.created_at).toLocaleString('pt-BR') : '',
           valueBRL: Number(item.amount).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }),
@@ -154,13 +159,11 @@ export default defineComponent({
           link: item.links?.frontend || ''
         }));
 
-        if ('meta' in response) {
-          this.pagination.current_page = response.meta.current_page;
-          this.pagination.last_page = response.meta.last_page;
-          this.pagination.per_page = response.meta.per_page;
-          this.pagination.total = response.meta.total;
-          this.pagination.links = response.meta.links;
-        }
+        this.pagination.current_page = response.page;
+        this.pagination.last_page = Math.ceil(response.total / response.per_page);
+        this.pagination.per_page = response.per_page;
+        this.pagination.total = response.total;
+        this.pagination.links = [];
       } catch (error) {
         console.error('Erro ao carregar saques:', error);
       } finally {
@@ -170,7 +173,7 @@ export default defineComponent({
     async handleSearch(term: string) {
       this.loading = true;
       try {
-        let response;
+        let response: ListWithdrawalsResponse;
 
         if (USE_MOCK_DATA) {
           // Filtra os dados mockados
@@ -181,7 +184,9 @@ export default defineComponent({
           );
           response = {
             data: filteredData,
-            meta: MOCK_WITHDRAWALS.meta
+            total: filteredData.length,
+            page: 1,
+            per_page: this.pagination.per_page
           };
         } else {
           response = await managerService.withdrawals.list({
@@ -197,7 +202,7 @@ export default defineComponent({
           });
         }
 
-        this.withdrawals = (response.data || []).map((item: any) => ({
+        this.withdrawals = response.data.map((item) => ({
           id: item.id,
           date: item.created_at ? new Date(item.created_at).toLocaleString('pt-BR') : '',
           valueBRL: Number(item.amount).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }),
@@ -207,13 +212,11 @@ export default defineComponent({
           link: item.links?.frontend || ''
         }));
 
-        if ('meta' in response) {
-          this.pagination.current_page = response.meta.current_page;
-          this.pagination.last_page = response.meta.last_page;
-          this.pagination.per_page = response.meta.per_page;
-          this.pagination.total = response.meta.total;
-          this.pagination.links = response.meta.links;
-        }
+        this.pagination.current_page = response.page;
+        this.pagination.last_page = Math.ceil(response.total / response.per_page);
+        this.pagination.per_page = response.per_page;
+        this.pagination.total = response.total;
+        this.pagination.links = [];
       } catch (error) {
         console.error('Erro ao pesquisar saques:', error);
       } finally {
@@ -305,6 +308,24 @@ export default defineComponent({
       } else if (action === 'reject') {
         this.rejeitar(id);
       }
+    },
+    async getBalance() {
+      const response = await managerService.withdrawals.information();
+      return Number(response.message) || 0;
+    },
+    async loadWithdrawalInfo() {
+      try {
+        const response = await managerService.withdrawals.information();
+        this.withdrawalInfo = {
+          minimum_amount: response.minimum_amount || 0,
+          maximum_amount: response.maximum_amount || 0,
+          daily_limit: response.daily_limit || 0,
+          withdrawals_today: response.withdrawals_today || 0,
+          current_balance: response.current_balance || 0
+        };
+      } catch (error) {
+        console.error('Erro ao carregar informações de saque:', error);
+      }
     }
   }
 })
@@ -325,7 +346,7 @@ export default defineComponent({
 
       <!-- Modais -->
       <WithdrawalRequestModal v-if="showRequestModal" @close="showRequestModal = false"
-        @submit="handleWithdrawalRequest" :show-footer="false" />
+        @submit="handleWithdrawalRequest" :show-footer="false" :withdrawal-info="withdrawalInfo" />
       <WithdrawalSuccessModal v-if="showSuccessModal" :amount="lastWithdrawalAmount" :pix-key="lastWithdrawalPixKey"
         @close="showSuccessModal = false" :show-footer="false" />
 

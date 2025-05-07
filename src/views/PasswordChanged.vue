@@ -26,7 +26,7 @@ d="M52.1627 19.8508L32.0134 40.0002L21.9414 29.9255" stroke="#01DD56" stroke-wid
           <BaseButton
             variant="primary"
             class="w-full h-[40px]"
-            @click="router.push('/login')">
+            @click="handleBack">
             Login
           </BaseButton>
         </div>
@@ -39,10 +39,27 @@ d="M52.1627 19.8508L32.0134 40.0002L21.9414 29.9255" stroke="#01DD56" stroke-wid
 </template>
 
 <script setup lang="ts">
-import { useRouter } from 'vue-router'
 import LoginBackground from '@/components/layout/login/LoginBackground.vue'
 import VerticalLines from '@/components/layout/login/VerticalLines.vue'
+import { ref, onMounted } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
 import BaseButton from '@/components/common/BaseButton.vue'
+import { useAuthContextStore } from '@/stores/auth-context'
 
 const router = useRouter()
+const route = useRoute()
+const authContextStore = useAuthContextStore()
+const loading = ref(false)
+
+onMounted(() => {
+  // Salva o papel do usuário no store
+  if (route.meta.role) {
+    authContextStore.setUserRole(route.meta.role as 'MANAGER' | 'AFFILIATE')
+  }
+})
+
+const handleBack = () => {
+  loading.value = true
+  router.push(authContextStore.userRole === 'MANAGER' ? '/login/manager' : '/login/affiliate')
+}
 </script>

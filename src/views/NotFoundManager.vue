@@ -38,49 +38,22 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref } from 'vue'
 import LoginBackground from '@/components/layout/login/LoginBackground.vue'
 import VerticalLines from '@/components/layout/login/VerticalLines.vue'
 import BaseButton from '@/components/common/BaseButton.vue'
-import { useRouter, useRoute } from 'vue-router'
-import { useAuthStore } from '@/stores/auth'
-import { useAuthContextStore } from '@/stores/auth-context'
+import { useRouter } from 'vue-router'
+import { isAuthenticated, getDashboardPath, getLoginPath } from '@/middleware/auth'
 
 const router = useRouter()
-const route = useRoute()
-const authStore = useAuthStore()
-const authContextStore = useAuthContextStore()
 const loading = ref(false)
-
-onMounted(() => {
-  // Se o usuário estiver autenticado, mantém o contexto atual
-  if (authStore.isAuthenticated) {
-    return
-  }
-  
-  // Se não estiver autenticado, salva o papel do usuário no store
-  if (route.meta.role) {
-    authContextStore.setUserRole(route.meta.role as 'MANAGER' | 'AFFILIATE')
-  }
-})
 
 const handleBack = () => {
   loading.value = true
-  if (authStore.isAuthenticated) {
-    // Se estiver autenticado, limpa os dados de autenticação
-    authStore.logout()
-    // Limpa dados específicos do dashboard
-    localStorage.removeItem('role')
-    localStorage.removeItem('recoveryEmail')
-    // Mantém apenas o contexto do usuário
-    const currentRole = authContextStore.userRole
-    // Limpa o store de contexto
-    authContextStore.clearUserRole()
-    // Redireciona para a página de login do contexto atual
-    router.push(currentRole === 'MANAGER' ? '/login/manager' : '/login/affiliate')
+  if (isAuthenticated()) {
+    router.push(getDashboardPath())
   } else {
-    // Se não estiver autenticado, vai para a página de login do contexto atual
-    router.push(authContextStore.userRole === 'MANAGER' ? '/login/manager' : '/login/affiliate')
+    router.push(getLoginPath())
   }
 }
-</script>
+</script> 
