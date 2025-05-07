@@ -11,9 +11,9 @@
       </div>
       <div
         class="font-inter cursor-not-allowed text-[14px] leading-5 self-stretch flex min-w-60 items-center gap-[30px] text-white my-auto">
-        <img
+        <!-- <img
           src="https://cdn.builder.io/api/v1/image/assets/7f72b52c1e064ab59dcec351fcad2273/af02ba544c49dcfe6925b9408f10a84e26e396f2?placeholderIfAbsent=true"
-          class="aspect-[2.44] object-contain w-[83px] self-stretch shrink-0" alt="Notifications" />
+          class="aspect-[2.44] object-contain w-[83px] self-stretch shrink-0" alt="Notifications" /> -->
         <div class="relative">
           <div class="self-stretch flex items-stretch gap-[10px] my-auto cursor-pointer">
             <BaseDropdown :options="[
@@ -26,17 +26,17 @@
             ]" v-model="isDropdownOpen" @select="handleDropdownAction"
               class="flex items-center w-full outline-none border-none focus:outline-none focus:ring-0 p-0">
               <template #trigger>
-                <div class="flex items-center gap-[15px] w-full">
+                <div class="flex items-center justify-end gap-[15px] w-full">
                   <div class="flex items-center gap-1">
                     <p
                       class="font-inter text-[#FFF] text-[14px] leading-[18px] grow my-auto truncate overflow-hidden whitespace-nowrap">
-                      {{ authStore.currentUser?.name || 'Usuário' }}
+                      {{ authStore.user?.name || 'Usuário' }}
                     </p>
                   </div>
 
 
                   <img
-                    :src="authStore.currentUser?.avatar_path || `https://ui-avatars.com/api/?name=${authStore.currentUser?.name}&background=random`"
+                    :src="authStore.user?.avatar_path || `https://ui-avatars.com/api/?name=${authStore.user?.name}&background=random`"
                     class="aspect-[1.65] object-contain w-[46px] h-[46px] rounded-full shrink-0 bg" alt="User avatar" />
 
                   <svg :class="['w-5 h-5 transition-transform', { 'rotate-180': isDropdownOpen }]"

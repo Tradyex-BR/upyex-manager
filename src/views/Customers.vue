@@ -287,8 +287,8 @@ export default defineComponent({
           { key: 'status', label: 'Status', align: 'center' },
           { key: 'created_at', label: 'Data de cadastro', align: 'center' },
           { key: 'last_access', label: 'Último acesso', align: 'center' },
-          { key: 'actions', label: 'Ações', align: 'center' }
-        ]" :items="customers">
+/*           { key: 'actions', label: 'Ações', align: 'center' }
+ */        ]" :items="customers">
           <template #name="{ item }">
             {{ item.nome }}
           </template>
