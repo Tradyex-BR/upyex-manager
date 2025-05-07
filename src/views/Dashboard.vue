@@ -12,25 +12,28 @@
             </div>
             <DashboardNavigation v-model="currentView" />
 
-                  <div v-if="currentView === 'cards'" class="flex flex-col gap-6 mt-6">
+            <div v-if="currentView === 'cards'" class="flex flex-col gap-6 mt-6">
               <GraphicSection title="Vendas diárias" description="Quantidade de vendas nos últimos 15 dias"
                 class="min-h-[382px]">
-                <CartesianAxes :data="data.sales.graph" />
+                <CartesianAxes v-if="data.sales.graph.reduce((acc, curr) => acc + curr.count, 0) > 0"
+                  :data="data.sales.graph" />
+                <EmptyChart v-else center />
               </GraphicSection>
 
               <div class="grid grid-cols-2 gap-6 mb-8">
                 <GraphicSection title="Status das vendas" description="Distribuição por status de pagamento"
-                  class="h-[446px]">
-                  <div class="flex gap-8 h-full justify-center items-center">
+                  class="min-h-[446px]">
+                  <div v-if="totalStatusData > 0" class="flex gap-8 h-full justify-center items-center">
                     <DoughnutChart :data="formattedStatusData" />
                     <div class="flex flex-col gap-4">
                       <DoughnutChartLegends :data="formattedStatusData" />
                     </div>
                   </div>
+                  <EmptyChart v-else center />
                 </GraphicSection>
                 <GraphicSection title="Método de pagamento" description="Distribuição por método de pagamento"
-                  class="h-[446px]">
-                  <PaymentMethodCards :data="formattedPaymentMethodData" />
+                  class="min-h-[446px]">
+                  <PaymentMethodCards :data="formattedPaymentMethodData" class="w-full" />
                 </GraphicSection>
               </div>
             </div>
@@ -38,12 +41,12 @@
               <div class="flex flex-row gap-6" v-if="role === 'manager'">
                 <GraphicSection title="Análise de clientes" description="Detalhes sobre base de clientes"
                   class="max-w-[352px] max-h-[382px] mt-6 flex flex-col">
-                  <DashboardCards :data="data" border vertical
-                    class="flex-1 max-h-[116px]" :gap="8" />
+                  <DashboardCards :data="data" border vertical class="flex-1 max-h-[116px]" :gap="8" />
                 </GraphicSection>
                 <GraphicSection title="Status dos saques" description="Distribuição dos status por saque"
-                  class="w-full h-[382px] mt-6">
-                  <BarChart :data="formattedWithdrawalsData" />
+                  class="w-full min-h-[382px] mt-6">
+                  <BarChart v-if="totalWithdrawalsData > 0" :data="formattedWithdrawalsData" />
+                  <EmptyChart v-else center />
                 </GraphicSection>
               </div>
               <div class="flex flex-row gap-6" v-else>
@@ -68,6 +71,7 @@ import GraphicSection from "@/components/graphics/GraphicSection.vue"
 import { useDashboard } from '@/composables/useDashboard'
 import AuthenticatedLayout from '@/components/layout/AuthenticatedLayout.vue'
 import BarChart from "@/components/graphics/BarChart.vue"
+import EmptyChart from '@/components/layout/dashboard/EmptyChart.vue'
 const currentView = ref('cards')
 const role = localStorage.getItem('role') || 'manager'
 
@@ -77,6 +81,8 @@ const {
   fetchData,
 } = useDashboard()
 
+const totalStatusData = computed(() => Object.values(data.value?.sales?.cards?.by_status || {}).reduce((acc, curr) => acc + Number(curr), 0))
+const totalWithdrawalsData = computed(() => Object.values(data.value?.withdrawals?.by_status || {}).reduce((acc, curr) => acc + Number(curr), 0))
 const formattedStatusData = computed(() => ({
   data: Object.entries(data.value?.sales?.cards?.by_status || {}).map(([label, value]) => ({
     label,
@@ -93,9 +99,9 @@ const formattedPaymentMethodData = computed(() => {
       methods: Object.entries(methods).map(([method, value]) => ({
         label: method,
         value: Number(value),
-        icon: (method === 'credit_card' ? 'card' : 
-               method === 'pix' ? 'pix' : 
-               method === 'bank_transfer' ? 'bank' : 'other') as 'card' | 'pix' | 'bank' | 'other',
+        icon: (method === 'credit_card' ? 'card' :
+          method === 'pix' ? 'pix' :
+            method === 'bank_transfer' ? 'bank' : 'other') as 'card' | 'pix' | 'bank' | 'other',
         iconColor: '#4A5C8A',
         barColor: 'bg-[#CF631C]'
       })),

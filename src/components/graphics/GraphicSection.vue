@@ -4,7 +4,7 @@
       <h3 class="text-white text-[20px] font-semibold leading-6">{{ title }}</h3>
       <p class="text-[#B8B8B8] font-inter text-[14px] leading-[18px]">{{ description }}</p>
     </div>
-    <div class="w-full h-[calc(100%-4rem)]">
+    <div class="w-full h-[calc(100%-4rem)] flex items-center justify-center">
       <slot></slot>
     </div>
   </div>

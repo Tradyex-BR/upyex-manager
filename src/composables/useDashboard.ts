@@ -93,13 +93,13 @@ export function useDashboard() {
     },
     withdrawals: {
       by_status: {
-        requested: 12,
-        approved: 10,
-        rejected: 53,
-        processing: 10,
-        processed: 10,
-        cancelled: 10,
-        failed: 10
+        requested: 0,
+        approved: 0,
+        rejected: 0,
+        processing: 0,
+        processed: 0,
+        cancelled: 0,
+        failed: 0
       }
     },
     customers: {
@@ -118,39 +118,39 @@ export function useDashboard() {
       cards: {
         by_status: {
           awaiting_payment: 0,
-          paid: 10,
+          paid: 0,
           refunded: 0,
           cancelled: 0,
           failed: 0
         },
         by_payment_method: {
-          bank_transfer: 5,
-          credit_card: 10,
-          debit_card: 46,
-          payment_link: 345,
-          pix: 25
+          bank_transfer: 0,
+          credit_card: 0,
+          debit_card: 0,
+          payment_link: 0,
+          pix: 0
         }
       },
       graph: [
         {
           date: "2025-04-25",
-          count: 10
+          count: 0
         },
         {
           date: "2025-04-26",
-          count: 56
+          count: 0
         },
         {
           date: "2025-04-27",
-          count: 24
+          count: 0
         },
         {
           date: "2025-04-28",
-          count: 966
+          count: 0
         },
         {
           date: "2025-04-29",
-          count: 423
+          count: 0
         }
       ]
     },
