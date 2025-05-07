@@ -1,91 +1,86 @@
 <template>
   <div class="flex flex-row h-full" :class="{ 'flex-col': vertical }" :style="{ gap: `${gap}px` }">
-    <template v-if="Array.isArray(data)">
-      <StatCard v-for="(item, index) in data" :key="index" :value="item.value" :label="item.label" :border="border" :class="$attrs.class" :index="index" />
-    </template>
-    <template v-else-if="isDashboardCard(data)">
-      <StatCard 
-        :value="data.value" 
-        :label="data.label" 
-        :border="border"
-        :class="$attrs.class"
-        :index="0"
-      />
-    </template>
-    <template v-else-if="isCustomerData(data)">
-      <StatCard 
-        :value="data.total.toString()" 
-        label="Total de Clientes" 
-        :border="border"
-        :class="$attrs.class"
-        :index="0"
-        :animate="true"
-      />
-      <StatCard 
-        :value="data.new.toString()" 
-        label="Novos Clientes" 
-        :border="border"
-        :class="$attrs.class"
-        :index="1"
-        :animate="true"
-      />
+    <template v-if="vertical">
+      <div class="flex flex-col gap-4">
+        <StatCard v-for="(card, index) in managerListCards" :key="index" :value="card.value" :label="card.label"
+          :border="card.border" :class="$attrs.class" :index="index" />
+      </div>
     </template>
     <template v-else>
-      <StatCard v-for="(item, index) in Object.values(data || {})" :key="index" :value="item.value" :label="item.label" :border="border" :class="$attrs.class" :index="index" />
+      <div class="flex flex-row gap-4">
+        <StatCard v-for="(card, index) in (role === 'manager' ? managerCards : affiliateCards)" :key="index"
+          :value="card.value" :label="card.label" :border="card.border" :class="$attrs.class, 'flex-1'" :index="index" />
+      </div>
     </template>
   </div>
 </template>
 
 <script setup lang="ts">
 import StatCard from './StatCard.vue';
-import { defineComponent, defineOptions, withDefaults } from 'vue';
+import { defineComponent } from 'vue';
+import { DashboardResponse } from '@/types/dashboard';
 
 defineComponent({
-  name: 'DashboardCards',
-  onMounted() {
-    console.log('DashboardCards mounted')
-  }
+  name: 'DashboardCards'
 })
 
-interface DashboardCard {
-  value: string;
-  label: string;
-}
-
-interface CustomerData {
-  total: number;
-  new: number;
-}
-
-interface DashboardData {
-  paid: DashboardCard;
-  customers: CustomerData;
-  withdrawals: DashboardCard;
-}
-
-const props = withDefaults(defineProps<{
-  data: DashboardCard | DashboardData | CustomerData | Record<string, any>,
+const props = defineProps<{
+  data: DashboardResponse,
   vertical?: boolean,
   border?: boolean,
-  gap?: number
-}>(), {
-  vertical: false,
-  border: false,
-  gap: 24 // 6 * 4 = 24px (equivalente ao gap-6 do Tailwind)
-})
+  gap?: number,
+  role?: string
+}>();
 
-// Função para verificar se é DashboardCard
-const isDashboardCard = (data: any): data is DashboardCard => {
-  return data && typeof data === 'object' && 'value' in data && 'label' in data;
-}
+const managerCards = [
+  {
+    value: props.data.sales?.cards?.by_status?.paid?.toString() || '0',
+    label: 'Vendas Pagas',
+    border: false
+  },
+  {
+    value: props.data.customers?.total?.toString() || '0',
+    label: 'Total de Clientes',
+    border: false
+  },
+  {
+    value: props.data.withdrawals?.by_status?.requested?.toString() || '0',
+    label: 'Saques Solicitados',
+    border: false
+  },
+]
 
-// Função para verificar se é CustomerData
-const isCustomerData = (data: any): data is CustomerData => {
-  return data && typeof data === 'object' && 'total' in data && 'new' in data;
-}
+const managerListCards = [
+  {
+    value: props.data.customers?.total?.toString() || '0',
+    label: 'Total de Clientes',
+    border: true
+  },
+  {
+    value: props.data.customers?.new?.toString() || '0',
+    label: 'Novos Clientes',
+    border: true
+  },
 
-// Log para debug
-console.log('DashboardCards data:', props.data);
+]
+
+const affiliateCards = [
+  {
+    value: props.data.sales?.cards?.by_status?.paid?.toString() || '0',
+    label: 'Vendas totais',
+    border: false
+  },
+  {
+    value: props.data.balance?.next_7_days?.toString() || '0',
+    label: 'Saldo a liberar (Proximos 7 dias)',
+    border: false
+  },
+  {
+    value: props.data.balance?.current_balance?.toString() || '0',
+    label: 'Saldo a liberar',
+    border: false
+  },
+]
 
 // Adicionar inheritAttrs como false para permitir que as classes sejam passadas para o StatCard
 defineOptions({

@@ -18,11 +18,12 @@ import {
   Tooltip,
   Legend,
   Filler,
-  FontSpec
+  FontSpec,
+  ChartType,
+  ChartData as ChartJSData
 } from 'chart.js'
 // Importa o adaptador e a localidade
 import 'chartjs-adapter-date-fns';
-import { ptBR } from 'date-fns/locale';
 
 // Define a interface para os dados
 interface ChartData {
@@ -51,17 +52,6 @@ Chart.register(
 const chartRef = ref<HTMLCanvasElement | null>(null)
 let chartInstance: Chart | null = null
 
-// Dados mockados para visualização
-const mockData = ref<ChartData[]>([
-  { date: '2024-03-18', count: 120 },
-  { date: '2024-03-19', count: 180 },
-  { date: '2024-03-20', count: 150 },
-  { date: '2024-03-21', count: 200 },
-  { date: '2024-03-22', count: 220 },
-  { date: '2024-03-23', count: 190 },
-  { date: '2024-03-24', count: 160 }
-])
-
 // Cores baseadas na imagem
 const chartLineColor = '#F9A825'; // Laranja
 const chartGridColor = '#F9A825'; // Cor suave para ticks
@@ -85,44 +75,41 @@ const createOrUpdateChart = () => {
   }
 
   // Usa APENAS os dados das props
-  const chartData = mockData.value
+  const chartData = props.data || []
 
   // --- Estilos Padrão ---
-const defaultTextColor = '#B8B8B8';
-const defaultFont: Partial<FontSpec> = { // Usa Partial<FontSpec> para tipagem
-  family: "'Inter', sans-serif", // Nome da fonte (coloque fallbacks)
-  size: 14,                      // Tamanho da fonte
-  lineHeight: 1.28,              // Aproximação de 18px / 14px
-  weight: 'normal'             // Peso da fonte (ajuste se necessário)
-};
+  const defaultTextColor = '#B8B8B8';
+  const defaultFont: Partial<FontSpec> = { // Usa Partial<FontSpec> para tipagem
+    family: "'Inter', sans-serif", // Nome da fonte (coloque fallbacks)
+    size: 14,                      // Tamanho da fonte
+    lineHeight: 1.28,              // Aproximação de 18px / 14px
+    weight: 'normal'             // Peso da fonte (ajuste se necessário)
+  };
 
   chartInstance = new Chart(ctx, {
-    type: 'line',
+    type: 'line' as ChartType,
     data: {
-      // Para TimeScale, é melhor passar objetos {x, y}
       datasets: [{
-        label: 'Contagem', // Mesmo que a legenda esteja oculta, é bom ter um label
+        label: 'Contagem',
         data: chartData.map(item => ({
-          x: new Date(item.date).valueOf(), // Passa como timestamp (ou objeto Date)
+          x: new Date(item.date).valueOf(),
           y: item.count
         })),
         borderColor: chartLineColor,
-        borderWidth: 2, // Linha mais fina
-        tension: 0.4,   // Linha suavizada
-        pointRadius: 0, // Oculta os pontos na linha
-        pointHoverRadius: 0, // Oculta os pontos no hover também
-        fill: true,     // Habilita o preenchimento
-        backgroundColor: (context: any) => { // Gradiente para o preenchimento
+        borderWidth: 2,
+        tension: 0.4,
+        pointRadius: 0,
+        pointHoverRadius: 0,
+        fill: true,
+        backgroundColor: (context: any) => {
           const chart = context.chart;
           const { ctx, chartArea } = chart;
           if (!chartArea) {
-            return 'rgba(0,0,0,0)'; // Fallback transparente
+            return 'rgba(0,0,0,0)';
           }
           const gradient = ctx.createLinearGradient(0, chartArea.bottom, 0, chartArea.top);
-          // Começa mais transparente/escuro em baixo
-          gradient.addColorStop(0, 'rgba(207, 99, 28, 0)'); // Cor do fundo com alpha ou outra cor escura
-          // Fica mais opaco perto da linha com a cor da linha
-          gradient.addColorStop(1, 'rgba(207, 99, 28, 0.7)'); // Cor da linha com alpha
+          gradient.addColorStop(0, 'rgba(207, 99, 28, 0)');
+          gradient.addColorStop(1, 'rgba(207, 99, 28, 0.7)');
           return gradient;
         },
       }]
@@ -138,17 +125,15 @@ const defaultFont: Partial<FontSpec> = { // Usa Partial<FontSpec> para tipagem
         // Eixo Y
         y: {
           beginAtZero: true,
-          max: 250,
+          max: props.data?.reduce((max, item) => Math.max(max, item.count), 0),
           border: {
             color: '#2C3652'
           },
           grid: {
             display: false,
-            drawBorder: false,
             drawOnChartArea: false,
             color: chartGridColor,
             lineWidth: 1,
-            borderDash: [3, 3],
             drawTicks: false,
           },
           ticks: {
@@ -177,16 +162,10 @@ const defaultFont: Partial<FontSpec> = { // Usa Partial<FontSpec> para tipagem
             displayFormats: {
               day: 'dd/MM'
             },
-            adapters: {
-              date: {
-                locale: ptBR
-              }
-            },
             tooltipFormat: 'dd/MM/yyyy'
           },
           grid: {
             display: false,
-            drawBorder: false,
           },
           border: {
             color: '#2C3652'
@@ -247,7 +226,3 @@ onBeforeUnmount(() => {
   }
 })
 </script>
-
-<style scoped>
-/* Estilos adicionais se necessários */
-</style>

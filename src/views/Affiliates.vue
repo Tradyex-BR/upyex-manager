@@ -341,7 +341,7 @@ export default defineComponent({
           </template>
 
           <template #id="{ item }">
-            <span class="font-inter text-[14px] font-normal leading-[18px] text-white">{{ item.id }}</span>
+            <span class="font-inter text-[14px] font-normal leading-[18px] text-white">{{ item.integration_code }}</span>
           </template>
 
           <template #created_at="{ item }">
@@ -365,8 +365,3 @@ export default defineComponent({
     <CreateAffiliateModal v-if="showCreateModal" @close="closeCreateModal" @submit="handleCreate" />
   </AuthenticatedLayout>
 </template>
-
-
-<style scoped>
-/* Estilos específicos para Affiliates.vue */
-</style>

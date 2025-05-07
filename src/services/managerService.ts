@@ -157,19 +157,45 @@ export interface DashboardParams {
   start_date: string;
   end_date: string;
 }
+
 export interface DashboardResponse {
-  cards: {
-    by_status: Record<string, number>;
-    by_payment_method: Record<string, number>;
+  sales: {
+    cards: {
+      by_status: {
+        awaiting_payment: number;
+        paid: number;
+        refunded: number;
+        cancelled: number;
+        failed: number;
+      };
+      by_payment_method: {
+        bank_transfer: number;
+        credit_card: number;
+        debit_card: number;
+        payment_link: number;
+        pix: number;
+      };
+    };
+    graph: Array<{
+      date: string;
+      count: number;
+    }>;
   };
-  withdrawals?: {
-    by_status?: Record<string, number>;
+  withdrawals: {
+    by_status: {
+      requested: number;
+      approved: number;
+      rejected: number;
+      processing: number;
+      processed: number;
+      cancelled: number;
+      failed: number;
+    };
   };
-  customers?: {
-    total?: number;
-    new?: number;
+  customers: {
+    total: number;
+    new: number;
   };
-  // Add more fields as needed to match the API response
 }
 
 export interface ListCustomersParams {

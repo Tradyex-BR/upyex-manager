@@ -1,103 +1,98 @@
 <template>
   <AuthenticatedLayout :loading="loading">
-    <div class="gap-5 flex max-md:flex-col max-md:items-stretch">
-      <main class="w-full max-md:w-full max-md:ml-0">
-        <div class="w-full max-md:max-w-full">
-          <section class="min-h-[944px] w-full overflow-hidden max-md:max-w-full max-md:px-5">
-            <div class="flex justify-between items-center mb-6">
-              <p class="text-white text-2xl font-semibold">Vendas</p>
-              <div class="cursor-not-allowed">
-                <MenuIcon />
-              </div>
-              <!-- <BaseButton @click="handleNewSale" class="bg-[#CF631C] cursor-pointer text-white font-bold py-2 px-4 rounded-lg transition-colors">
+    <section class="min-h-[944px] w-full overflow-hidden">
+      <div class="flex justify-between items-center mb-6">
+        <p class="text-white text-2xl font-semibold">Vendas</p>
+        <div class="cursor-not-allowed">
+          <!--           <MenuIcon />
+ -->
+        </div>
+        <!-- <BaseButton @click="handleNewSale" class="bg-[#CF631C] cursor-pointer text-white font-bold py-2 px-4 rounded-lg transition-colors">
                 Nova Venda
               </BaseButton> -->
-            </div>
-            <div>
-              <div v-if="loading" class="flex items-center justify-center py-10">
-                <span class="text-white text-lg">Carregando vendas...</span>
-              </div>
-              <div v-else-if="sales.length === 0"
-                class="flex w-full min-h-[200px] items-center justify-center text-gray-400 text-lg">
-                Nenhuma venda encontrada
-              </div>
-              <BaseTable v-else :headers="isManager ? [
-                { key: 'date', label: 'Data', align: 'left' },
-                { key: 'customer', label: 'Cliente', align: 'center' },
-                { key: 'token', label: 'Token', align: 'center' },
-                { key: 'status', label: 'Status', align: 'center' },
-                { key: 'payment_method', label: 'Método de Pagamentos', align: 'center' },
-                { key: 'volume', label: 'Volume', align: 'center' },
-                { key: 'value', label: 'Valor BRL', align: 'center' }
-              ] : [
-                { key: 'date', label: 'Data', align: 'left' },
-                { key: 'token', label: 'Token', align: 'center' },
-                { key: 'updated_at', label: 'Última Atualização', align: 'center' },
-                { key: 'value', label: 'Valor BRL', align: 'center' },
-                { key: 'status', label: 'Status', align: 'center' },
-                { key: 'wallet_id', label: 'Carteira', align: 'center' },
-                { key: 'transaction_id', label: 'ID Transação', align: 'center' }
-              ]" :items="sales">
-                <template #date="{ item }">
-                  {{ new Date(item.created_at).toLocaleDateString('pt-BR') }}
-                </template>
-
-                <template #customer="{ item }">
-                  {{ item.customer?.name }}
-                </template>
-
-                <template #token="{ item }">
-                  <div class="flex items-center justify-center gap-3">
-                    <img
-                      :src="item.customer?.application?.logo_url || `https://ui-avatars.com/api/?name=${item.customer?.application?.name}&background=random`"
-                      :alt="item.customer?.application?.name" class="w-8 h-8 rounded-full object-cover" />
-                    <div class="flex flex-col">
-                      <span class="font-inter text-[14px] font-normal leading-[18px] text-white">
-                        {{ item.customer?.application?.name || '-' }}
-                      </span>
-                    </div>
-                  </div>
-                </template>
-
-                <template #status="{ item }">
-                  <span :class="getStatusClass(item.status)">{{ mapStatus(item.status) }}</span>
-                </template>
-
-                <template #payment_method="{ item }">
-                  {{ mapPaymentMethod(item.payment_method) }}
-                </template>
-
-                <template #volume="{ item }">
-                  {{ item.products && item.products.length ? item.products[0].amount : '-' }}
-                </template>
-
-                <template #value="{ item }">
-                  {{ item.products && item.products.length ? `R$ ${item.products[0].price.toFixed(2)}` : '-' }}
-                </template>
-
-                <template #updated_at="{ item }">
-                  {{ new Date(item.updated_at).toLocaleDateString('pt-BR') }}
-                </template>
-
-                <template #wallet_id="{ item }">
-                  <div class="flex items-center justify-center gap-2">
-                    {{ formatWalletId(item.customer?.application?.id) || '-' }}
-                    <CopyButton :stringToCopy="item.customer?.application?.id" />
-                  </div>
-                </template>
-
-                <template #transaction_id="{ item }">
-                  <div class="flex items-center justify-center gap-2">
-                    {{ formatTransactionId(item.id) || '-' }}
-                    <CopyButton :stringToCopy="item.id" />
-                  </div>
-                </template>
-              </BaseTable>
-            </div>
-          </section>
+      </div>
+      <div class="flex w-full min-h-[calc(100vh-200px)] justify-center text-gray-400">
+        <div v-if="loading" class="flex items-center justify-center py-10">
+          <span class="text-white text-lg">Carregando vendas...</span>
         </div>
-      </main>
-    </div>
+        <div v-else-if="sales.length === 0"
+          class="flex w-full min-h-[200px] items-center justify-center text-gray-400 text-lg">
+          Nenhuma venda encontrada
+        </div>
+        <BaseTable v-else :headers="isManager ? [
+          { key: 'date', label: 'Data', align: 'left' },
+          { key: 'customer', label: 'Cliente', align: 'center' },
+          { key: 'token', label: 'Token', align: 'center' },
+          { key: 'status', label: 'Status', align: 'center' },
+          { key: 'payment_method', label: 'Método de Pagamentos', align: 'center' },
+          { key: 'volume', label: 'Volume', align: 'center' },
+          { key: 'value', label: 'Valor BRL', align: 'center' }
+        ] : [
+          { key: 'date', label: 'Data', align: 'left' },
+          { key: 'token', label: 'Token', align: 'center' },
+          { key: 'updated_at', label: 'Última Atualização', align: 'center' },
+          { key: 'value', label: 'Valor BRL', align: 'center' },
+          { key: 'status', label: 'Status', align: 'center' },
+          { key: 'wallet_id', label: 'Carteira', align: 'center' },
+          { key: 'transaction_id', label: 'ID Transação', align: 'center' }
+        ]" :items="sales">
+          <template #date="{ item }">
+            {{ new Date(item.created_at).toLocaleDateString('pt-BR') }}
+          </template>
+
+          <template #customer="{ item }">
+            {{ item.customer?.name }}
+          </template>
+
+          <template #token="{ item }">
+            <div class="flex items-center justify-center gap-3">
+              <img
+                :src="item.customer?.application?.logo_url || `https://ui-avatars.com/api/?name=${item.customer?.application?.name}&background=random`"
+                :alt="item.customer?.application?.name" class="w-8 h-8 rounded-full object-cover" />
+              <div class="flex flex-col">
+                <span class="font-inter text-[14px] font-normal leading-[18px] text-white">
+                  {{ item.customer?.application?.name || '-' }}
+                </span>
+              </div>
+            </div>
+          </template>
+
+          <template #status="{ item }">
+            <span :class="getStatusClass(item.status)">{{ mapStatus(item.status) }}</span>
+          </template>
+
+          <template #payment_method="{ item }">
+            {{ mapPaymentMethod(item.payment_method) }}
+          </template>
+
+          <template #volume="{ item }">
+            {{ item.products && item.products.length ? item.products[0].amount : '-' }}
+          </template>
+
+          <template #value="{ item }">
+            {{ item.products && item.products.length ? `R$ ${item.products[0].price.toFixed(2)}` : '-' }}
+          </template>
+
+          <template #updated_at="{ item }">
+            {{ new Date(item.updated_at).toLocaleDateString('pt-BR') }}
+          </template>
+
+          <template #wallet_id="{ item }">
+            <div class="flex items-center justify-center gap-2">
+              {{ formatWalletId(item.customer?.application?.id) || '-' }}
+              <CopyButton :stringToCopy="item.customer?.application?.id" />
+            </div>
+          </template>
+
+          <template #transaction_id="{ item }">
+            <div class="flex items-center justify-center gap-2">
+              {{ formatTransactionId(item.id) || '-' }}
+              <CopyButton :stringToCopy="item.id" />
+            </div>
+          </template>
+        </BaseTable>
+      </div>
+    </section>
   </AuthenticatedLayout>
 
   <SaleDetailsModal v-if="showDetailModal" :show="showDetailModal" :sale="editingSale"
@@ -436,7 +431,7 @@ export default defineComponent({
       availableProducts: [] as any[],
       dropdownOpen: null as string | null,
       isManager: false,
-      useMockData: true // Alterado para false para usar a API real
+      useMockData: false // Alterado para false para usar a API real
     }
   },
   async mounted() {

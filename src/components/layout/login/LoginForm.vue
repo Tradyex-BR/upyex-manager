@@ -35,7 +35,8 @@
       </div>
 
       <div class="flex flex-col gap-4">
-        <BaseButton type="submit" variant="primary" class="h-[40px]" :disabled="!isFormValid" :loading="loading || isFingerprintLoading">
+        <BaseButton type="submit" variant="primary" class="h-[40px]" :disabled="!isFormValid"
+          :loading="loading || isFingerprintLoading">
           {{ isFingerprintLoading ? 'Carregando...' : 'Entrar' }}
         </BaseButton>
 
@@ -96,7 +97,7 @@ const mockFingerprint = isDev ? inject('fingerprint') as { getData: () => Promis
 const { data: visitorData, error: fingerprintError, isLoading: isFingerprintLoading, getData: getFingerprint } = !isDev ? useVisitorData(
   { extendedResult: true },
   { immediate: true }
-) : { data: ref(null), error: ref(null), isLoading: ref(false), getData: async () => {} }
+) : { data: ref(null), error: ref(null), isLoading: ref(false), getData: async () => { } }
 
 const visitorId = ref('')
 
@@ -120,12 +121,6 @@ watch(email, (newValue) => {
 
 const isFormValid = computed(() => {
   const valid = isEmailValid.value && password.value.length > 0 && !isFingerprintLoading.value && visitorId.value !== ''
-  console.log('isFormValid:', valid, {
-    isEmailValid: isEmailValid.value,
-    hasPassword: password.value.length > 0,
-    isFingerprintLoading: isFingerprintLoading.value,
-    hasVisitorId: visitorId.value !== ''
-  })
   return valid
 })
 

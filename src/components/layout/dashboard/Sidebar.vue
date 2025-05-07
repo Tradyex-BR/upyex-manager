@@ -94,8 +94,8 @@ export default defineComponent({
           visible: true
         },
         { 
-          text: 'Ofertas', 
-          route: '/offers',
+          text: 'Aplicações', 
+          route: '/applications',
           icon: 'svg-ofertas',
           visible: role === 'affiliate'
         },

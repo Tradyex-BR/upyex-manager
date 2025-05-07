@@ -64,9 +64,9 @@ const routes: Array<RouteRecordRaw> = [
     meta: { requiresAuth: true }
   },
   {
-    path: '/offers',
-    name: 'offers',
-    component: Offers,
+    path: '/applications',
+    name: 'Applications',
+    component: () => import('../views/Applications.vue'),
     meta: {
       requiresAuth: true
     }

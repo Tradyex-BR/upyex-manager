@@ -9,10 +9,10 @@
     <div v-else class="overflow-visible">
       <section class="min-h-[944px] w-full overflow-visible">
         <div class="flex justify-between items-center mb-6">
-          <p class="text-white text-2xl font-semibold">Ofertas</p>
-          <BaseButton class="ml-2" @click="handleGenerateLink">
+          <p class="text-white text-2xl font-semibold">Aplicações</p>
+          <!-- <BaseButton class="ml-2" @click="handleGenerateLink">
             Gerar link genérico
-          </BaseButton>
+          </BaseButton> -->
         </div>
         <div>
           <BaseTable 

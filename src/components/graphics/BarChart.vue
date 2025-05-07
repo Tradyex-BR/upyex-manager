@@ -28,7 +28,6 @@ let chart: Chart | null = null
 
 // --- NOVAS CONSTANTES DE COR ---
 const barColor = '#CF631C'
-const labelColor = '#B8B8B8' // Cor para os textos dos labels (ex: cinza claro)
 const axisLineColor = '#2C3652' // Cor para as linhas dos eixos (ex: cinza mais escuro)
 const axisFontFamily = 'Lato, sans-serif'
 const axisFontSize = 14
@@ -50,8 +49,8 @@ const mockBarData = {
 const createOrUpdateChart = () => {
   if (!chartCanvas.value) return
 
-  // Usa o mock se não houver prop
-  const chartInput = mockBarData
+  // Usa os dados das props se disponíveis, senão usa o mock
+  const chartInput = props.data || mockBarData
 
   const labels = chartInput.data.map(item => item.label)
   const values = chartInput.data.map(item => item.value)
@@ -75,8 +74,6 @@ const createOrUpdateChart = () => {
     options: {
       responsive: true,
       maintainAspectRatio: false,
-      barPercentage: 0.2,
-      categoryPercentage: 0.8,
       plugins: {
         legend: {
           display: false
@@ -88,7 +85,7 @@ const createOrUpdateChart = () => {
       scales: {
         y: {
           beginAtZero: true,
-          max: 250,
+          max: props.data.data.reduce((max, item) => Math.max(max, item.value), 0),
           grid: {
             display: false,
           },
@@ -105,7 +102,7 @@ const createOrUpdateChart = () => {
           },
           border: {
             display: true,
-            color: axisLineColor, // <--- Usar a cor da linha do eixo aqui
+            color: axisLineColor,
             width: 1
           }
         },
@@ -125,9 +122,15 @@ const createOrUpdateChart = () => {
           },
           border: {
             display: true,
-            color: axisLineColor, // <--- Usar a cor da linha do eixo aqui
+            color: axisLineColor,
             width: 1
           }
+        }
+      },
+      datasets: {
+        bar: {
+          barPercentage: 0.2,
+          categoryPercentage: 0.8
         }
       }
     }

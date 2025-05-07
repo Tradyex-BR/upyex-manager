@@ -13,7 +13,9 @@ import {
     ArcElement,
     Legend,
     Tooltip,
-    type FontSpec // Importa FontSpec para tipagem
+    type FontSpec,
+    type LegendItem,
+    type PointStyle
 } from 'chart.js';
 
 // Registra apenas os componentes necessários para Doughnut
@@ -112,47 +114,41 @@ const createOrUpdateChart = () => {
 
   const config = {
     type: 'doughnut' as const,
-    data: chartConfigData.value, // Usa os dados computados
+    data: chartConfigData.value,
     options: {
       responsive: true,
-      maintainAspectRatio: true, // Permite que o gráfico se ajuste ao container
-      cutout: '90%', // Ajusta o tamanho do buraco central (experimente valores como '70%' a '85%')
-      
-
+      maintainAspectRatio: true,
+      cutout: '90%',
       plugins: {
         legend: {
-          display: false, // Mantém a legenda visível
-          position: 'right' as const, // Posiciona a legenda à direita
-          align: 'center' as const, // Centraliza os itens verticalmente na legenda
+          display: false,
+          position: 'right' as const,
+          align: 'center' as const,
           labels: {
-            color: defaultTextColor, // Aplica a cor padrão do texto
-            font: defaultFont,       // Aplica a fonte padrão
-            padding: 20,             // Espaçamento entre os itens da legenda
-            usePointStyle: true,     // Usa 'circle' ou outro estilo de ponto
-            pointStyle: 'circle',    // Define o estilo do ponto como círculo
-
-            // --- Geração customizada dos labels da legenda ---
+            color: defaultTextColor,
+            font: defaultFont,
+            padding: 20,
+            usePointStyle: true,
+            pointStyle: 'circle' as PointStyle,
             generateLabels: (chart: Chart) => {
               const data = chart.data;
               if (data.labels && data.datasets.length) {
                 const dataset = data.datasets[0];
                 return data.labels.map((label, i) => {
                   const meta = chart.getDatasetMeta(0);
-                  const style = meta.controller.getStyle(i);
-                  const value = dataset.data[i] as number; // Pega o valor
+                  const style = meta.controller.getStyle(i, false);
+                  const value = dataset.data[i] as number;
 
                   return {
-                    text: `${label}   ${value}%`, // Combina label e valor com espaço
+                    text: `${label}   ${value}%`,
                     fillStyle: style.backgroundColor,
                     strokeStyle: style.borderColor,
                     lineWidth: style.borderWidth,
                     hidden: !chart.isDatasetVisible(0) || isNaN(value),
                     index: i,
-                    // Propriedades adicionadas para garantir estilo
                     fontColor: defaultTextColor,
-                    pointStyle: 'circle',
-            
-                  };
+                    pointStyle: 'circle' as PointStyle
+                  } as LegendItem;
                 });
               }
               return [];
@@ -160,28 +156,7 @@ const createOrUpdateChart = () => {
           }
         },
         tooltip: {
-          enabled: true // Desabilita os tooltips como na imagem
-          // Se precisar habilitar e estilizar:
-          // callbacks: {
-          //      label: function(context) {
-          //          let label = context.label || '';
-          //          if (label) {
-          //              label += ': ';
-          //          }
-          //          if (context.parsed !== null) {
-          //              label += context.parsed + '%';
-          //          }
-          //          return label;
-          //      }
-          //  },
-          // backgroundColor: 'rgba(0, 0, 0, 0.8)',
-          // titleFont: defaultFont,
-          // titleColor: defaultTextColor,
-          // bodyFont: defaultFont,
-          // bodyColor: defaultTextColor,
-          // padding: 10,
-          // cornerRadius: 4,
-          // usePointStyle: true,
+          enabled: true
         }
       }
     }

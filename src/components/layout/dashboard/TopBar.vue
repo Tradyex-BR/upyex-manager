@@ -16,20 +16,15 @@
           class="aspect-[2.44] object-contain w-[83px] self-stretch shrink-0" alt="Notifications" />
         <div class="relative">
           <div class="self-stretch flex items-stretch gap-[10px] my-auto cursor-pointer">
-            <BaseDropdown
-              :options="[
-                {
-                  text: 'Sair',
-                  icon: FontAwesomeIcon,
-                  iconProps: { icon: faRightFromBracket },
-                  action: 'logout'
-                }
-              ]"
-              v-model="isDropdownOpen"
-              
-              @select="handleDropdownAction"
-              class="flex items-center w-full outline-none border-none focus:outline-none focus:ring-0 p-0"
-            >
+            <BaseDropdown :options="[
+              {
+                text: 'Sair',
+                icon: FontAwesomeIcon,
+                iconProps: { icon: faRightFromBracket },
+                action: 'logout'
+              }
+            ]" v-model="isDropdownOpen" @select="handleDropdownAction"
+              class="flex items-center w-full outline-none border-none focus:outline-none focus:ring-0 p-0">
               <template #trigger>
                 <div class="flex items-center gap-[15px] w-full">
                   <div class="flex items-center gap-1">
@@ -39,14 +34,10 @@
                     </p>
                   </div>
 
-                  <div v-if="authStore.currentUser?.avatar_path">
-                    <img :src="authStore.currentUser?.avatar_path"
-                      class="aspect-[1.65] object-contain w-[46px] h-[46px] rounded-full shrink-0 bg" alt="User avatar" />
-                  </div>
-                  <div v-else>
-                    <img src="/png/default-avatar.png"
-                      class="aspect-[1.65] object-contain w-[46px] h-[46px] rounded-full shrink-0 bg" alt="User avatar" />
-                  </div>
+
+                  <img
+                    :src="authStore.currentUser?.avatar_path || `https://ui-avatars.com/api/?name=${authStore.currentUser?.name}&background=random`"
+                    class="aspect-[1.65] object-contain w-[46px] h-[46px] rounded-full shrink-0 bg" alt="User avatar" />
 
                   <svg :class="['w-5 h-5 transition-transform', { 'rotate-180': isDropdownOpen }]"
                     xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">

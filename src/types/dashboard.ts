@@ -5,27 +5,35 @@ export interface DashboardParams {
 }
 
 export interface DashboardResponse {
-  sales?: {
-    cards?: {
-      by_status?: {
+  balance?: {
+    current_balance: number
+    future_balance: number
+    next_7_days: number
+  }
+  sales: {
+    cards: {
+      by_status: {
+        awaiting_payment: number
         paid: number
-        [key: string]: number
+        refunded: number
+        cancelled: number
+        failed: number
       }
-      by_payment_method?: {
-        [key: string]: number
+      by_payment_method: {
+        bank_transfer: number
+        credit_card: number
+        debit_card: number
+        payment_link: number
+        pix: number
       }
     }
-    graph?: Array<{
+    graph: Array<{
       date: string
-      value: number
+      count: number
     }>
   }
-  customers?: {
-    total?: number
-    new?: number
-  }
-  withdrawals?: {
-    by_status?: {
+  withdrawals: {
+    by_status: {
       requested: number
       approved: number
       rejected: number
@@ -35,12 +43,9 @@ export interface DashboardResponse {
       failed: number
     }
   }
-  data?: {
-    balance?: {
-      current_balance?: number
-      future_balance?: number
-      next_7_days?: number
-    }
+  customers: {
+    total: number
+    new: number
   }
 }
 
