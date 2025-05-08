@@ -5,7 +5,7 @@ const toast = useToast()
 export const notificationService = {
   success: (message: string) => {
     toast.success(message, {
-      position: POSITION.TOP_RIGHT,
+      position: POSITION.BOTTOM_RIGHT,
       timeout: 3000,
       closeOnClick: true,
       pauseOnFocusLoss: true,
@@ -22,7 +22,7 @@ export const notificationService = {
 
   error: (message: string) => {
     toast.error(message, {
-      position: POSITION.TOP_RIGHT,
+      position: POSITION.BOTTOM_RIGHT,
       timeout: 5000,
       closeOnClick: true,
       pauseOnFocusLoss: true,
