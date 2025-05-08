@@ -39,19 +39,29 @@
         <div v-if="activeTab === 'info'" class="space-y-4 h-[296px]">
           <div class="space-y-2">
             <label class="text-sm text-white">Nome <span class="text-[#BE3E37]">*</span></label>
-            <BaseInput v-model="form.name" placeholder="Digite o nome completo do afiliado" required variant="dark" />
+            <BaseInput v-model="form.name" placeholder="Digite o nome completo do afiliado" required variant="dark">
+              <template #prefix>
+                <FontAwesomeIcon icon="user" class="text-[#85B1FF] mr-3" />
+              </template>
+            </BaseInput>
           </div>
 
           <div class="space-y-2">
             <label class="text-sm text-white">E-mail <span class="text-[#BE3E37]">*</span></label>
-            <BaseInput v-model="form.email" type="email" placeholder="Digite o e-mail do afiliado" required
-              variant="dark" />
+            <BaseInput v-model="form.email" type="email" placeholder="Digite o e-mail do afiliado" required variant="dark">
+              <template #prefix>
+                <FontAwesomeIcon icon="envelope" class="text-[#85B1FF] mr-3" />
+              </template>
+            </BaseInput>
           </div>
 
           <div class="space-y-2">
             <label class="text-sm text-white">Código de Integração <span class="text-[#BE3E37]">*</span></label>
-            <BaseInput v-model="form.integration_code" placeholder="Digite o código de integração" required
-              variant="dark" />
+            <BaseInput v-model="form.integration_code" placeholder="Digite o código de integração" required variant="dark">
+              <template #prefix>
+                <FontAwesomeIcon icon="hashtag" class="text-[#85B1FF] mr-3" />
+              </template>
+            </BaseInput>
           </div>
         </div>
 
@@ -151,12 +161,12 @@ import BaseModal from '@/components/common/BaseModal.vue'
 import BaseButton from '@/components/common/BaseButton.vue'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { library } from '@fortawesome/fontawesome-svg-core'
-import { faPlus, faTrashAlt, faChevronDown, faExclamationCircle } from '@fortawesome/free-solid-svg-icons'
+import { faPlus, faTrashAlt, faChevronDown, faExclamationCircle, faUser, faEnvelope, faHashtag } from '@fortawesome/free-solid-svg-icons'
 import BaseInput from '@/components/common/BaseInput.vue'
 import BaseDropdown from '@/components/common/BaseDropdown.vue'
 import { managerService } from '@/services/managerService'
 
-library.add(faPlus, faTrashAlt, faChevronDown, faExclamationCircle)
+library.add(faPlus, faTrashAlt, faChevronDown, faExclamationCircle, faUser, faEnvelope, faHashtag)
 
 interface Application {
   id: string;

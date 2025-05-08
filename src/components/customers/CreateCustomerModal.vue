@@ -6,14 +6,14 @@
         <div class="grid grid-cols-2 gap-5">
           <BaseInput v-model="form.name" label="Nome" placeholder="Nome completo" required variant="dark">
             <template #prefix>
-              <FontAwesomeIcon icon="user" class="text-[#B8B8B8] mr-3" />
+              <FontAwesomeIcon icon="user" class="text-[#85B1FF] mr-3" />
             </template>
           </BaseInput>
 
           <BaseInput v-model="form.email" label="Email" type="email" placeholder="email@exemplo.com" required
             variant="dark">
             <template #prefix>
-              <FontAwesomeIcon icon="envelope" class="text-[#B8B8B8] mr-3" />
+              <FontAwesomeIcon icon="envelope" class="text-[#85B1FF] mr-3" />
             </template>
           </BaseInput>
         </div>
@@ -23,13 +23,13 @@
           <BaseInput v-model="form.phone" label="Telefone" type="tel" placeholder="(00) 00000-0000" required
             variant="dark">
             <template #prefix>
-              <FontAwesomeIcon icon="phone" class="text-[#B8B8B8] mr-3" />
+              <FontAwesomeIcon icon="phone" class="text-[#85B1FF] mr-3" />
             </template>
           </BaseInput>
 
           <BaseInput v-model="form.document_number" label="CPF/CNPJ" placeholder="000.000.000-00" variant="dark">
             <template #prefix>
-              <FontAwesomeIcon icon="id-card" class="text-[#B8B8B8] mr-3" />
+              <FontAwesomeIcon icon="id-card" class="text-[#85B1FF] mr-3" />
             </template>
           </BaseInput>
         </div>
@@ -38,7 +38,7 @@
         <BaseInput v-model="form.affiliate_code" label="Código do Afiliado" placeholder="Código único do afiliado"
           required variant="dark">
           <template #prefix>
-            <FontAwesomeIcon icon="hashtag" class="text-[#B8B8B8] mr-3" />
+            <FontAwesomeIcon icon="hashtag" class="text-[#85B1FF] mr-3" />
           </template>
         </BaseInput>
       </div>
