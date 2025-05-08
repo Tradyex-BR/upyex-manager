@@ -10,7 +10,7 @@
         </BaseInput>
 
         <BaseInput v-model="password" label="Senha" :type="showPassword ? 'text' : 'password'"
-          placeholder="Digite sua senha" autocomplete= required :disabled="loading || isFingerprintLoading">
+          placeholder="Digite sua senha" autocomplete=required :disabled="loading || isFingerprintLoading">
           <template #prefix>
             <PasswordIcon />
           </template>
@@ -45,8 +45,8 @@
             </div>
           </div>
         </div>
-        <div v-if="error" class="text-red-600 text-sm">{{ error }}</div>
-      </div>
+<!--         <div v-if="error" class="text-red-600 text-sm">{{ error }}</div>
+ -->      </div>
     </div>
   </form>
 </template>
@@ -61,6 +61,7 @@ import BaseInput from '@/components/common/BaseInput.vue'
 import EmailIcon from '@/components/common/icons/EmailIcon.vue'
 import PasswordIcon from '@/components/common/icons/PasswordIcon.vue'
 import PasswordVisibilityIcon from '@/components/common/icons/PasswordVisibilityIcon.vue'
+import { notificationService } from '@/services/notificationService'
 
 const router = useRouter()
 const route = useRoute()
@@ -163,6 +164,7 @@ const handleLogin = async () => {
       error.value = 'Você precisa definir uma senha antes do primeiro acesso. Clique em "Esqueci minha senha" para criar sua senha.'
     } else {
       error.value = err.response?.data?.message || 'Erro ao autenticar'
+      notificationService.error(error.value)
     }
   } finally {
     loading.value = false

@@ -81,7 +81,7 @@ export default defineComponent({
     BaseTable
   },
   data() {
-    const role = localStorage.getItem('role')
+    const role = localStorage.getItem('contextRole')
     return {
       store: useDashboardStore(),
       showRequestModal: false,

@@ -23,7 +23,7 @@ export default {
   name: 'VerticalLines',
   data() {
     return {
-      lines: Array(16).fill(null).map(() => this.generateLineConfig()),
+      lines: Array(24).fill(null).map(() => this.generateLineConfig()),
       updateQueue: []
     }
   },

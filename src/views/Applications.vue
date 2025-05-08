@@ -165,7 +165,7 @@ export default defineComponent({
     }
   },
   async mounted() {
-    this.isManager = localStorage.getItem('role') === 'manager'
+    this.isManager = localStorage.getItem('contextRole') === 'manager'
     await this.handleSearch('');
   },
   watch: {

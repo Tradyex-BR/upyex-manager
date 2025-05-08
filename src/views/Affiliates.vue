@@ -11,6 +11,7 @@
   import MenuIcon from '@/components/icons/MenuIcon.vue'
   import BaseDropdown from '@/components/common/BaseDropdown.vue'
   import BaseTable from '@/components/common/BaseTable.vue'
+  import { notificationService } from '@/services/notificationService'
 
   const CheckIcon = defineAsyncComponent(() => import('@/components/icons/CheckIcon.vue'))
   const XIcon = defineAsyncComponent(() => import('@/components/icons/XIcon.vue'))
@@ -261,10 +262,12 @@
             case 'aprovar':
               await managerService.affiliates.approve(id);
               await loadAffiliates();
+              notificationService.success('Afiliado aprovado com sucesso');
               break;
             case 'bloquear':
               await managerService.affiliates.block(id);
               await loadAffiliates();
+              notificationService.success('Afiliado bloqueado com sucesso');
               break;
           }
         } catch (e) {
@@ -309,7 +312,7 @@
       }
     }
   })
-  </script>
+</script>
 
   <template>
     <AuthenticatedLayout :loading="loading">
@@ -342,7 +345,8 @@
             </template>
 
             <template #id="{ item }">
-              <span class="font-inter text-[14px] font-normal leading-[18px] text-white">{{ item.integration_code }}</span>
+              <span class="font-inter text-[14px] font-normal leading-[18px] text-white">{{ item.integration_code
+                }}</span>
             </template>
 
             <template #created_at="{ item }">
@@ -350,7 +354,9 @@
             </template>
 
             <template #updated_at="{ item }">
-              {{ new Date(item.updated_at).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }) }}
+              {{ new Date(item.updated_at).toLocaleString('pt-BR', {
+                day: '2-digit', month: '2-digit', year: 'numeric',
+                hour: '2-digit', minute: '2-digit' }) }}
             </template>
 
             <template #status="{ item }">
@@ -360,7 +366,8 @@
             </template>
 
             <template #actions="{ item }">
-              <BaseDropdown :options="dropdownOptions" @select="handleAction($event, item.id)" :top="50" class="w-min mx-auto" />
+              <BaseDropdown :options="dropdownOptions" @select="handleAction($event, item.id)" :top="50"
+                class="w-min mx-auto" />
             </template>
           </BaseTable>
         </div>
