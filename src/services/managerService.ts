@@ -232,7 +232,7 @@ export const managerService = {
      * Login do manager. Salva o token no localStorage.
      */
     login: async (credentials: ManagerLoginCredentials): Promise<ManagerLoginResponse> => {
-      const response = await api.post<ManagerLoginResponse>(credentials.role.toLowerCase() + '/auth', credentials);
+      const response = await api.post<ManagerLoginResponse>('/auth', credentials);
       if (response.data?.auth_token) {
         setToken(response.data.auth_token);
       }
@@ -249,7 +249,7 @@ export const managerService = {
      * Retorna dados do usuário logado.
      */
     current: async (): Promise<any> => {
-      const response = await api.get('/auth');
+      const response = await api.get(`/auth`);
       return response.data;
     },
     /**

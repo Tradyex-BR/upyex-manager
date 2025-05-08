@@ -119,12 +119,6 @@ const emitSearch = () => {
 // Adiciona o emit ao setup
 const emit = defineEmits(['search'])
 
-// Adicionar e remover o event listener
-onMounted(() => {
-  console.log('Avatar path:', authStore.currentUser?.avatar_path)
-  console.log('Current user:', authStore.currentUser)
-})
-
 onUnmounted(() => {
   // Remover o event listener já que agora é gerenciado pelo BaseDropdown
 })

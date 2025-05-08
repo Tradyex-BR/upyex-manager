@@ -49,7 +49,7 @@ defineEmits<{
   (e: 'update:modelValue', value: string): void;
 }>();
 
-const role = localStorage.getItem('role')
+const role = localStorage.getItem('contextRole')
 const navigationItems: NavigationItem[] = [
   { id: 'cards', label: 'Visão Geral' },
   { id: 'list', label: role === 'manager' ? 'Análise' : 'Vendas' }

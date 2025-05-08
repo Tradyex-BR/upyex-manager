@@ -61,7 +61,6 @@ import BaseInput from '@/components/common/BaseInput.vue'
 import EmailIcon from '@/components/common/icons/EmailIcon.vue'
 import PasswordIcon from '@/components/common/icons/PasswordIcon.vue'
 import PasswordVisibilityIcon from '@/components/common/icons/PasswordVisibilityIcon.vue'
-import type { LoginRequest } from '@/types/auth'
 
 const router = useRouter()
 const route = useRoute()
@@ -72,7 +71,7 @@ const emailError = ref('')
 const loading = ref(false)
 const error = ref('')
 
-const role = computed(() => route.meta.role as 'MANAGER' | 'AFFILIATE')
+const role = computed(() => localStorage.getItem('contextRole') as 'MANAGER' | 'AFFILIATE')
 
 const isDev = import.meta.env.DEV
 const mockFingerprint = isDev ? inject('fingerprint') as { getData: () => Promise<{ visitorId: string }> } : null
@@ -156,7 +155,6 @@ const handleLogin = async () => {
     await authStore.login({
       email: email.value,
       password: password.value,
-      role: role.value,
       fingerprint: visitorId.value
     })
     router.push('/dashboard')

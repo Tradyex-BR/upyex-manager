@@ -7,7 +7,7 @@ interface User {
   id: number
   name: string
   email: string
-  role: string
+  role?: string
   avatar_path: string
 }
 
@@ -19,7 +19,7 @@ export const useAuthStore = defineStore('auth', () => {
     return !!token.value && !!user.value
   })
 
-  const setAuth = (newToken: string, newUser: any) => {
+  const setAuth = (newToken: string, newUser: User) => {
     token.value = newToken
     user.value = newUser
     localStorage.setItem('token', newToken)
@@ -28,17 +28,15 @@ export const useAuthStore = defineStore('auth', () => {
 
   const logout = () => {
     // Salva o papel do usuário antes de limpar
-    const currentRole = user.value?.role?.toLowerCase() || localStorage.getItem('role') || 'manager'
-    
+    const currentRole = localStorage.getItem('contextRole') || 'manager'
+
     // Limpa os dados de autenticação
     token.value = ''
     user.value = null
     localStorage.removeItem('token')
     localStorage.removeItem('user')
-    
-    // Mantém apenas o papel do usuário
-    localStorage.setItem('role', currentRole)
-    
+    localStorage.setItem('contextRole', currentRole)
+
     // Redireciona para a página de login correspondente
     window.location.href = `/login/${currentRole}`
   }
@@ -49,14 +47,9 @@ export const useAuthStore = defineStore('auth', () => {
         email: credentials.email,
         password: credentials.password,
         fingerprint: credentials.fingerprint,
-        role: credentials.role
       })
       const token = response.auth_token
-      // Buscar dados do usuário logado
-      localStorage.removeItem('userRole')
-      localStorage.setItem('role', credentials.role.toLowerCase())
-      const user = await managerService.auth.current()
-      user.role = 'MANAGER'
+      const user = await managerService.auth.current(credentials.role)
 
       setAuth(token, user)
       return user

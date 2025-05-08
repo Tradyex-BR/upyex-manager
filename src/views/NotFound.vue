@@ -1,8 +1,7 @@
 <template>
-  <div
-    class="max-w-none flex flex-row w-full h-screen bg-[#010309] mx-auto"
-  >
-    <div class="flex z-[100] flex-col w-6/12 backdrop-blur-lg items-center justify-center gap-8 bg-white p-28 left-[section]">
+  <div class="max-w-none flex flex-row w-full h-screen bg-[#010309] mx-auto">
+    <div
+      class="flex z-[100] flex-col w-6/12 backdrop-blur-lg items-center justify-center gap-8 bg-white p-28 left-[section]">
       <div class="text-center">
         <h1 class="text-[#040D25] text-[48px] leading-[56px] font-bold mb-4">404</h1>
         <h2 class="text-[#040D25] text-[32px] leading-[40px] font-semibold mb-4">
@@ -15,10 +14,7 @@
 
       <div class="flex flex-col gap-6 w-full max-sm:items-center">
         <div>
-          <BaseButton
-            variant="primary"
-            class="w-full h-[40px]"
-            @click="handleBack">
+          <BaseButton variant="primary" class="w-full h-[40px]" @click="handleBack">
             Voltar para a página inicial
           </BaseButton>
         </div>
@@ -52,35 +48,20 @@ const authStore = useAuthStore()
 const authContextStore = useAuthContextStore()
 const loading = ref(false)
 
-onMounted(() => {
-  // Se o usuário estiver autenticado, mantém o contexto atual
-  if (authStore.isAuthenticated) {
-    return
-  }
-  
-  // Se não estiver autenticado, salva o papel do usuário no store
-  if (route.meta.role) {
-    authContextStore.setUserRole(route.meta.role as 'MANAGER' | 'AFFILIATE')
-  }
-})
-
 const handleBack = () => {
   loading.value = true
+
   if (authStore.isAuthenticated) {
     // Se estiver autenticado, limpa os dados de autenticação
     authStore.logout()
     // Limpa dados específicos do dashboard
     localStorage.removeItem('role')
     localStorage.removeItem('recoveryEmail')
-    // Mantém apenas o contexto do usuário
-    const currentRole = authContextStore.userRole
-    // Limpa o store de contexto
-    authContextStore.clearUserRole()
     // Redireciona para a página de login do contexto atual
-    router.push(currentRole === 'MANAGER' ? '/login/manager' : '/login/affiliate')
+    router.push(localStorage.getItem('contextRole') === 'manager' ? '/login/manager' : '/login/affiliate')
   } else {
     // Se não estiver autenticado, vai para a página de login do contexto atual
-    router.push(authContextStore.userRole === 'MANAGER' ? '/login/manager' : '/login/affiliate')
+    router.push(localStorage.getItem('contextRole') === 'manager' ? '/login/manager' : '/login/affiliate')
   }
 }
 </script>

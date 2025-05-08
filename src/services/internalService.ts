@@ -14,7 +14,7 @@ api.interceptors.request.use((config) => {
   if (token) {
     config.headers.Authorization = `Bearer ${token}`
   }
-  const role = localStorage.getItem('role')
+  const role = localStorage.getItem('contextRole')
   if (role) {
     config.baseURL += `/${role}`
   }

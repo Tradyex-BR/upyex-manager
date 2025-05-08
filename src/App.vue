@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useRoute } from 'vue-router';
-import { computed } from 'vue';
+import { computed, watch } from 'vue';
 import Sidebar from './components/layout/dashboard/Sidebar.vue';
 import TopBar from './components/layout/dashboard/TopBar.vue';
 
@@ -16,6 +16,13 @@ const pagesThatDontHaveSidebar = [
   '/password-changed'
 ];
 
+const affiliatesPages = [
+  '/login/affiliate',
+  '/forgot-password/affiliate',
+  '/email-sent/affiliate',
+  '/reset-password/affiliate',
+]
+
 const route = useRoute();
 import { ref } from 'vue'
 
@@ -23,12 +30,21 @@ const thisPageHaveSidebar = computed(() =>
   pagesThatDontHaveSidebar.includes(route.path) || route.name === 'NotFoundAffiliate' || route.name === 'NotFoundManager'
 );
 
+const fullPath = computed(() => route.fullPath);
+
 const searchTerm = ref('')
 function onSearch(term: string) {
   console.log('onSearch (App.vue) recebeu:', term)
   searchTerm.value = term
 }
 
+watch(fullPath, (newPath) => {
+  if (newPath.includes('manager')) {
+    localStorage.setItem('contextRole', 'manager');
+  } else if (affiliatesPages.some(page => newPath.includes(page))) {
+    localStorage.setItem('contextRole', 'affiliate');
+  }
+});
 </script>
 
 <template>

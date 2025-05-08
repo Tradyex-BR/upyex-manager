@@ -47,7 +47,7 @@ export function useDashboard() {
   const useMockData = ref(false)
 
   const role = computed(() => {
-    return localStorage.getItem('role') || 'manager'
+    return localStorage.getItem('contextRole') || 'manager'
   })
 
   const ManagerMockData: DashboardResponse = {

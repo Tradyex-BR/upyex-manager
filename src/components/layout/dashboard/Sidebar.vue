@@ -69,7 +69,7 @@ export default defineComponent({
     }
   },
   data() {
-    const role = localStorage.getItem('role')
+    const role = localStorage.getItem('contextRole')
 
     return {
       menuItems: [
