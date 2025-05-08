@@ -1,7 +1,8 @@
 <template>
   <div
     class="max-w-none flex flex-row w-full h-screen bg-[#010309] mx-auto max-md:max-w-[991px] max-md:flex-col max-sm:max-w-screen-sm">
-    <div class="z-[100] flex flex-col justify-center w-6/12 backdrop-blur-lg items-start gap-8 bg-white bg-[url('/png/static-neon.png')] bg-no-repeat bg-top bg-center p-28 left-[section] max-md:w-full">
+    <div
+      class="z-[100] flex flex-col justify-center w-6/12 backdrop-blur-lg items-start gap-8 bg-white bg-[url('/png/static-neon.png')] bg-no-repeat bg-top bg-center p-28 left-[section] max-md:w-full">
 
 
       <div class="flex flex-col gap-2">
@@ -14,51 +15,30 @@
       </div>
 
       <form class="flex flex-col gap-4 w-full" @submit.prevent="handleSubmit">
-        <BaseInput
-          v-model="password"
-          label="Senha"
-          :type="showPassword ? 'text' : 'password'"
-          placeholder="Digite sua senha"
-          required
-          :disabled="loading"
-        >
+        <BaseInput v-model="password" label="Senha" :type="showPassword ? 'text' : 'password'"
+          placeholder="Digite sua senha" autocomplete required :disabled="loading">
           <template #prefix>
             <div v-html="passwordIcon"></div>
           </template>
           <template #suffix>
-            <PasswordVisibilityIcon 
-              :is-visible="showPassword"
-              @toggle="showPassword = !showPassword"
-            />
+            <PasswordVisibilityIcon :is-visible="showPassword" @toggle="showPassword = !showPassword" />
           </template>
         </BaseInput>
 
-        <BaseInput
-          v-model="confirmPassword"
-          label="Confirmar senha"
-          :type="showConfirmPassword ? 'text' : 'password'"
-          placeholder="Digite sua senha"
-          required
-          :disabled="loading"
-        >
+        <BaseInput v-model="confirmPassword" label="Confirmar senha" :type="showConfirmPassword ? 'text' : 'password'"
+          placeholder="Digite sua senha" autocomplete required :disabled="loading">
           <template #prefix>
             <div v-html="passwordIcon"></div>
           </template>
           <template #suffix>
-            <PasswordVisibilityIcon 
-              :is-visible="showConfirmPassword"
-              @toggle="showConfirmPassword = !showConfirmPassword"
-            />
+            <PasswordVisibilityIcon :is-visible="showConfirmPassword"
+              @toggle="showConfirmPassword = !showConfirmPassword" />
           </template>
         </BaseInput>
 
         <div class="flex flex-col gap-6 w-full max-sm:items-center mt-4">
           <div>
-            <BaseButton
-              type="submit"
-              variant="primary"
-              :loading="loading"
-              class="w-full h-[40px]"
+            <BaseButton type="submit" variant="primary" :loading="loading" class="w-full h-[40px]"
               :disabled="!isFormValid">
               {{ loading ? 'Processando...' : 'Redefinir' }}
             </BaseButton>
@@ -67,7 +47,8 @@
 
           <div class="text-center font-inter text-[14px] leading-[18px] text-[#040D25]">
             <span>Lembrou sua senha? </span>
-            <router-link :to="route.meta.role === 'MANAGER' ? '/login/manager' : '/login/affiliate'" class="text-[#CF631C] hover:underline hover:text-[#CF631C]">
+            <router-link :to="route.meta.role === 'MANAGER' ? '/login/manager' : '/login/affiliate'"
+              class="text-[#CF631C] hover:underline hover:text-[#CF631C]">
               Faça login
             </router-link>
           </div>
@@ -88,11 +69,9 @@ import { useRouter, useRoute } from 'vue-router'
 import BaseButton from '@/components/common/BaseButton.vue'
 import PasswordVisibilityIcon from '@/components/common/icons/PasswordVisibilityIcon.vue'
 import BaseInput from '@/components/common/BaseInput.vue'
-import { useAuthContextStore } from '@/stores/auth-context'
 
 const router = useRouter()
 const route = useRoute()
-const authContextStore = useAuthContextStore()
 
 const password = ref('')
 const confirmPassword = ref('')
@@ -103,7 +82,7 @@ const loading = ref(false)
 onMounted(() => {
   // Salva o papel do usuário no store
   if (route.meta.role) {
-    authContextStore.setUserRole(route.meta.role as 'MANAGER' | 'AFFILIATE')
+    localStorage.setItem('contextRole', route.meta.role as 'manager' | 'affiliate')
   }
 })
 
@@ -128,12 +107,12 @@ const handleSubmit = async () => {
 
   try {
     loading.value = true
-    const endpoint = authContextStore.userRole === 'MANAGER' ? '/manager/auth/password/reset' : '/affiliate/auth/password/reset'
+    const endpoint = localStorage.getItem('contextRole') === 'manager' ? '/manager/auth/password/reset' : '/affiliate/auth/password/reset'
     const token = route.query.token as string
-    
+
     // Aqui você implementará a lógica de redefinição de senha
     // await authStore.resetPassword(token, password.value)
-    
+
     router.push('/password-changed')
   } catch (error) {
     console.error('Erro ao redefinir senha:', error)

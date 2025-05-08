@@ -41,7 +41,7 @@ export const useAuthStore = defineStore('auth', () => {
     window.location.href = `/login/${currentRole}`
   }
 
-  const login = async (credentials: { email: string; password: string; role: 'MANAGER' | 'AFFILIATE'; fingerprint: string }) => {
+  const login = async (credentials: { email: string; password: string; fingerprint: string }) => {
     try {
       const response = await managerService.auth.login({
         email: credentials.email,
@@ -49,7 +49,7 @@ export const useAuthStore = defineStore('auth', () => {
         fingerprint: credentials.fingerprint,
       })
       const token = response.auth_token
-      const user = await managerService.auth.current(credentials.role)
+      const user = await managerService.auth.current()
 
       setAuth(token, user)
       return user

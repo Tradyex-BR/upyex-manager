@@ -24,13 +24,13 @@ const routes: Array<RouteRecordRaw> = [
     path: '/login/manager',
     name: 'LoginManager',
     component: () => import('../views/Login.vue'),
-    meta: { requiresAuth: false, role: 'MANAGER' }
+    meta: { requiresAuth: false, role: 'manager' }
   },
   {
     path: '/login/affiliate',
     name: 'LoginAffiliate',
     component: () => import('../views/Login.vue'),
-    meta: { requiresAuth: false, role: 'AFFILIATE' }
+    meta: { requiresAuth: false, role: 'affiliate' }
   },
   {
     path: '/forgot-password',
@@ -40,13 +40,13 @@ const routes: Array<RouteRecordRaw> = [
     path: '/forgot-password/manager',
     name: 'ForgotPasswordManager',
     component: () => import('../views/ForgotPassword.vue'),
-    meta: { requiresAuth: false, role: 'MANAGER' }
+    meta: { requiresAuth: false, role: 'manager' }
   },
   {
     path: '/forgot-password/affiliate',
     name: 'ForgotPasswordAffiliate',
     component: () => import('../views/ForgotPassword.vue'),
-    meta: { requiresAuth: false, role: 'AFFILIATE' }
+    meta: { requiresAuth: false, role: 'affiliate' }
   },
   {
     path: '/reset-password',
@@ -56,13 +56,13 @@ const routes: Array<RouteRecordRaw> = [
     path: '/reset-password/manager',
     name: 'ResetPasswordManager',
     component: () => import('../views/ResetPassword.vue'),
-    meta: { requiresAuth: false, role: 'MANAGER' }
+    meta: { requiresAuth: false, role: 'manager' }
   },
   {
     path: '/reset-password/affiliate',
     name: 'ResetPasswordAffiliate',
     component: () => import('../views/ResetPassword.vue'),
-    meta: { requiresAuth: false, role: 'AFFILIATE' }
+    meta: { requiresAuth: false, role: 'affiliate' }
   },
   {
     path: '/email-sent',
@@ -72,13 +72,13 @@ const routes: Array<RouteRecordRaw> = [
     path: '/email-sent/manager',
     name: 'EmailSentManager',
     component: () => import('../views/EmailSent.vue'),
-    meta: { requiresAuth: false, role: 'MANAGER' }
+    meta: { requiresAuth: false, role: 'manager' }
   },
   {
     path: '/email-sent/affiliate',
     name: 'EmailSentAffiliate',
     component: () => import('../views/EmailSent.vue'),
-    meta: { requiresAuth: false, role: 'AFFILIATE' }
+    meta: { requiresAuth: false, role: 'affiliate' }
   },
   {
     path: '/password-changed',
@@ -90,13 +90,13 @@ const routes: Array<RouteRecordRaw> = [
     path: '/password-changed/manager',
     name: 'PasswordChangedManager',
     component: () => import('../views/PasswordChanged.vue'),
-    meta: { requiresAuth: false, role: 'MANAGER' }
+    meta: { requiresAuth: false, role: 'manager' }
   },
   {
     path: '/password-changed/affiliate',
     name: 'PasswordChangedAffiliate',
     component: () => import('../views/PasswordChanged.vue'),
-    meta: { requiresAuth: false, role: 'AFFILIATE' }
+    meta: { requiresAuth: false, role: 'affiliate' }
   },
   {
     path: '/dashboard',

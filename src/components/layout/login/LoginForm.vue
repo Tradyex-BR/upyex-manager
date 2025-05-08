@@ -10,7 +10,7 @@
         </BaseInput>
 
         <BaseInput v-model="password" label="Senha" :type="showPassword ? 'text' : 'password'"
-          placeholder="Digite sua senha" required :disabled="loading || isFingerprintLoading">
+          placeholder="Digite sua senha" autocomplete= required :disabled="loading || isFingerprintLoading">
           <template #prefix>
             <PasswordIcon />
           </template>
@@ -71,7 +71,7 @@ const emailError = ref('')
 const loading = ref(false)
 const error = ref('')
 
-const role = computed(() => localStorage.getItem('contextRole') as 'MANAGER' | 'AFFILIATE')
+const role = computed(() => localStorage.getItem('contextRole') as 'manager' | 'affiliate')
 
 const isDev = import.meta.env.DEV
 const mockFingerprint = isDev ? inject('fingerprint') as { getData: () => Promise<{ visitorId: string }> } : null
@@ -106,7 +106,7 @@ const isFormValid = computed(() => {
 })
 
 const forgotPasswordRoute = computed(() => {
-  return role.value === 'MANAGER' ? '/forgot-password/manager' : '/forgot-password/affiliate'
+  return role.value === 'manager' ? '/forgot-password/manager' : '/forgot-password/affiliate'
 })
 
 const handleForgotPassword = () => {

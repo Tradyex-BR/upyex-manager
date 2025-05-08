@@ -16,7 +16,7 @@ api.interceptors.request.use((config) => {
   }
   const role = localStorage.getItem('contextRole')
   if (role) {
-    config.baseURL += `/${role}`
+    config.baseURL += `/${role.toLowerCase()}`
   }
   return config
 })

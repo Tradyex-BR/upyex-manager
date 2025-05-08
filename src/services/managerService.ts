@@ -4,7 +4,6 @@ export interface ManagerLoginCredentials {
   email: string;
   password: string;
   fingerprint?: string;
-  role: string;
 }
 export interface ManagerLoginResponse {
   auth_token: string;

@@ -40,12 +40,10 @@ import VerticalLines from '@/components/layout/login/VerticalLines.vue'
 import BaseButton from '@/components/common/BaseButton.vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
-import { useAuthContextStore } from '@/stores/auth-context'
 
 const router = useRouter()
 const route = useRoute()
 const authStore = useAuthStore()
-const authContextStore = useAuthContextStore()
 const loading = ref(false)
 
 const handleBack = () => {

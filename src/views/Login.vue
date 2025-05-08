@@ -9,7 +9,7 @@
           Boas vindas ao TradyEx
         </h1>
         <div class="font-inter text-[#222A3F] text-[14px] leading-[18px]">
-          {{ route.meta.role === 'MANAGER' ? 'Área do Administrador' : 'Área do Afiliado' }}
+          {{ route.meta.role === 'manager' ? 'Área do Administrador' : 'Área do Afiliado' }}
         </div>
       </div>
 
@@ -29,7 +29,6 @@
 import { ref, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
-import { useAuthContextStore } from '@/stores/auth-context'
 import LoginForm from '@/components/layout/login/LoginForm.vue'
 import LoginBackground from '@/components/layout/login/LoginBackground.vue'
 import VerticalLines from '@/components/layout/login/VerticalLines.vue'
@@ -37,27 +36,26 @@ import VerticalLines from '@/components/layout/login/VerticalLines.vue'
 const router = useRouter()
 const route = useRoute()
 const authStore = useAuthStore()
-const authContextStore = useAuthContextStore()
 
 onMounted(() => {
   // Se o usuário estiver autenticado, redireciona para o dashboard do contexto atual
   if (authStore.isAuthenticated) {
-    router.replace(authContextStore.userRole === 'MANAGER' ? '/dashboard' : '/affiliate/dashboard')
+    router.replace(localStorage.getItem('contextRole') === 'manager' ? '/dashboard' : '/affiliate/dashboard')
     return
   }
 
   // Se a rota não tiver um papel definido, verifica o contexto salvo
   if (!route.meta.role) {
-    if (authContextStore.userRole) {
+    if (localStorage.getItem('contextRole')) {
       // Se tiver um contexto salvo, redireciona para a página de login correspondente
-      router.replace(`/login/${authContextStore.userRole.toLowerCase()}`)
+      router.replace(`/login/${localStorage.getItem('contextRole')?.toLowerCase()}`)
     } else {
       // Se não tiver contexto, redireciona para a rota de manager
       router.replace('/login/manager')
     }
   } else {
     // Salva o papel do usuário no store
-    authContextStore.setUserRole(route.meta.role as 'MANAGER' | 'AFFILIATE')
+    localStorage.setItem('contextRole', route.meta.role as 'manager' | 'affiliate')
   }
 })
 </script>

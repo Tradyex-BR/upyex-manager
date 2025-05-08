@@ -1,5 +1,4 @@
 import { useAuthStore } from '@/stores/auth'
-import { useAuthContextStore } from '@/stores/auth-context'
 import { storeToRefs } from 'pinia'
 
 // Lista de chaves que devem ser mantidas no localStorage
@@ -15,9 +14,6 @@ export const clearAuthData = () => {
   // Limpa o store de autenticação
   const authStore = useAuthStore()
   authStore.logout()
-
-  // Limpa o store de contexto
-  const authContextStore = useAuthContextStore()
 }
 
 export const clearNonPersistentData = () => {
@@ -39,9 +35,7 @@ export const isAuthenticated = () => {
 }
 
 export const getCurrentRole = () => {
-  const authContextStore = useAuthContextStore()
-  const { userRole } = storeToRefs(authContextStore)
-  return userRole.value || localStorage.getItem('contextRole') || 'manager'
+  return localStorage.getItem('contextRole') || 'manager'
 }
 
 export const getDashboardPath = () => {

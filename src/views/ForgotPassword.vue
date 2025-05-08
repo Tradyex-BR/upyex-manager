@@ -1,7 +1,8 @@
 <template>
   <div
     class="max-w-none flex flex-row w-full h-screen bg-[#010309] mx-auto max-md:max-w-[991px] max-md:flex-col max-sm:max-w-screen-sm">
-    <div class="z-[100] flex flex-col justify-center w-6/12 backdrop-blur-lg items-start gap-8 bg-white bg-[url('/png/static-neon.png')] bg-no-repeat bg-top bg-center p-28 left-[section] max-md:w-full">
+    <div
+      class="z-[100] flex flex-col justify-center w-6/12 backdrop-blur-lg items-start gap-8 bg-white bg-[url('/png/static-neon.png')] bg-no-repeat bg-top bg-center p-28 left-[section] max-md:w-full">
 
       <div class="flex flex-col gap-2">
         <h1 class="text-[#040D25] text-[32px] leading-[40px] font-semibold">
@@ -13,14 +14,8 @@
       </div>
 
       <form class="flex flex-col gap-4 w-full" @submit.prevent="handleSubmit">
-        <BaseInput
-          v-model="email"
-          label="Email"
-          type="email"
-          placeholder="Digite seu email"
-          required
-          :disabled="loading"
-        >
+        <BaseInput v-model="email" label="Email" type="email" placeholder="Digite seu email" required
+          :disabled="loading">
           <template #prefix>
             <div v-html="emailIcon"></div>
           </template>
@@ -29,20 +24,16 @@
 
       <div class="flex flex-col gap-6 w-full max-sm:items-center">
         <div>
-          <BaseButton
-            type="submit"
-            variant="primary"
-            :loading="loading"
-            :disabled="!isEmailValid"
-            class="w-full h-[40px]"
-            @click="handleSubmit">
+          <BaseButton type="submit" variant="primary" :loading="loading" :disabled="!isEmailValid"
+            class="w-full h-[40px]" @click="handleSubmit">
             {{ loading ? 'Enviando...' : 'Redefinir' }}
           </BaseButton>
         </div>
 
         <div class="text-center font-inter text-[14px] leading-[18px] text-[#040D25]">
           <span>Lembrou sua senha? </span>
-          <router-link :to="route.meta.role === 'MANAGER' ? '/login/manager' : '/login/affiliate'" class="text-[#CF631C] hover:underline hover:text-[#CF631C]">
+          <router-link :to="route.meta.role === 'MANAGER' ? '/login/manager' : '/login/affiliate'"
+            class="text-[#CF631C] hover:underline hover:text-[#CF631C]">
             Faça login
           </router-link>
         </div>
@@ -63,11 +54,9 @@ import LoginBackground from '@/components/layout/login/LoginBackground.vue'
 import VerticalLines from '@/components/layout/login/VerticalLines.vue'
 import BaseButton from '@/components/common/BaseButton.vue'
 import BaseInput from '@/components/common/BaseInput.vue'
-import { useAuthContextStore } from '@/stores/auth-context'
 
 const router = useRouter()
 const route = useRoute()
-const authContextStore = useAuthContextStore()
 const email = ref('')
 const loading = ref(false)
 const error = ref('')
@@ -86,7 +75,7 @@ onMounted(() => {
   }
   // Salva o papel do usuário no store
   if (route.meta.role) {
-    authContextStore.setUserRole(route.meta.role as 'MANAGER' | 'AFFILIATE')
+    localStorage.setItem('contextRole', route.meta.role as 'manager' | 'affiliate')
   }
 })
 
@@ -109,7 +98,7 @@ const handleSubmit = async () => {
   window.localStorage.setItem('recoveryEmail', email.value)
 
   try {
-    const endpoint = authContextStore.userRole === 'MANAGER' ? '/manager/auth/password/forgot' : '/affiliate/auth/password/forgot'
+    const endpoint = localStorage.getItem('contextRole') === 'manager' ? '/manager/auth/password/forgot' : '/affiliate/auth/password/forgot'
     const url = `${import.meta.env.VITE_API_BASE_URL}${endpoint}?email=${encodeURIComponent(email.value.trim())}`
     const res = await fetch(url, {
       method: 'GET'
@@ -119,7 +108,7 @@ const handleSubmit = async () => {
       throw new Error(data.message || 'Erro ao solicitar recuperação de senha')
     }
     message.value = data.message || 'Email enviado com instruções para redefinir a senha.'
-    setTimeout(() => router.push(`/email-sent/${authContextStore.userRole.toLowerCase()}`), 1200)
+    setTimeout(() => router.push(`/email-sent/${localStorage.getItem('contextRole')?.toLowerCase()}`), 1200)
   } catch (err: any) {
     error.value = err.message || 'Erro ao solicitar recuperação de senha'
   } finally {
