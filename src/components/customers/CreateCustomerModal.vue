@@ -4,81 +4,53 @@
       <div class="flex flex-col gap-7">
         <!-- Nome e Email -->
         <div class="grid grid-cols-2 gap-5">
-          <BaseInput
-            v-model="form.name"
-            label="Nome"
-            placeholder="Nome completo"
-            required
-            variant="dark"
-          >
+          <BaseInput v-model="form.name" label="Nome" placeholder="Nome completo" required variant="dark">
             <template #prefix>
-              <FontAwesomeIcon icon="user" class="text-[#e67e22] mr-3" />
+              <FontAwesomeIcon icon="user" class="text-[#B8B8B8] mr-3" />
             </template>
           </BaseInput>
 
-          <BaseInput
-            v-model="form.email"
-            label="Email"
-            type="email"
-            placeholder="email@exemplo.com"
-            required
-            variant="dark"
-          >
+          <BaseInput v-model="form.email" label="Email" type="email" placeholder="email@exemplo.com" required
+            variant="dark">
             <template #prefix>
-              <FontAwesomeIcon icon="envelope" class="text-[#e67e22] mr-3" />
+              <FontAwesomeIcon icon="envelope" class="text-[#B8B8B8] mr-3" />
             </template>
           </BaseInput>
         </div>
 
         <!-- Telefone e CPF/CNPJ -->
         <div class="grid grid-cols-2 gap-5">
-          <BaseInput
-            v-model="form.phone"
-            label="Telefone"
-            type="tel"
-            placeholder="(00) 00000-0000"
-            required
-            variant="dark"
-          >
+          <BaseInput v-model="form.phone" label="Telefone" type="tel" placeholder="(00) 00000-0000" required
+            variant="dark">
             <template #prefix>
-              <FontAwesomeIcon icon="phone" class="text-[#e67e22] mr-3" />
+              <FontAwesomeIcon icon="phone" class="text-[#B8B8B8] mr-3" />
             </template>
           </BaseInput>
 
-          <BaseInput
-            v-model="form.document_number"
-            label="CPF/CNPJ"
-            placeholder="000.000.000-00"
-            variant="dark"
-          >
+          <BaseInput v-model="form.document_number" label="CPF/CNPJ" placeholder="000.000.000-00" variant="dark">
             <template #prefix>
-              <FontAwesomeIcon icon="id-card" class="text-[#e67e22] mr-3" />
+              <FontAwesomeIcon icon="id-card" class="text-[#B8B8B8] mr-3" />
             </template>
           </BaseInput>
         </div>
 
         <!-- Código do Afiliado -->
-        <BaseInput
-          v-model="form.affiliate_code"
-          label="Código do Afiliado"
-          placeholder="Código único do afiliado"
-          required
-          variant="dark"
-        >
+        <BaseInput v-model="form.affiliate_code" label="Código do Afiliado" placeholder="Código único do afiliado"
+          required variant="dark">
           <template #prefix>
-            <FontAwesomeIcon icon="hashtag" class="text-[#e67e22] mr-3" />
+            <FontAwesomeIcon icon="hashtag" class="text-[#B8B8B8] mr-3" />
           </template>
         </BaseInput>
       </div>
 
       <div class="flex gap-5 mt-2">
-        <BaseButton variant="outline" class="bg-[#131836] hover:bg-[#1e2642] text-white h-12 px-5 transition-colors flex-1"
-          @click="$emit('close')">
+        <BaseButton variant="outline"
+          class="bg-[#131836] hover:bg-[#1e2642] text-white h-12 px-5 transition-colors flex-1" @click="$emit('close')">
           Cancelar
         </BaseButton>
 
-        <BaseButton class="flex-1 h-12 transition-colors" type="submit"
-          :disabled="!isFormValid || loading" :loading="loading">
+        <BaseButton class="flex-1 h-12 transition-colors" type="submit" :disabled="!isFormValid || loading"
+          :loading="loading">
           {{ loading ? "Criando Cliente..." : "Criar Cliente" }}
         </BaseButton>
       </div>
