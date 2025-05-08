@@ -246,6 +246,7 @@ export default defineComponent({
             }
             break;
           case 'edit_application':
+            this.selectedApplication = this.offers.find(o => o.id === id);
             this.showEditModal = true;
             break;
           case 'reset_api_key':
