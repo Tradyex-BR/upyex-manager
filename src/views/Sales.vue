@@ -123,6 +123,7 @@ import BaseTable from '@/components/common/BaseTable.vue'
 import SaleDetailsModal from '@/components/sales/SaleDetailsModal.vue'
 import NewSaleModal from '@/components/sales/NewSaleModal.vue'
 import EditSaleModal from '@/components/sales/EditSaleModal.vue'
+import { notificationService } from '@/services/notificationService'
 
 const AFFILIATE_MOCK_DATA = [
   {
@@ -542,10 +543,10 @@ export default defineComponent({
         await externalService.sales.register(payload);
         await this.loadSales();
         this.showCreateModal = false;
-        this.toast.success('Venda registrada com sucesso!');
+        notificationService.success('Venda registrada com sucesso!');
       } catch (error) {
         console.error('Erro ao criar venda:', error);
-        this.toast.error('Erro ao registrar venda');
+        notificationService.error('Erro ao registrar venda');
       }
     },
 
@@ -561,10 +562,10 @@ export default defineComponent({
         await externalService.sales.update(this.editingSale.id, payload);
         await this.loadSales();
         this.showEditModal = false;
-        this.toast.success('Venda atualizada com sucesso!');
+        notificationService.success('Venda atualizada com sucesso!');
       } catch (error) {
         console.error('Erro ao editar venda:', error);
-        this.toast.error('Erro ao atualizar venda');
+        notificationService.error('Erro ao atualizar venda');
       }
     },
 

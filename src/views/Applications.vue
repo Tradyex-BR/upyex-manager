@@ -294,10 +294,10 @@ export default defineComponent({
     async handleResetApplication() {
       try {
         await managerService.applications.resetSecret(this.selectedApplication.id)
-        this.toast.success('Chave API resetada com sucesso')
+        notificationService.success('Chave API resetada com sucesso')
       } catch (error) {
         console.error('Erro ao resetar chave API:', error)
-        this.toast.error('Erro ao resetar chave API')
+        notificationService.error('Erro ao resetar chave API')
       }
     },
     async loadOffers() {
