@@ -14,7 +14,9 @@ import {
   faRightFromBracket,
   faCheck,
   faXmark,
-  faExclamationTriangle
+  faExclamationTriangle,
+  faCopy,
+  faRotate
 } from '@fortawesome/free-solid-svg-icons'
 
 library.add(
@@ -31,7 +33,9 @@ library.add(
   faRightFromBracket,
   faCheck,
   faXmark,
-  faExclamationTriangle
+  faExclamationTriangle,
+  faCopy,
+  faRotate
 )
 
 export { FontAwesomeIcon } 

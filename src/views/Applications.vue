@@ -73,16 +73,13 @@
         </section>
       </div>
 
-      <!-- Modal de Detalhes da Oferta -->
-      <!--     <OfferDetailsModal
-        :show="showDetailsModal"
-        :offer="selectedOffer"
-        @close="showDetailsModal = false"
-      /> -->
-
       <!-- Modal de Criação de Aplicação -->
-      <GenerateLinkModal v-if="showCreateModal" :show="showCreateModal" :application-id="selectedOffer?.id"
+      <GenerateLinkModal v-if="showCreateModal" :show="showCreateModal" :application-id="selectedApplication?.id"
         @close="showCreateModal = false" @submit="handleCreateApplication" />
+      <EditApplicationModal v-if="showEditModal" :show="showEditModal" :application-id="selectedApplication?.id"
+        @close="showEditModal = false" @submit="handleEditApplication" />
+      <ConfirmResetModal v-if="showResetModal" :show="showResetModal" :application-id="selectedApplication?.id"
+        :api-key="selectedApplication?.api_secret" @close="showResetModal = false" @submit="handleResetApplication" />
     </AuthenticatedLayout>
   </template>
 
@@ -104,6 +101,8 @@ import PenIcon from '@/components/icons/PenIcon.vue'
 import KeyIcon from '@/components/icons/KeyIcon.vue'
 import TrashIcon from '@/components/icons/TrashIcon.vue'
 import BaseDropdown from '@/components/common/BaseDropdown.vue'
+import EditApplicationModal from '@/components/offers/EditApplicationModal.vue'
+import ConfirmResetModal from '@/components/offers/ConfirmResetModal.vue'
 
 export default defineComponent({
   props: {
@@ -120,7 +119,9 @@ export default defineComponent({
     GenerateLinkModal,
     OfferDetailsModal,
     BaseTable,
-    BaseDropdown
+    BaseDropdown,
+    EditApplicationModal,
+    ConfirmResetModal
   },
   setup() {
     const store = useDashboardStore()
@@ -129,23 +130,23 @@ export default defineComponent({
     const toast = useToast()
     const dropdownOptions = [
       {
-        text: 'Bloquear',
-        action: 'bloquear',
+        text: 'Ativar/Desativar',
+        action: 'toggle_status',
         icon: XIcon
       },
       {
-        text: 'Editar Permissão',
-        action: 'editar_permissao',
-        icon: PenIcon
-      },
-      {
-        text: 'Resetar Senha',
-        action: 'resetar_senha',
+        text: 'Copiar Chave API',
+        action: 'copy_api_key',
         icon: KeyIcon
       },
       {
-        text: 'Excluir',
-        action: 'excluir',
+        text: 'Editar Aplicação',
+        action: 'edit_application',
+        icon: PenIcon
+      },
+      {
+        text: 'Resetar Chave API',
+        action: 'reset_api_key',
         icon: TrashIcon
       }
     ]
@@ -156,8 +157,9 @@ export default defineComponent({
       offers: [] as any[],
       loading: true,
       showCreateModal: false,
-      showDetailsModal: false,
-      selectedOffer: null as any,
+      showEditModal: false,
+      showResetModal: false,
+      selectedApplication: null as any,
       isManager: false,
       dropdownOpen: null as string | null
     }
@@ -197,19 +199,58 @@ export default defineComponent({
     },
     async handleApplicationAction(id: string, action: string) {
       try {
-        /* const customer = this.customers.find(c => c.id === id);
-        if (!customer) return; */
-
         switch (action) {
-          case 'ativar_desativar':
+          case 'toggle_status':
+            try {
+              const application = this.offers.find(o => o.id === id)
+              if (!application) {
+                throw new Error('Aplicação não encontrada')
+              }
+
+              const payload = {
+                ...application,
+                is_active: !application.is_active
+              }
+
+              await managerService.applications.update(id, payload)
+
+              // Atualiza o estado local
+              const index = this.offers.findIndex(o => o.id === id)
+              if (index !== -1) {
+                this.offers[index] = { ...this.offers[index], is_active: !application.is_active }
+              }
+
+              this.toast.success('Status atualizado com sucesso')
+            } catch (error) {
+              console.error('Erro ao atualizar status:', error)
+              this.toast.error('Erro ao atualizar status da aplicação')
+            }
             break;
-          case 'copiar_chave':
-            // Implementar lógica de edição de permissão
+          case 'copy_api_key':
+            try {
+              const application = await managerService.applications.get(id)
+              if (!application) {
+                throw new Error('Aplicação não encontrada')
+              }
+
+              const apiSecret = application.api_secret
+              if (!apiSecret) {
+                throw new Error('Chave API não encontrada')
+              }
+
+              await navigator.clipboard.writeText(apiSecret)
+              this.toast.success('Chave API copiada com sucesso')
+            } catch (error) {
+              console.error('Erro ao copiar chave API:', error)
+              this.toast.error('Erro ao copiar chave API')
+            }
             break;
-          case 'edição':
-            // Implementar lógica de reset de senha
+          case 'edit_application':
+            this.showEditModal = true;
             break;
-          case 'resetar':
+          case 'reset_api_key':
+            this.selectedApplication = this.offers.find(o => o.id === id);
+            this.showResetModal = true;
             break;
         }
       } catch (e) {
@@ -231,15 +272,37 @@ export default defineComponent({
         console.error('Erro ao criar aplicação:', error);
       }
     },
-    showOfferDetails(offer: any) {
-      this.selectedOffer = offer;
-      this.showDetailsModal = true;
+    async handleEditApplication(formData: any) {
+      try {
+        const updatedApplication = await managerService.applications.update(this.selectedApplication.id, formData);
+
+        // Atualiza o item localmente
+        const index = this.offers.findIndex(o => o.id === this.selectedApplication.id);
+        if (index !== -1) {
+          this.offers[index] = { ...this.offers[index], ...updatedApplication };
+        }
+
+        this.showEditModal = false;
+        this.toast.success('Aplicação atualizada com sucesso');
+      } catch (error) {
+        console.error('Erro ao editar aplicação:', error);
+        this.toast.error('Erro ao atualizar aplicação');
+      }
+    },
+    async handleResetApplication() {
+      try {
+        await managerService.applications.resetSecret(this.selectedApplication.id)
+        this.toast.success('Chave API resetada com sucesso')
+      } catch (error) {
+        console.error('Erro ao resetar chave API:', error)
+        this.toast.error('Erro ao resetar chave API')
+      }
     },
     async loadOffers() {
       await this.handleSearch('');
     },
     handleGenerateLink(offer: any) {
-      this.selectedOffer = offer
+      this.selectedApplication = offer
       this.showCreateModal = true
     }
   }

@@ -84,6 +84,7 @@ export interface Application {
   logo_url: string | null;
   base_affiliate_link: string;
   is_active?: boolean;
+  api_secret?: string;
 }
 export interface CreateApplicationPayload {
   name: string;
