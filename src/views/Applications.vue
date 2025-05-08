@@ -103,6 +103,7 @@ import TrashIcon from '@/components/icons/TrashIcon.vue'
 import BaseDropdown from '@/components/common/BaseDropdown.vue'
 import EditApplicationModal from '@/components/offers/EditApplicationModal.vue'
 import ConfirmResetModal from '@/components/offers/ConfirmResetModal.vue'
+import { notificationService } from '@/services/notificationService'
 
 export default defineComponent({
   props: {
@@ -220,10 +221,10 @@ export default defineComponent({
                 this.offers[index] = { ...this.offers[index], is_active: !application.is_active }
               }
 
-              this.toast.success('Status atualizado com sucesso')
+              notificationService.success('Status atualizado com sucesso')
             } catch (error) {
               console.error('Erro ao atualizar status:', error)
-              this.toast.error('Erro ao atualizar status da aplicação')
+              notificationService.error('Erro ao atualizar status da aplicação')
             }
             break;
           case 'copy_api_key':
@@ -239,10 +240,10 @@ export default defineComponent({
               }
 
               await navigator.clipboard.writeText(apiSecret)
-              this.toast.success('Chave API copiada com sucesso')
+              notificationService.success('Chave API copiada com sucesso')
             } catch (error) {
               console.error('Erro ao copiar chave API:', error)
-              this.toast.error('Erro ao copiar chave API')
+              notificationService.error('Erro ao copiar chave API')
             }
             break;
           case 'edit_application':
@@ -284,10 +285,10 @@ export default defineComponent({
         }
 
         this.showEditModal = false;
-        this.toast.success('Aplicação atualizada com sucesso');
+        notificationService.success('Aplicação atualizada com sucesso');
       } catch (error) {
         console.error('Erro ao editar aplicação:', error);
-        this.toast.error('Erro ao atualizar aplicação');
+        notificationService.error('Erro ao atualizar aplicação');
       }
     },
     async handleResetApplication() {
