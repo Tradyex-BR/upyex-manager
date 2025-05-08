@@ -73,7 +73,7 @@ import AuthenticatedLayout from '@/components/layout/AuthenticatedLayout.vue'
 import BarChart from "@/components/graphics/BarChart.vue"
 import EmptyChart from '@/components/layout/dashboard/EmptyChart.vue'
 const currentView = ref('cards')
-const role = localStorage.getItem('role') || 'manager'
+const role = localStorage.getItem('contextRole') || 'manager'
 
 const translateLabel = (label: string): string => {
   const translations: Record<string, string> = {
