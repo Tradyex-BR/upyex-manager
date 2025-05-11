@@ -345,10 +345,10 @@ export const managerService = {
   },
 
   dashboard: {
-    getData: async (payload: DashboardParams): Promise<DashboardResponse> => {
+    getData: async (payload: DashboardParams, paidSales: number = 0): Promise<DashboardResponse> => {
       const response = await api.request<DashboardResponse>({
         method: 'GET',
-        url: '/dashboard',
+        url: '/dashboard?paid_sales_only=' + paidSales,
         params: payload, // Envia como query params
       });
       return response.data;

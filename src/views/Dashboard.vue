@@ -33,6 +33,23 @@
                 </GraphicSection>
                 <GraphicSection title="Método de pagamento" description="Distribuição por método de pagamento"
                   class="min-h-[446px]">
+                  <template #actions>
+                    <BaseDropdown :options="dropdownOptions" @select="handleDropdownAction" :top="50"
+                      class="w-min mx-auto" v-model="isDropdownOpen">
+                      <template #trigger>
+                        <div
+                          class="w-[120px] flex items-center justify-between gap-[15px] rounded-lg border border-[#2C3652] p-3">
+                          <p class="w-[80px] text-start text-white font-inter leading-5">{{ currentDropdownAction }}</p>
+                          <svg :class="['w-5 h-5 transition-transform', { 'rotate-180': isDropdownOpen }]"
+                            xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" clip-rule="evenodd"
+                              d="M4.41074 6.9107C4.73618 6.58527 5.26382 6.58527 5.58926 6.9107L10 11.3214L14.4107 6.9107C14.7362 6.58527 15.2638 6.58527 15.5893 6.9107C15.9147 7.23614 15.9147 7.76378 15.5893 8.08921L10.5893 13.0892C10.2638 13.4146 9.73618 13.4146 9.41075 13.0892L4.41074 8.08921C4.08531 7.76378 4.08531 7.23614 4.41074 6.9107Z"
+                              fill="#4D5E8F" />
+                          </svg>
+                        </div>
+                      </template>
+                    </BaseDropdown>
+                  </template>
                   <PaymentMethodCards :data="formattedPaymentMethodData" class="w-full" />
                 </GraphicSection>
               </div>
@@ -72,8 +89,12 @@ import { useDashboard } from '@/composables/useDashboard'
 import AuthenticatedLayout from '@/components/layout/AuthenticatedLayout.vue'
 import BarChart from "@/components/graphics/BarChart.vue"
 import EmptyChart from '@/components/layout/dashboard/EmptyChart.vue'
+import BaseDropdown from '@/components/common/BaseDropdown.vue'
+
 const currentView = ref('cards')
 const role = localStorage.getItem('contextRole') || 'manager'
+const currentDropdownAction = ref('Total')
+const isDropdownOpen = ref(false)
 
 const translateLabel = (label: string): string => {
   const translations: Record<string, string> = {
@@ -150,7 +171,32 @@ const formattedWithdrawalsData = computed(() => ({
   }))
 }))
 
+const dropdownOptions = computed(() => [
+  {
+    text: 'Total',
+    action: 'total'
+
+  },
+  {
+    text: 'Pagos',
+    action: 'paid'
+  },
+])
+
 onMounted(() => {
   fetchData()
 })
+
+const handleDropdownAction = (action: string) => {
+  console.log('Ação selecionada:', action)
+  // Aqui você pode implementar a lógica para cada ação
+  switch (action) {
+    case 'total':
+      currentDropdownAction.value = 'Total'
+      break
+    case 'paid':
+      currentDropdownAction.value = 'Pagos'
+      break
+  }
+}
 </script>

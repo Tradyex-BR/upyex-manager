@@ -54,57 +54,57 @@ export function useDashboard() {
     sales: {
       cards: {
         by_status: {
-          awaiting_payment: 10,
-          paid: 312,
-          refunded: 42,
-          cancelled: 42,
-          failed: 4
+          awaiting_payment: 0,
+          paid: 0,
+          refunded: 0,
+          cancelled: 0,
+          failed: 0
         },
         by_payment_method: {
-          bank_transfer: 5,
-          credit_card: 10,
-          debit_card: 46,
-          payment_link: 345,
-          pix: 25
+          bank_transfer: 0,
+          credit_card: 0,
+          debit_card: 0,
+          payment_link: 0,
+          pix: 0
         }
       },
       graph: [
         {
           date: "2025-04-25",
-          count: 10
+          count: 0
         },
         {
           date: "2025-04-26",
-          count: 56
+          count: 0
         },
         {
           date: "2025-04-27",
-          count: 24
+          count: 0
         },
         {
           date: "2025-04-28",
-          count: 966
+          count: 0
         },
         {
           date: "2025-04-29",
-          count: 423
+          count: 0
         }
       ]
     },
     withdrawals: {
       by_status: {
-        requested: 312,
-        approved: 32,
-        rejected: 31,
-        processing: 41,
-        processed: 12,
-        cancelled: 31,
-        failed: 412
+        requested: 0,
+        approved: 0,
+        rejected: 0,
+        processing: 0,
+        processed: 0,
+        cancelled: 0,
+        failed: 0
       }
     },
     customers: {
-      total: 45,
-      new: 35
+      total: 0,
+      new: 0
     }
   }
 
@@ -156,7 +156,7 @@ export function useDashboard() {
     },
     withdrawals: {
       by_status: {
-        requested: 10,
+        requested: 0,
         approved: 0,
         rejected: 0,
         processing: 0,
@@ -166,8 +166,8 @@ export function useDashboard() {
       }
     },
     customers: {
-      total: 20,
-      new: 20
+      total: 0,
+      new: 0
     }
   }
 
