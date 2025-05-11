@@ -3,7 +3,7 @@
     <div className="border-r-[color:var(--Borda,#222A3F)] w-full h-full whitespace-nowrap border-r border-solid">
       <div
         className="text-2xl font-bold font-inter flex self-stretch justify-center items-center h-[80px] w-full gap-2.5 overflow-hidden text-[rgba(185,89,25,1)] text-center p-6">
-        TRADYEX
+        UPYEX
       </div>
       <nav className="w-full pt-10 px-6 max-md:pb-[100px] max-md:px-5">
         <div className="flex gap-2 w-full flex-col items-stretch">
@@ -50,6 +50,7 @@ interface MenuItem {
   text: string
   route: string
   icon: string
+  visible: boolean
 }
 
 export default defineComponent({
