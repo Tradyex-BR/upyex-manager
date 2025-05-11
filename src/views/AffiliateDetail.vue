@@ -150,6 +150,7 @@ import { defineComponent } from 'vue'
 import { managerService } from '@/services/managerService'
 import BaseButton from '@/components/common/BaseButton.vue'
 import BaseTable from '@/components/common/BaseTable.vue'
+import { Affiliate, AffiliateApplication } from '@/types/affiliate'
 
 export default defineComponent({
   name: 'AffiliateDetail',
@@ -159,7 +160,7 @@ export default defineComponent({
   },
   data() {
     return {
-      affiliate: null as any,
+      affiliate: null as Affiliate | null,
       loading: true,
       showEditModal: false,
       editForm: {
@@ -167,14 +168,14 @@ export default defineComponent({
         email: '',
         integration_code: '',
         is_active: true,
-        applications: []
+        applications: [] as AffiliateApplication[]
       },
       editLoading: false,
       editError: ''
     }
   },
   async mounted() {
-    const affiliateId = this.$route.params.id
+    const affiliateId = this.$route.params.id as string
     await this.loadAffiliate(affiliateId)
   },
   methods: {
@@ -182,7 +183,7 @@ export default defineComponent({
       this.loading = true
       try {
         const response = await managerService.affiliates.get(id)
-        this.affiliate = response
+        this.affiliate = response as Affiliate
       } catch (e) {
         console.error('Erro ao carregar afiliado:', e)
       } finally {
@@ -190,6 +191,8 @@ export default defineComponent({
       }
     },
     handleEdit() {
+      if (!this.affiliate) return
+      
       this.editForm = {
         name: this.affiliate.name,
         email: this.affiliate.email,
@@ -200,6 +203,8 @@ export default defineComponent({
       this.showEditModal = true
     },
     async saveAffiliateEdits() {
+      if (!this.affiliate) return
+      
       this.editLoading = true
       this.editError = ''
       try {

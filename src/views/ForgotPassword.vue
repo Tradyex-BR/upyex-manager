@@ -48,7 +48,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, watch, computed } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import LoginBackground from '@/components/layout/login/LoginBackground.vue'
 import VerticalLines from '@/components/layout/login/VerticalLines.vue'

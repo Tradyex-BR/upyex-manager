@@ -24,7 +24,7 @@
         </div>
         <div class="mb-4">
           <label class="block text-white mb-1">Aplicações</label>
-          <div v-for="(app, idx) in form.applications" :key="app.id" class="mb-2 p-2 bg-[#1a1a2a] rounded">
+          <div v-for="app in form.applications" :key="app.id" class="mb-2 p-2 bg-[#1a1a2a] rounded">
             <div class="mb-1">
               <label class="block text-xs text-gray-400">ID</label>
               <input v-model="app.id" class="w-full px-2 py-1 rounded bg-[#23263a] text-white" readonly />
@@ -58,6 +58,18 @@
 <script lang="ts">
 import { defineComponent, ref, watch } from 'vue'
 
+interface Affiliate {
+  name: string;
+  email: string;
+  integration_code: string;
+  is_active: boolean;
+  applications: Array<{
+    id: string;
+    commission_percentage: number;
+    commission_release_days: number;
+  }>;
+}
+
 export default defineComponent({
   name: 'EditAffiliateModal',
   props: {
@@ -66,18 +78,18 @@ export default defineComponent({
       required: true
     },
     affiliate: {
-      type: Object,
+      type: Object as () => Affiliate,
       required: true
     }
   },
   emits: ['close', 'save'],
   setup(props, { emit }) {
-    const form = ref({
+    const form = ref<Affiliate>({
       name: '',
       email: '',
       integration_code: '',
       is_active: true,
-      applications: [] as any[]
+      applications: []
     })
     const loading = ref(false)
     const error = ref('')

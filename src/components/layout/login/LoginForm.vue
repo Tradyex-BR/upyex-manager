@@ -53,7 +53,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted, watch, computed, inject } from 'vue'
-import { useRouter, useRoute } from 'vue-router'
+import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useVisitorData } from '@fingerprintjs/fingerprintjs-pro-vue-v3'
 import BaseButton from '@/components/common/BaseButton.vue'
@@ -64,7 +64,6 @@ import PasswordVisibilityIcon from '@/components/common/icons/PasswordVisibility
 import { notificationService } from '@/services/notificationService'
 
 const router = useRouter()
-const route = useRoute()
 const email = ref('')
 const password = ref('')
 const showPassword = ref(false)
@@ -76,10 +75,10 @@ const role = computed(() => localStorage.getItem('contextRole') as 'manager' | '
 
 const isDev = import.meta.env.DEV
 const mockFingerprint = isDev ? inject('fingerprint') as { getData: () => Promise<{ visitorId: string }> } : null
-const { data: visitorData, error: fingerprintError, isLoading: isFingerprintLoading, getData: getFingerprint } = !isDev ? useVisitorData(
+const { data: visitorData, isLoading: isFingerprintLoading, getData: getFingerprint } = !isDev ? useVisitorData(
   { extendedResult: true },
   { immediate: true }
-) : { data: ref(null), error: ref(null), isLoading: ref(false), getData: async () => { } }
+) : { data: ref(null), isLoading: ref(false), getData: async () => { } }
 
 const visitorId = ref('')
 

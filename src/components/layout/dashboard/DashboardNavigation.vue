@@ -41,7 +41,7 @@ interface NavigationItem {
   label: string;
 }
 
-const props = defineProps<{
+defineProps<{
   modelValue: string;
 }>();
 

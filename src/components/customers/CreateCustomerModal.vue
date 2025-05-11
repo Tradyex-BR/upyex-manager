@@ -82,8 +82,8 @@ interface CustomerFormData {
   affiliate_code: string
 }
 
-const props = defineProps<Props>()
 const emit = defineEmits<Emits>()
+defineProps<Props>()
 
 const loading = ref(false)
 const form = ref<CustomerFormData>({

@@ -107,8 +107,6 @@ const handleSubmit = async () => {
 
   try {
     loading.value = true
-    const endpoint = localStorage.getItem('contextRole') === 'manager' ? '/manager/auth/password/reset' : '/affiliate/auth/password/reset'
-    const token = route.query.token as string
 
     // Aqui você implementará a lógica de redefinição de senha
     // await authStore.resetPassword(token, password.value)

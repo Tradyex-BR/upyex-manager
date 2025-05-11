@@ -77,7 +77,7 @@ const copyApiKey = () => {
   }, 2000);
 };
 
-const emit = defineEmits<{
+defineEmits<{
   (e: 'close'): void
   (e: 'submit'): void
 }>()

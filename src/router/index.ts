@@ -1,15 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import { useAuthStore } from '../stores/auth'
 import { RouteRecordRaw } from 'vue-router'
-import Offers from '@/views/Offers.vue'
-import EditOffer from '@/views/offers/EditOffer.vue'
-import Home from '@/views/Home.vue'
-import Login from '@/views/Login.vue'
-import Sales from '@/views/Sales.vue'
-import Affiliates from '@/views/Affiliates.vue'
-import EditAffiliate from '@/views/affiliates/EditAffiliate.vue'
-import EditCustomer from '@/views/customers/EditCustomer.vue'
-import { isAuthenticated, getCurrentRole, getDashboardPath, getLoginPath, getNotFoundPath, clearNonPersistentData } from '@/middleware/auth'
+import { isAuthenticated, getDashboardPath, getLoginPath, getNotFoundPath, clearNonPersistentData } from '@/middleware/auth'
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -156,7 +147,7 @@ const router = createRouter({
 })
 
 // Proteção de rotas
-router.beforeEach((to, from, next) => {
+router.beforeEach((to, _, next) => {
   // Se a rota não existe, redireciona para a página 404 correspondente
   if (!to.matched.length) {
     next(getNotFoundPath())

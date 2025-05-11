@@ -13,14 +13,12 @@ import {
   LineElement,
   PointElement,
   LinearScale,
-  TimeScale, // Importa a escala de tempo!
+  TimeScale,
   Title,
   Tooltip,
   Legend,
   Filler,
-  FontSpec,
-  ChartType,
-  ChartData as ChartJSData
+  ChartType
 } from 'chart.js'
 // Importa o adaptador e a localidade
 import 'chartjs-adapter-date-fns';
@@ -55,7 +53,6 @@ let chartInstance: Chart | null = null
 // Cores baseadas na imagem
 const chartLineColor = '#F9A825'; // Laranja
 const chartGridColor = '#F9A825'; // Cor suave para ticks
-const chartTickColor = '#B8B8B8'; // Cinza claro para os rótulos dos eixos
 
 const axisFontFamily = 'Lato, sans-serif'
 const axisFontSize = 14
@@ -76,15 +73,6 @@ const createOrUpdateChart = () => {
 
   // Usa APENAS os dados das props
   const chartData = props.data || []
-
-  // --- Estilos Padrão ---
-  const defaultTextColor = '#B8B8B8';
-  const defaultFont: Partial<FontSpec> = { // Usa Partial<FontSpec> para tipagem
-    family: "'Inter', sans-serif", // Nome da fonte (coloque fallbacks)
-    size: 14,                      // Tamanho da fonte
-    lineHeight: 1.28,              // Aproximação de 18px / 14px
-    weight: 'normal'             // Peso da fonte (ajuste se necessário)
-  };
 
   chartInstance = new Chart(ctx, {
     type: 'line' as ChartType,

@@ -83,7 +83,7 @@ export default defineComponent({
     }
   },
   emits: ['update:modelValue', 'select'],
-  setup(props, { emit }) {
+  setup(props) {
     const isOpen = ref(false)
     const dropdownRef = ref<HTMLElement | null>(null)
     const dropdownMenu = ref<HTMLElement | null>(null)

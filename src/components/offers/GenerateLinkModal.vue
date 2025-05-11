@@ -65,7 +65,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, onMounted } from 'vue'
 import BaseModal from '@/components/common/BaseModal.vue'
 import CopyButton from '@/components/common/CopyButton.vue'
 import { managerService } from '@/services/managerService'

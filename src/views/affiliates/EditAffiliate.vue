@@ -185,7 +185,7 @@ export default defineComponent({
     const loadAffiliate = async () => {
       try {
         const response = await managerService.affiliates.get(route.params.id as string)
-        affiliate.value = response
+        affiliate.value = response as Affiliate
         form.value = {
           name: response.name,
           email: response.email,

@@ -79,9 +79,9 @@
           <div>
             <label class="block text-gray-400 mb-2">Link da API</label>
             <div class="flex items-center gap-2 bg-[#23263a] rounded-lg p-2">
-              <p class="text-white font-medium truncate flex-1">{{ customer?.linkApi }}</p>
-              <button v-if="customer?.linkApi" 
-                @click="copyToClipboard(customer.linkApi)" 
+              <p class="text-white font-medium truncate flex-1">{{ customer?.links?.api }}</p>
+              <button v-if="customer?.links?.api" 
+                @click="copyToClipboard(customer.links.api)" 
                 class="text-[#CF631C] hover:text-[#E67E22] transition-colors p-1">
                 <i class="fas fa-copy"></i>
               </button>
@@ -124,18 +124,8 @@
 <script lang="ts">
 import { defineComponent, ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { managerService } from '@/services/managerService'
-import { externalService } from '@/services/externalService'
-
-interface Customer {
-  id: string;
-  name: string;
-  email: string;
-  phone: string;
-  document_number: string;
-  status: string;
-  linkApi: string;
-}
+import { managerService, Customer, ListCustomersParams } from '@/services/managerService'
+import { externalService, UpdateCustomerPayload } from '@/services/externalService'
 
 export default defineComponent({
   name: 'EditCustomer',
@@ -144,7 +134,7 @@ export default defineComponent({
     const router = useRouter()
     const loading = ref(false)
     const customer = ref<Customer | null>(null)
-    const form = ref({
+    const form = ref<UpdateCustomerPayload & { status: string }>({
       name: '',
       email: '',
       phone: '',
@@ -155,22 +145,22 @@ export default defineComponent({
     const loadCustomer = async () => {
       loading.value = true
       try {
-        const response = await managerService.customers.get(route.params.id as string)
-        customer.value = {
-          id: response.id.toString(),
-          name: response.name || '',
-          email: response.email || '',
-          phone: response.phone || '',
-          document_number: response.document_number || '',
-          status: response.status || 'Ativo',
-          linkApi: response.links?.api || ''
-        }
+        const response = await managerService.customers.list({ 
+          id: route.params.id as string,
+          search: null,
+          page: 1,
+          per_page: 1,
+          sort_by: 'name',
+          sort_order: 'asc'
+        } as ListCustomersParams)
+        const customerData = response.data[0]
+        customer.value = customerData
         form.value = {
-          name: customer.value.name,
-          email: customer.value.email,
-          phone: customer.value.phone,
-          document_number: customer.value.document_number,
-          status: customer.value.status
+          name: customerData.name,
+          email: customerData.email,
+          phone: customerData.phone,
+          document_number: customerData.document_number,
+          status: customerData.status
         }
       } catch (error) {
         console.error('Erro ao carregar cliente:', error)
@@ -193,7 +183,10 @@ export default defineComponent({
 
     const handleResetPassword = async () => {
       try {
-        await externalService.customers.resetPassword(customer.value?.id as string)
+        await externalService.customers.update(customer.value?.id as string, {
+          ...form.value,
+          reset_password: true
+        } as UpdateCustomerPayload & { reset_password: boolean })
         // Adicionar notificação de sucesso
       } catch (error) {
         console.error('Erro ao resetar senha:', error)

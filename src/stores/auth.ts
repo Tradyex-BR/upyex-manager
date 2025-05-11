@@ -1,7 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import { managerService } from '@/services/managerService'
-import { useRouter } from 'vue-router'
 
 interface User {
   id: number

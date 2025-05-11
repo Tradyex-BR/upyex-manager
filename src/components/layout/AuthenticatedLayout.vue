@@ -15,7 +15,7 @@ import { ref, onMounted, watch } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import { useRouter } from 'vue-router'
 
-const props = defineProps<{
+defineProps<{
   loading?: boolean
 }>()
 

@@ -79,7 +79,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, watch, computed } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import DashboardCards from "@/components/layout/dashboard/DashboardCards.vue"
 import DashboardNavigation from "@/components/layout/dashboard/DashboardNavigation.vue"
 import CartesianAxes from "@/components/graphics/CartesianAxes.vue"
@@ -199,18 +199,12 @@ const handleDropdownAction = (action: string) => {
   switch (action) {
     case 'total':
       currentDropdownAction.value = 'Total'
+      fetchData()
       break
     case 'paid':
       currentDropdownAction.value = 'Pagos'
+      fetchData(currentDropdownAction.value)
       break
   }
 }
-
-watch(currentDropdownAction, () => {
-  if (currentDropdownAction.value === 'Total') {
-    fetchData()
-  } else {
-    fetchData(currentDropdownAction.value)
-  }
-})  
 </script>

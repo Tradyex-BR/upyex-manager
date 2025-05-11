@@ -11,7 +11,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, watch, onBeforeUnmount, computed } from 'vue'
+import { watch, onMounted, onBeforeUnmount } from 'vue'
 
 // Define a interface para os dados de entrada
 interface ChartDataItem {

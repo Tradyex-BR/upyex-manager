@@ -39,6 +39,7 @@ export interface Affiliate {
   name: string;
   email: string;
   integration_code: string;
+  is_active: boolean;
   applications: AffiliateApplication[];
 }
 export interface ListAffiliatesParams {
@@ -213,9 +214,14 @@ export interface ListCustomersParams {
 
 export interface Customer {
   id: string;
-  // Adicione outros campos relevantes do usuário aqui
-  name?: string;
-  email?: string;
+  name: string;
+  email: string;
+  phone: string;
+  document_number: string;
+  status: string;
+  links?: {
+    api: string;
+  };
 }
 
 export interface ListCustomersResponse {

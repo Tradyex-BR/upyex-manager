@@ -204,8 +204,6 @@ const form = ref<Form>({
   ]
 })
 
-const positions = new Map()
-
 const getDropdownOptions = (currentAppId: string) => {
   return availableApplications.value
     .filter(app => {

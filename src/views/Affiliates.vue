@@ -11,7 +11,6 @@
   import MenuIcon from '@/components/icons/MenuIcon.vue'
   import BaseDropdown from '@/components/common/BaseDropdown.vue'
   import BaseTable from '@/components/common/BaseTable.vue'
-  import { notificationService } from '@/services/notificationService'
 
   const CheckIcon = defineAsyncComponent(() => import('@/components/icons/CheckIcon.vue'))
   const XIcon = defineAsyncComponent(() => import('@/components/icons/XIcon.vue'))
@@ -29,14 +28,6 @@
     integration_code: string;
     is_active: boolean;
     created_at: string;
-    applications: Application[];
-  }
-
-  interface EditForm {
-    name: string;
-    email: string;
-    integration_code: string;
-    is_active: boolean;
     applications: Application[];
   }
 
@@ -75,7 +66,16 @@
       const showCreateModal = ref(false)
       const showDetailsModal = ref(false)
       const selectedAffiliate = ref<Affiliate | null>(null)
-      const searchQuery = ref('')
+      const createLoading = ref(false)
+      const createError = ref('')
+      const createForm = ref<CreateForm>({
+        name: '',
+        email: '',
+        integration_code: '',
+        applications: [
+          { id: '', commission_percentage: 0.2, commission_release_days: 7 }
+        ]
+      })
 
       const dropdownOptions = [
         {
@@ -90,7 +90,6 @@
         }
       ]
 
-      // Adicionar watch para searchTerm
       watch(() => props.searchTerm, (newTerm) => {
         handleSearch(newTerm)
       })
@@ -167,7 +166,7 @@
           await handleSearch('')
           closeCreateModal()
         } catch (e) {
-          throw e // Propaga o erro para o componente filho
+          throw e
         }
       }
 
@@ -184,98 +183,28 @@
         }
       }
 
-      const handleResetSecret = () => {
-        // Implemente a lógica para resetar o segredo do afiliado
-      }
-
-      const handleEditApplications = () => {
-        // Implemente a lógica para editar as aplicações do afiliado
-      }
-
-      const createLoading = ref(false)
-      const createError = ref('')
-      const editLoading = ref(false)
-      const editError = ref('')
-      const editForm = ref({
-        name: '',
-        email: '',
-        integration_code: '',
-        is_active: true,
-        applications: []
-      } as EditForm)
-      const createForm = ref({
-        name: '',
-        email: '',
-        integration_code: '',
-        applications: [
-          { id: '', commission_percentage: 0.2, commission_release_days: 7 }
-        ]
-      } as CreateForm)
-
-      const removeApp = (idx: number) => {
-        createForm.value.applications.splice(idx, 1)
-      }
-
-      const addApp = () => {
-        createForm.value.applications.push({ id: '', commission_percentage: 0.2, commission_release_days: 7 })
-      }
-
-      const saveAffiliateEdits = async () => {
-        if (!selectedAffiliate.value) return
-        editLoading.value = true
-        editError.value = ''
-        try {
-          await managerService.affiliates.update(selectedAffiliate.value.id, editForm.value)
-          const idx = affiliates.value.findIndex(a => a.id === selectedAffiliate.value?.id)
-          if (idx !== -1 && selectedAffiliate.value) {
-            affiliates.value[idx] = { ...selectedAffiliate.value, ...editForm.value }
-          }
-          closeDetailsModal()
-        } catch (e) {
-          editError.value = 'Erro ao atualizar afiliado.'
-        } finally {
-          editLoading.value = false
+      const getStatusClass = (status: string) => {
+        return {
+          'px-2 py-1 rounded-full text-xs font-medium': true,
+          'bg-green-100 text-green-800': status === 'Ativo',
+          'bg-red-100 text-red-800': status === 'Inativo'
         }
-      }
-
-      const removeEditApp = (idx: number) => {
-        editForm.value.applications.splice(idx, 1)
-      }
-
-      const addEditApp = () => {
-        editForm.value.applications.push({ id: '', commission_percentage: 0.2, commission_release_days: 7 })
-      }
-
-      const getStatusClass = (status: string): string => {
-        const baseClass = 'font-inter text-[14px] font-medium leading-[18px] inline-flex h-6 px-2 justify-center items-center gap-1 rounded-[6px] w-fit mx-auto'
-        const statusMap: { [key: string]: string } = {
-          'Ativo': `${baseClass} bg-green-500/20 text-green-500`,
-          'Inativo': `${baseClass} bg-red-500/20 text-red-500`,
-          'Bloqueado': `${baseClass} bg-red-500/20 text-red-500`
-        }
-        return statusMap[status] || `${baseClass} bg-gray-500/20 text-gray-500`
       }
 
       const handleAction = async (action: string, id: string) => {
-        try {
-          switch (action) {
-            case 'aprovar':
-              await managerService.affiliates.approve(id);
-              await loadAffiliates();
-              notificationService.success('Afiliado aprovado com sucesso');
-              break;
-            case 'bloquear':
-              await managerService.affiliates.block(id);
-              await loadAffiliates();
-              notificationService.success('Afiliado bloqueado com sucesso');
-              break;
-          }
-        } catch (e) {
-          console.error(`Erro ao executar ação ${action}:`, e);
+        const affiliate = affiliates.value.find(a => a.id === id)
+        if (!affiliate) return
+
+        if (action === 'aprovar') {
+          await handleToggleStatus(id, true)
+        } else if (action === 'bloquear') {
+          await handleToggleStatus(id, false)
         }
       }
 
-      onMounted(loadAffiliates)
+      onMounted(() => {
+        loadAffiliates()
+      })
 
       return {
         loading,
@@ -283,10 +212,10 @@
         showCreateModal,
         showDetailsModal,
         selectedAffiliate,
-        searchQuery,
+        createLoading,
+        createError,
+        createForm,
         dropdownOptions,
-        loadAffiliates,
-        handleSearch,
         openCreateModal,
         closeCreateModal,
         openDetailsModal,
@@ -294,19 +223,6 @@
         navigateToEdit,
         handleCreate,
         handleToggleStatus,
-        handleResetSecret,
-        handleEditApplications,
-        createLoading,
-        createError,
-        editLoading,
-        editError,
-        editForm,
-        createForm,
-        removeApp,
-        addApp,
-        saveAffiliateEdits,
-        removeEditApp,
-        addEditApp,
         getStatusClass,
         handleAction
       }

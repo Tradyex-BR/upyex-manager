@@ -26,7 +26,7 @@ import { defineProps, defineEmits } from 'vue'
 type ButtonVariant = 'primary' | 'secondary' | 'outline' | 'ghost' | 'danger' | 'success'
 type ButtonSize = 'sm' | 'md' | 'lg'
 
-const props = withDefaults(defineProps<{
+withDefaults(defineProps<{
   type?: 'button' | 'reset' | 'submit',
   disabled?: boolean,
   loading?: boolean,

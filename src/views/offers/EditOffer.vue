@@ -185,9 +185,9 @@ export default defineComponent({
         form.value = {
           name: response.name,
           description: response.description,
-          logo_url: response.logo_url,
+          logo_url: response.logo_url || '',
           base_affiliate_link: response.base_affiliate_link,
-          is_active: response.is_active
+          is_active: response.is_active ?? true
         }
       } catch (error) {
         console.error('Erro ao carregar oferta:', error)

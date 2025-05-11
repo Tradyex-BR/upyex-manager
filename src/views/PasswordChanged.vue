@@ -39,13 +39,12 @@
 <script setup lang="ts">
 import LoginBackground from '@/components/layout/login/LoginBackground.vue'
 import VerticalLines from '@/components/layout/login/VerticalLines.vue'
-import { ref, onMounted } from 'vue'
+import { onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import BaseButton from '@/components/common/BaseButton.vue'
 
 const router = useRouter()
 const route = useRoute()
-const loading = ref(false)
 
 onMounted(() => {
   // Salva o papel do usuário no store
@@ -55,7 +54,6 @@ onMounted(() => {
 })
 
 const handleBack = () => {
-  loading.value = true
   router.push(localStorage.getItem('contextRole') === 'manager' ? '/login/manager' : '/login/affiliate')
 }
 </script>

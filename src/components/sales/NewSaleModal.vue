@@ -131,7 +131,7 @@ export default defineComponent({
     }
   },
   emits: ['close', 'save'],
-  setup(props, { emit }) {
+  setup(_, { emit }) {
     const form = ref({
       id: '',
       customer_id: '',

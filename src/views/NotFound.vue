@@ -34,15 +34,14 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref } from 'vue'
 import LoginBackground from '@/components/layout/login/LoginBackground.vue'
 import VerticalLines from '@/components/layout/login/VerticalLines.vue'
 import BaseButton from '@/components/common/BaseButton.vue'
-import { useRouter, useRoute } from 'vue-router'
+import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 
 const router = useRouter()
-const route = useRoute()
 const authStore = useAuthStore()
 const loading = ref(false)
 
