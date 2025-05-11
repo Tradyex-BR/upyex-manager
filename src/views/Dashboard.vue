@@ -17,7 +17,9 @@
                 class="min-h-[382px]">
                 <CartesianAxes v-if="data.sales.graph.reduce((acc, curr) => acc + curr.count, 0) > 0"
                   :data="data.sales.graph" />
-                <EmptyChart v-else center />
+                <div v-else class="h-full w-full flex items-center justify-center">
+                  <EmptyChart />
+                </div>
               </GraphicSection>
 
               <div class="grid grid-cols-2 gap-6 mb-8">
