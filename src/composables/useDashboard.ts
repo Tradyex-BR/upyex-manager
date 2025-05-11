@@ -171,7 +171,7 @@ export function useDashboard() {
     }
   }
 
-  const fetchData = async () => {
+  const fetchData = async (action?: string) => {
     loading.value = true
     error.value = ''
     try {
@@ -182,7 +182,8 @@ export function useDashboard() {
           start_date: "2025-04-25",
           end_date: "2025-04-29",
         }
-        data.value = await managerService.dashboard.getData(params)
+        const formattedAction = action === 'Pagos' ? 1 : 0
+        data.value = await managerService.dashboard.getData(params, formattedAction)
       }
     } catch (e: any) {
       console.error('Erro ao buscar dashboard:', e)

@@ -184,7 +184,11 @@ const dropdownOptions = computed(() => [
 ])
 
 onMounted(() => {
-  fetchData()
+  if (currentDropdownAction.value === 'Total') {
+    fetchData()
+  } else {
+    fetchData(currentDropdownAction.value)
+  }
 })
 
 const handleDropdownAction = (action: string) => {
@@ -199,4 +203,12 @@ const handleDropdownAction = (action: string) => {
       break
   }
 }
+
+watch(currentDropdownAction, () => {
+  if (currentDropdownAction.value === 'Total') {
+    fetchData()
+  } else {
+    fetchData(currentDropdownAction.value)
+  }
+})  
 </script>
