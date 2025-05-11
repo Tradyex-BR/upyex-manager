@@ -1,5 +1,5 @@
 <script lang="ts">
-import { defineAsyncComponent, defineComponent, ref } from 'vue'
+import { defineAsyncComponent, defineComponent } from 'vue'
 import { useDashboardStore } from '@/stores/dashboard'
 import { managerService } from '@/services/managerService'
 import { externalService } from '@/services/externalService'
@@ -18,8 +18,6 @@ import { ListWithdrawalsResponse } from '@/services/managerService'
 
 const CheckIcon = defineAsyncComponent(() => import('@/components/icons/CheckIcon.vue'))
 const XIcon = defineAsyncComponent(() => import('@/components/icons/XIcon.vue'))
-
-const loading = ref(true)
 
 // Dados mockados para testes
 const MOCK_WITHDRAWALS: ListWithdrawalsResponse = {
@@ -130,8 +128,8 @@ export default defineComponent({
   },
   methods: {
     async loadWithdrawals() {
-      this.loading = true;
       try {
+        this.loading = true;
         let response: ListWithdrawalsResponse;
 
         if (USE_MOCK_DATA) {
@@ -166,12 +164,13 @@ export default defineComponent({
         this.pagination.links = [];
       } catch (error) {
         console.error('Erro ao carregar saques:', error);
+        this.withdrawals = [];
+        this.pagination.total = 0;
       } finally {
         this.loading = false;
       }
     },
     async handleSearch(term: string) {
-      this.loading = true;
       try {
         let response: ListWithdrawalsResponse;
 
@@ -219,8 +218,6 @@ export default defineComponent({
         this.pagination.links = [];
       } catch (error) {
         console.error('Erro ao pesquisar saques:', error);
-      } finally {
-        this.loading = false;
       }
     },
     async handleWithdrawalRequest({ amount, pixKey }: { amount: string, pixKey: string }) {
@@ -288,7 +285,6 @@ export default defineComponent({
     async goToPage(page: number) {
       if (page < 1 || page > this.pagination.last_page) return;
       this.pagination.current_page = page;
-      this.loading = true;
       await this.loadWithdrawals();
     },
     translateStatus(status: string): string {
@@ -337,8 +333,6 @@ export default defineComponent({
       <!-- Título e botão sempre visíveis -->
       <div class="flex justify-between items-center mb-6 overflow-visible">
         <p class="text-white text-2xl font-semibold">Saques</p>
-        <!--         @click="showRequestModal = true"
- -->
         <BaseButton class="ml-2 " @click="showRequestModal = true">
           Novo Saque
         </BaseButton>
@@ -352,10 +346,7 @@ export default defineComponent({
 
       <!-- Conteúdo condicional -->
       <div class="flex w-full min-h-[calc(100vh-200px)] justify-center text-gray-400">
-        <div v-if="loading" class="flex items-center justify-center py-10">
-          <span class="text-white text-lg">Carregando saques...</span>
-        </div>
-        <div v-else-if="withdrawals.length === 0"
+        <div v-if="withdrawals.length === 0"
           class="flex w-full min-h-[200px] items-center justify-center text-gray-400 text-lg">
           Nenhum saque encontrado
         </div>
