@@ -184,11 +184,10 @@
       }
 
       const getStatusClass = (status: string) => {
-        return {
-          'px-2 py-1 rounded-full text-xs font-medium': true,
-          'bg-green-100 text-green-800': status === 'Ativo',
-          'bg-red-100 text-red-800': status === 'Inativo'
-        }
+        const baseClass = 'font-inter text-[14px] font-medium leading-[18px] inline-flex h-6 px-2 justify-center items-center gap-1 rounded-[6px] w-fit mx-auto'
+        return status === 'Ativo'
+          ? `${baseClass} bg-green-500/20 text-green-500`
+          : `${baseClass} bg-red-500/20 text-red-500`
       }
 
       const handleAction = async (action: string, id: string) => {
