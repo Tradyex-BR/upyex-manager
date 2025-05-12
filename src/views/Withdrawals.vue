@@ -370,7 +370,7 @@ export default defineComponent({
     async rejeitar(id: string) {
       try {
         console.log('rejeitar', id);
-       /*  await this.loadWithdrawals(); */ // Recarrega a lista após a rejeição
+        /*  await this.loadWithdrawals(); */ // Recarrega a lista após a rejeição
       } catch (error) {
         console.error('Erro ao rejeitar saque:', error);
       }
@@ -431,9 +431,9 @@ export default defineComponent({
   <AuthenticatedLayout :loading="loading">
     <section class="min-h-[944px] w-full overflow-visible">
       <!-- Título e botão sempre visíveis -->
-      <div v-if="role === 'affiliate'" class="flex justify-between items-center mb-6 overflow-visible">
+      <div class="flex justify-between items-center mb-6 overflow-visible">
         <p class="text-white text-2xl font-semibold">Saques</p>
-        <BaseButton class="ml-2 " @click="showRequestModal = true">
+        <BaseButton v-if="role === 'affiliate'" class="ml-2 " @click="showRequestModal = true">
           Novo Saque
         </BaseButton>
       </div>

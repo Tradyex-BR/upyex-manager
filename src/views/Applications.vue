@@ -11,9 +11,6 @@
         <section class="min-h-[944px] w-full overflow-visible">
           <div class="flex justify-between items-center mb-6">
             <p class="text-white text-2xl font-semibold">Aplicações</p>
-            <!-- <BaseButton class="ml-2" @click="handleGenerateLink">
-              Gerar link genérico
-            </BaseButton> -->
           </div>
           <div>
 
@@ -73,9 +70,6 @@
         </section>
       </div>
 
-      <!-- Modal de Criação de Aplicação -->
-      <GenerateLinkModal v-if="showCreateModal" :show="showCreateModal" :application-id="selectedApplication?.id"
-        @close="showCreateModal = false" @submit="handleCreateApplication" />
       <EditApplicationModal v-if="showEditModal" :show="showEditModal" :application-id="selectedApplication?.id"
         @close="showEditModal = false" @submit="handleEditApplication" />
       <ConfirmResetModal v-if="showResetModal" :show="showResetModal" :application-id="selectedApplication?.id"
@@ -88,8 +82,6 @@ import { defineComponent, ref } from 'vue'
 import { useDashboardStore } from '@/stores/dashboard'
 import AuthenticatedLayout from '@/components/layout/AuthenticatedLayout.vue'
 import BaseButton from '@/components/common/BaseButton.vue'
-import GenerateLinkModal from '@/components/offers/GenerateLinkModal.vue'
-import OfferDetailsModal from '@/components/offers/OfferDetailsModal.vue'
 import { managerService } from '@/services/managerService'
 import { useRouter } from 'vue-router'
 import { useToast } from 'vue-toastification'
@@ -117,8 +109,6 @@ export default defineComponent({
     AuthenticatedLayout,
     BaseButton,
     CopyButton,
-    GenerateLinkModal,
-    OfferDetailsModal,
     BaseTable,
     BaseDropdown,
     EditApplicationModal,
