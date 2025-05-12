@@ -1,7 +1,6 @@
 <script lang="ts">
 import { defineAsyncComponent, defineComponent } from 'vue'
 import { managerService } from '@/services/managerService'
-import { externalService } from '@/services/externalService'
 import Sidebar from '@/components/layout/dashboard/Sidebar.vue'
 import TopBar from '@/components/layout/dashboard/TopBar.vue'
 import BaseButton from '@/components/common/BaseButton.vue'
@@ -19,16 +18,6 @@ const XIcon = defineAsyncComponent(() => import('@/components/icons/XIcon.vue'))
 const PenIcon = defineAsyncComponent(() => import('@/components/icons/PenIcon.vue'))
 const KeyIcon = defineAsyncComponent(() => import('@/components/icons/KeyIcon.vue'))
 const TrashIcon = defineAsyncComponent(() => import('@/components/icons/TrashIcon.vue'))
-
-
-// Função para gerar ID único
-function generateUniqueId(): string {
-  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
-    const r = Math.random() * 16 | 0;
-    const v = c === 'x' ? r : (r & 0x3 | 0x8);
-    return v.toString(16);
-  });
-}
 
 interface Usuario {
   id: string;
@@ -140,13 +129,7 @@ export default defineComponent({
 
         switch (action) {
           case 'bloquear':
-            // Atualiza o status do cliente
-            await externalService.customers.update(id, {
-              name: customer.nome,
-              email: customer.email,
-              phone: customer.phone || '',
-              document_number: customer.document_number || ''
-            });
+
             await this.loadCustomers();
             break;
           case 'editar_permissao':
@@ -164,44 +147,11 @@ export default defineComponent({
         console.error(`Erro ao executar ação ${action}:`, e)
       }
     },
-    async handleDeleteCustomer() {
-      if (!this.deletingCustomer) return;
-
-      try {
-        await externalService.customers.delete(this.deletingCustomer.id);
-        await this.loadCustomers();
-        this.showDeleteModal = false;
-        this.deletingCustomer = null;
-      } catch (error) {
-        console.error('Erro ao excluir cliente:', error);
-      }
-    },
     goToCustomerDetail(id: string) {
       const customer = this.customers.find(u => u.id === id)
       if (customer) {
         this.editingCustomer = customer
         this.showDetailModal = true
-      }
-    },
-    async handleCreateCustomer(formData: any) {
-      try {
-        const payload = {
-          id: generateUniqueId(),
-          name: formData.nome,
-          email: formData.email,
-          phone: formData.phone || '',
-          document_number: formData.document_number || null,
-          affiliate_code: formData.affiliate_code
-        };
-
-        await externalService.customers.register(payload);
-
-        // Atualizar a lista de clientes
-        await this.loadCustomers();
-
-        this.showCreateModal = false;
-      } catch (error) {
-        console.error('Erro ao criar cliente:', error);
       }
     },
     async handleSearch(term: string) {
@@ -323,16 +273,5 @@ export default defineComponent({
         </BaseTable>
       </div>
     </section>
-
-    <!-- Modal de visualização/edição de cliente -->
-    <CustomerDetailModal :show="showDetailModal" :customer="editingCustomer" @close="showDetailModal = false"
-      @action="handleCustomerAction" />
-
-    <!-- Modal de Criação de Cliente -->
-    <CreateCustomerModal :show="showCreateModal" @close="showCreateModal = false" @submit="handleCreateCustomer" />
-
-    <!-- Modal de Exclusão de Cliente -->
-    <DeleteCustomerModal v-if="showDeleteModal" :client-info="deletingCustomer" @close="showDeleteModal = false"
-      @confirm="handleDeleteCustomer" />
   </AuthenticatedLayout>
 </template>
