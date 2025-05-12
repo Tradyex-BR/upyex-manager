@@ -105,9 +105,9 @@ const isFormValid = computed(() => {
     return false
   }
 
-  // Validar telefone (formato básico: (00) 00000-0000)
-  const phoneRegex = /^\(\d{2}\) \d{5}-\d{4}$/
-  if (!phoneRegex.test(form.value.phone)) {
+  // Validar telefone (aceita diferentes formatos comuns)
+  const phoneRegex = /^(\d{2})?[\s-]?\d{4,5}[\s-]?\d{4}$/
+  if (!phoneRegex.test(form.value.phone.replace(/\D/g, ''))) {
     return false
   }
 

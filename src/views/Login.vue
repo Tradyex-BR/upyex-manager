@@ -6,7 +6,7 @@
 
       <div>
         <h1 class="text-[#040D25] text-[32px] leading-[40px] font-semibold">
-          Boas vindas ao TradyEx
+          Boas vindas ao UpyEx
         </h1>
         <div class="font-inter text-[#222A3F] text-[14px] leading-[18px]">
           {{ route.meta.role === 'manager' ? 'Área do Administrador' : 'Área do Afiliado' }}
