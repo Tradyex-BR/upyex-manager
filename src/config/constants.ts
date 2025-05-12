@@ -1,4 +1,45 @@
-export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000';
+import { POSITION } from 'vue-toastification'
+
+// API Configuration
+export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000'
+export const API_TIMEOUT = 5000
+
+// Authentication
+export const TOKEN_KEY = 'token'
+export const CONTEXT_ROLE_KEY = 'contextRole'
+
+// Roles
+export const ROLES = {
+  MANAGER: 'MANAGER',
+  AFFILIATE: 'AFFILIATE'
+} as const
+
+// Routes
+export const ROUTES = {
+  LOGIN: '/login',
+  DASHBOARD: '/dashboard',
+  AFFILIATES: '/affiliates',
+  CUSTOMERS: '/customers',
+  SALES: '/sales',
+  WITHDRAWALS: '/withdrawals',
+  APPLICATIONS: '/applications'
+} as const
+
+// Toast Configuration
+export const TOAST_CONFIG = {
+  position: POSITION.BOTTOM_RIGHT,
+  timeout: 3000,
+  closeOnClick: true,
+  pauseOnFocusLoss: true,
+  pauseOnHover: true,
+  draggable: true,
+  draggablePercent: 0.6,
+  showCloseButtonOnHover: false,
+  hideProgressBar: false,
+  closeButton: 'button',
+  icon: true,
+  rtl: false
+} as const
 
 export const APP_CONFIG = {
   APP_NAME: 'Upyex Manager',

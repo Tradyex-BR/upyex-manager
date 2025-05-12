@@ -1,73 +1,36 @@
 import { useToast, POSITION } from 'vue-toastification'
+import { TOAST_CONFIG } from '@/config/constants'
 
 const toast = useToast()
 
 export const notificationService = {
   success: (message: string) => {
     toast.success(message, {
-      position: POSITION.BOTTOM_RIGHT,
-      timeout: 3000,
-      closeOnClick: true,
-      pauseOnFocusLoss: true,
-      pauseOnHover: true,
-      draggable: true,
-      draggablePercent: 0.6,
-      showCloseButtonOnHover: false,
-      hideProgressBar: false,
-      closeButton: "button",
-      icon: true,
-      rtl: false
+      ...TOAST_CONFIG,
+      position: POSITION.BOTTOM_RIGHT
     })
   },
 
   error: (message: string) => {
     toast.error(message, {
+      ...TOAST_CONFIG,
       position: POSITION.BOTTOM_RIGHT,
-      timeout: 5000,
-      closeOnClick: true,
-      pauseOnFocusLoss: true,
-      pauseOnHover: true,
-      draggable: true,
-      draggablePercent: 0.6,
-      showCloseButtonOnHover: false,
-      hideProgressBar: false,
-      closeButton: "button",
-      icon: true,
-      rtl: false
+      timeout: 5000
     })
   },
 
   info: (message: string) => {
     toast.info(message, {
-      position: POSITION.TOP_RIGHT,
-      timeout: 3000,
-      closeOnClick: true,
-      pauseOnFocusLoss: true,
-      pauseOnHover: true,
-      draggable: true,
-      draggablePercent: 0.6,
-      showCloseButtonOnHover: false,
-      hideProgressBar: false,
-      closeButton: "button",
-      icon: true,
-      rtl: false
+      ...TOAST_CONFIG,
+      position: POSITION.TOP_RIGHT
     })
   },
 
   warning: (message: string) => {
     toast.warning(message, {
+      ...TOAST_CONFIG,
       position: POSITION.TOP_RIGHT,
-      timeout: 4000,
-      closeOnClick: true,
-      pauseOnFocusLoss: true,
-      pauseOnHover: true,
-      draggable: true,
-      draggablePercent: 0.6,
-      showCloseButtonOnHover: false,
-      hideProgressBar: false,
-      closeButton: "button",
-      icon: true,
-      rtl: false
+      timeout: 4000
     })
   }
 } 

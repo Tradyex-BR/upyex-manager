@@ -1,8 +1,9 @@
 import axios from 'axios'
+import { API_BASE_URL, API_TIMEOUT, TOKEN_KEY, CONTEXT_ROLE_KEY } from '@/config/constants'
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL || '/', // Usa variável de ambiente ou '/' para proxy
-  timeout: 5000,
+  baseURL: API_BASE_URL,
+  timeout: API_TIMEOUT,
   headers: {
     'Content-Type': 'application/json'
   }
@@ -10,11 +11,11 @@ const api = axios.create({
 
 // Interceptor para adicionar token de autenticação
 api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('token')
+  const token = localStorage.getItem(TOKEN_KEY)
   if (token) {
     config.headers.Authorization = `Bearer ${token}`
   }
-  const role = localStorage.getItem('contextRole')
+  const role = localStorage.getItem(CONTEXT_ROLE_KEY)
   if (role) {
     config.baseURL += `/${role.toLowerCase()}`
   }

@@ -6,9 +6,6 @@ import TopBar from '@/components/layout/dashboard/TopBar.vue'
 import BaseButton from '@/components/common/BaseButton.vue'
 import BaseModal from '@/components/common/BaseModal.vue'
 import AuthenticatedLayout from '@/components/layout/AuthenticatedLayout.vue'
-import CreateCustomerModal from '@/components/customers/CreateCustomerModal.vue'
-import CustomerDetailModal from '@/components/customers/CustomerDetailModal.vue'
-import DeleteCustomerModal from '@/components/customers/DeleteCustomerModal.vue'
 import { useRouter } from 'vue-router'
 import MenuIcon from '@/components/icons/MenuIcon.vue'
 import BaseDropdown from '@/components/common/BaseDropdown.vue'
@@ -47,12 +44,9 @@ export default defineComponent({
     BaseButton,
     AuthenticatedLayout,
     BaseModal,
-    CreateCustomerModal,
-    CustomerDetailModal,
     MenuIcon,
     BaseDropdown,
     BaseTable,
-    DeleteCustomerModal
   },
   setup() {
     const router = useRouter()
