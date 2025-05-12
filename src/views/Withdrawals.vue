@@ -20,43 +20,120 @@ const CheckIcon = defineAsyncComponent(() => import('@/components/icons/CheckIco
 const XIcon = defineAsyncComponent(() => import('@/components/icons/XIcon.vue'))
 
 // Dados mockados para testes
-const MOCK_WITHDRAWALS: ListWithdrawalsResponse = {
+const MANAGER_WITHDRAWALS: ListWithdrawalsResponse = {
   data: [
     {
-      id: '1',
-      created_at: '2024-03-20T10:00:00Z',
-      amount: 1500.00,
-      destination: 'chave.pix@exemplo.com',
-      method: 'pix',
-      status: 'requested',
-      links: { frontend: 'https://exemplo.com/saque/1' }
-    },
-    {
-      id: '2',
-      created_at: '2024-03-19T15:30:00Z',
-      amount: 2500.00,
-      destination: '0x1234...5678',
-      method: 'crypto',
-      status: 'approved',
-      links: { frontend: 'https://exemplo.com/saque/2' }
-    },
-    {
-      id: '3',
-      created_at: '2024-03-18T09:15:00Z',
-      amount: 800.00,
-      destination: 'chave.pix@outro.com',
-      method: 'pix',
-      status: 'rejected',
-      links: { frontend: 'https://exemplo.com/saque/3' }
+      id: "01968d22-3ca1-72a3-afa3-297a68d90ddd",
+      external_id: null,
+      amount: "2684.11",
+      status: "requested",
+      method: "crypto",
+      destination: "pipvhZsOvO7aIB2Ampi2BUixwCZ0yrwIkJBbQAzwdEu0",
+      approved_at: null,
+      rejected_at: null,
+      processing_at: null,
+      processed_at: null,
+      cancelled_at: null,
+      created_at: "2025-05-01T18:35:53.000000Z",
+      updated_at: "2025-05-01T18:35:53.000000Z",
+      links: {
+        api: "http://board-api.upyex.test/api/manager/withdrawals/01968d22-3ca1-72a3-afa3-297a68d90ddd",
+        frontend: "http://board.upyex.test/manager/withdrawals/01968d22-3ca1-72a3-afa3-297a68d90ddd"
+      }
     }
   ],
-  total: 3,
+  total: 1,
   page: 1,
-  per_page: 20
+  per_page: 20,
+  links: {
+    first: "http://board-api.upyex.test/api/manager/withdrawals?page=1",
+    last: "http://board-api.upyex.test/api/manager/withdrawals?page=1",
+    prev: null,
+    next: null
+  },
+  meta: {
+    current_page: 1,
+    from: 1,
+    last_page: 1,
+    links: [
+      {
+        url: null,
+        label: "&laquo; Anterior",
+        active: false
+      },
+      {
+        url: "http://board-api.upyex.test/api/manager/withdrawals?page=1",
+        label: "1",
+        active: true
+      },
+      {
+        url: null,
+        label: "Próximo &raquo;",
+        active: false
+      }
+    ],
+    path: "http://board-api.upyex.test/api/manager/withdrawals",
+    per_page: 20,
+    to: 1,
+    total: 1
+  }
+}
+
+const AFFILIATE_WITHDRAWALS: ListWithdrawalsResponse = {
+  data: [
+    {
+      id: "01968d38-af8b-72c9-9259-d43a00ad8734",
+      amount: "7672.54",
+      status: "requested",
+      method: "pix",
+      destination: "65452036040",
+      created_at: "2025-05-01T19:00:24.000000Z",
+      updated_at: "2025-05-01T19:00:24.000000Z",
+      links: {
+        api: "http://board-api.upyex.test/api/affiliate/withdrawals/01968d38-af8b-72c9-9259-d43a00ad8734",
+        frontend: "http://board.upyex.test/affiliate/withdrawals/01968d38-af8b-72c9-9259-d43a00ad8734"
+      }
+    }
+  ],
+  total: 1,
+  page: 1,
+  per_page: 20,
+  links: {
+    first: "http://board-api.upyex.test/api/affiliate/withdrawals?page=1",
+    last: "http://board-api.upyex.test/api/affiliate/withdrawals?page=1",
+    prev: null,
+    next: null
+  },
+  meta: {
+    current_page: 1,
+    from: 1,
+    last_page: 1,
+    links: [
+      {
+        url: null,
+        label: "&laquo; Anterior",
+        active: false
+      },
+      {
+        url: "http://board-api.upyex.test/api/affiliate/withdrawals?page=1",
+        label: "1",
+        active: true
+      },
+      {
+        url: null,
+        label: "Próximo &raquo;",
+        active: false
+      }
+    ],
+    path: "http://board-api.upyex.test/api/affiliate/withdrawals",
+    per_page: 20,
+    to: 1,
+    total: 1
+  }
 }
 
 // Flag para controlar se usa dados mockados
-const USE_MOCK_DATA = false
+const USE_MOCK_DATA = true
 
 export default defineComponent({
   name: 'Withdrawals',
@@ -136,7 +213,8 @@ export default defineComponent({
         let response: ListWithdrawalsResponse;
 
         if (USE_MOCK_DATA) {
-          response = MOCK_WITHDRAWALS;
+          response = this.role === "manager" ? MANAGER_WITHDRAWALS : AFFILIATE_WITHDRAWALS;
+          console.log(response);
         } else {
           response = await managerService.withdrawals.list({
             start_date: '',
@@ -179,7 +257,11 @@ export default defineComponent({
 
         if (USE_MOCK_DATA) {
           // Filtra os dados mockados
-          const filteredData = MOCK_WITHDRAWALS.data.filter(item =>
+          const filteredData = this.role === "manager" ? MANAGER_WITHDRAWALS.data.filter(item =>
+            item.destination.toLowerCase().includes(term.toLowerCase()) ||
+            item.amount.toString().includes(term) ||
+            this.translateStatus(item.status).toLowerCase().includes(term.toLowerCase())
+          ) : AFFILIATE_WITHDRAWALS.data.filter(item =>
             item.destination.toLowerCase().includes(term.toLowerCase()) ||
             item.amount.toString().includes(term) ||
             this.translateStatus(item.status).toLowerCase().includes(term.toLowerCase())
@@ -188,7 +270,23 @@ export default defineComponent({
             data: filteredData,
             total: filteredData.length,
             page: 1,
-            per_page: this.pagination.per_page
+            per_page: this.pagination.per_page,
+            links: {
+              first: '',
+              last: '',
+              prev: null,
+              next: null
+            },
+            meta: {
+              current_page: 1,
+              from: 1,
+              last_page: 1,
+              links: [],
+              path: '',
+              per_page: this.pagination.per_page,
+              to: 1,
+              total: filteredData.length
+            }
           };
         } else {
           response = await managerService.withdrawals.list({

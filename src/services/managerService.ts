@@ -123,12 +123,20 @@ export interface ListWithdrawalsParams {
 
 export interface Withdrawal {
   id: string;
-  amount: number;
+  external_id?: string | null;
+  amount: string;
   status: string;
   method: string;
   destination: string;
+  approved_at?: string | null;
+  rejected_at?: string | null;
+  processing_at?: string | null;
+  processed_at?: string | null;
+  cancelled_at?: string | null;
   created_at: string;
+  updated_at: string;
   links?: {
+    api?: string;
     frontend?: string;
   };
 }
@@ -154,6 +162,26 @@ export interface ListWithdrawalsResponse {
   total: number;
   page: number;
   per_page: number;
+  links: {
+    first: string;
+    last: string;
+    prev: string | null;
+    next: string | null;
+  };
+  meta: {
+    current_page: number;
+    from: number;
+    last_page: number;	
+    links: {
+      url: string | null;
+      label: string;
+      active: boolean;
+    }[];
+    path: string;
+    per_page: number;
+    to: number;
+    total: number;
+  };
 }
 
 import { setToken, removeToken } from './tokenService';
