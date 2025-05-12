@@ -1,38 +1,34 @@
 <template>
   <BaseModal v-if="show" title="Novo Cliente" content-class="gap-8" @close="$emit('close')">
-    <form @submit.prevent="handleSubmit" class="flex flex-col gap-8">
-      <div class="flex flex-col gap-7">
+    <form @submit.prevent="handleSubmit" class="flex flex-col gap-8 w-full">
+      <div class="flex flex-col gap-7 w-full">
         <!-- Nome e Email -->
-        <div class="grid grid-cols-2 gap-5">
-          <BaseInput v-model="form.name" label="Nome" placeholder="Nome completo" required variant="dark">
-            <template #prefix>
-              <FontAwesomeIcon icon="user" class="text-[#85B1FF] mr-3" />
-            </template>
-          </BaseInput>
+        <BaseInput v-model="form.name" label="Nome" placeholder="Nome completo" required variant="dark" class="flex-1">
+          <template #prefix>
+            <FontAwesomeIcon icon="user" class="text-[#85B1FF] mr-3" />
+          </template>
+        </BaseInput>
 
-          <BaseInput v-model="form.email" label="Email" type="email" placeholder="email@exemplo.com" required
-            variant="dark">
-            <template #prefix>
-              <FontAwesomeIcon icon="envelope" class="text-[#85B1FF] mr-3" />
-            </template>
-          </BaseInput>
-        </div>
+        <BaseInput v-model="form.email" label="Email" type="email" placeholder="email@exemplo.com" required
+          variant="dark" class="flex-1">
+          <template #prefix>
+            <FontAwesomeIcon icon="envelope" class="text-[#85B1FF] mr-3" />
+          </template>
+        </BaseInput>
 
         <!-- Telefone e CPF/CNPJ -->
-        <div class="grid grid-cols-2 gap-5">
-          <BaseInput v-model="form.phone" label="Telefone" type="tel" placeholder="(00) 00000-0000" required
-            variant="dark">
-            <template #prefix>
-              <FontAwesomeIcon icon="phone" class="text-[#85B1FF] mr-3" />
-            </template>
-          </BaseInput>
+        <BaseInput v-model="form.phone" label="Telefone" type="tel" placeholder="(00) 00000-0000" required
+          variant="dark">
+          <template #prefix>
+            <FontAwesomeIcon icon="phone" class="text-[#85B1FF] mr-3" />
+          </template>
+        </BaseInput>
 
-          <BaseInput v-model="form.document_number" label="CPF/CNPJ" placeholder="000.000.000-00" variant="dark">
-            <template #prefix>
-              <FontAwesomeIcon icon="id-card" class="text-[#85B1FF] mr-3" />
-            </template>
-          </BaseInput>
-        </div>
+        <BaseInput v-model="form.document_number" label="CPF/CNPJ" placeholder="000.000.000-00" variant="dark">
+          <template #prefix>
+            <FontAwesomeIcon icon="id-card" class="text-[#85B1FF] mr-3" />
+          </template>
+        </BaseInput>
 
         <!-- Código do Afiliado -->
         <BaseInput v-model="form.affiliate_code" label="Código do Afiliado" placeholder="Código único do afiliado"
