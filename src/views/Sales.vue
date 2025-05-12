@@ -97,12 +97,6 @@
 
   <SaleDetailsModal v-if="showDetailModal" :show="showDetailModal" :sale="editingSale"
     @close="showDetailModal = false" />
-
-  <NewSaleModal v-if="showCreateModal" :show="showCreateModal" @close="showCreateModal = false"
-    @save="handleCreateSale" />
-
-  <EditSaleModal v-if="showEditModal" :show="showEditModal" :sale="editingSale" @close="showEditModal = false"
-    @save="handleEditSale" />
 </template>
 
 <script lang="ts">
@@ -111,7 +105,6 @@ import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useDashboardStore } from '@/stores/dashboard'
 import { managerService } from '@/services/managerService'
-import { externalService } from '@/services/externalService'
 import AuthenticatedLayout from '@/components/layout/AuthenticatedLayout.vue'
 import BaseButton from '@/components/common/BaseButton.vue'
 import { useToast } from 'vue-toastification'
@@ -529,44 +522,6 @@ export default defineComponent({
 
     handleNewSale() {
       this.showCreateModal = true;
-    },
-
-    async handleCreateSale(saleData: any) {
-      try {
-        const now = new Date().toISOString();
-        const payload = {
-          ...saleData,
-          created_at: now,
-          updated_at: now
-        };
-
-        await externalService.sales.register(payload);
-        await this.loadSales();
-        this.showCreateModal = false;
-        notificationService.success('Venda registrada com sucesso!');
-      } catch (error) {
-        console.error('Erro ao criar venda:', error);
-        notificationService.error('Erro ao registrar venda');
-      }
-    },
-
-    async handleEditSale(saleData: any) {
-      if (!this.editingSale) return;
-
-      try {
-        const payload = {
-          status: saleData.status,
-          payment_method: saleData.payment_method
-        };
-
-        await externalService.sales.update(this.editingSale.id, payload);
-        await this.loadSales();
-        this.showEditModal = false;
-        notificationService.success('Venda atualizada com sucesso!');
-      } catch (error) {
-        console.error('Erro ao editar venda:', error);
-        notificationService.error('Erro ao atualizar venda');
-      }
     },
 
     showSaleDetails(sale: any) {
