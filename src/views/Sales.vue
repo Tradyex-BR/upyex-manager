@@ -116,7 +116,6 @@ import BaseTable from '@/components/common/BaseTable.vue'
 import SaleDetailsModal from '@/components/sales/SaleDetailsModal.vue'
 import NewSaleModal from '@/components/sales/NewSaleModal.vue'
 import EditSaleModal from '@/components/sales/EditSaleModal.vue'
-import { notificationService } from '@/services/notificationService'
 
 const AFFILIATE_MOCK_DATA = [
   {
