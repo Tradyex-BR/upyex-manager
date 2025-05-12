@@ -169,7 +169,6 @@ import BaseInput from '@/components/common/BaseInput.vue'
 import BaseDropdown from '@/components/common/BaseDropdown.vue'
 import { managerService } from '@/services/managerService'
 import { notificationService } from '@/services/notificationService'
-import router from '@/router'
 
 library.add(faPlus, faTrashAlt, faChevronDown, faExclamationCircle, faUser, faEnvelope, faHashtag)
 
