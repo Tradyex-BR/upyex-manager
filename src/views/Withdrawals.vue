@@ -124,7 +124,10 @@ export default defineComponent({
   },
   async mounted() {
     await this.loadWithdrawals();
-    await this.loadWithdrawalInfo();
+
+    if (this.role === "affiliate") {
+      await this.loadWithdrawalInfo();
+    }
   },
   methods: {
     async loadWithdrawals() {
@@ -331,7 +334,7 @@ export default defineComponent({
   <AuthenticatedLayout :loading="loading">
     <section class="min-h-[944px] w-full overflow-visible">
       <!-- Título e botão sempre visíveis -->
-      <div class="flex justify-between items-center mb-6 overflow-visible">
+      <div v-if="role === 'affiliate'" class="flex justify-between items-center mb-6 overflow-visible">
         <p class="text-white text-2xl font-semibold">Saques</p>
         <BaseButton class="ml-2 " @click="showRequestModal = true">
           Novo Saque
