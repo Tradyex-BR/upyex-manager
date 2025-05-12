@@ -93,8 +93,8 @@ import PenIcon from '@/components/icons/PenIcon.vue'
 import KeyIcon from '@/components/icons/KeyIcon.vue'
 import TrashIcon from '@/components/icons/TrashIcon.vue'
 import BaseDropdown from '@/components/common/BaseDropdown.vue'
-import EditApplicationModal from '@/components/offers/EditApplicationModal.vue'
-import ConfirmResetModal from '@/components/offers/ConfirmResetModal.vue'
+import EditApplicationModal from '@/components/applications/EditApplicationModal.vue'
+import ConfirmResetModal from '@/components/applications/ConfirmResetModal.vue'
 import { notificationService } from '@/services/notificationService'
 
 export default defineComponent({
