@@ -272,9 +272,12 @@ export default defineComponent({
     <section class=" min-h-[944px] w-full overflow-visible">
       <div class="flex justify-between items-center mb-6">
         <p class="text-white text-2xl font-semibold">Clientes</p>
+        <!--
+        
         <BaseButton class="ml-2" @click="showCreateModal = true">
           Novo Cliente
         </BaseButton>
+        -->
       </div>
       <div>
         <div v-if="customers.length === 0"
@@ -308,7 +311,8 @@ export default defineComponent({
           <template #last_access="{ item }">
             {{ item.affiliate?.latest_login_at ? new Date(item.affiliate.latest_login_at).toLocaleString('pt-BR', {
               day: '2-digit', month: '2-digit',
-              year: 'numeric', hour: '2-digit', minute: '2-digit' }) : '-' }} 
+              year: 'numeric', hour: '2-digit', minute: '2-digit'
+            }) : '-' }}
           </template>
 
           <!-- <template #actions="{ item }">
