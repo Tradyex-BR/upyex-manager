@@ -11,7 +11,7 @@
     import MenuIcon from '@/components/icons/MenuIcon.vue'
     import BaseDropdown from '@/components/common/BaseDropdown.vue'
     import BaseTable from '@/components/common/BaseTable.vue'
-import { notificationService } from '@/services/notificationService'
+    import { notificationService } from '@/services/notificationService'
 
     const CheckIcon = defineAsyncComponent(() => import('@/components/icons/CheckIcon.vue'))
     const XIcon = defineAsyncComponent(() => import('@/components/icons/XIcon.vue'))
@@ -95,8 +95,14 @@ import { notificationService } from '@/services/notificationService'
           handleSearch(newTerm)
         })
 
-        const loadAffiliates = async () => {
+        const loadAffiliates = async (refresh = true) => {
           try {
+            if (showCreateModal.value) {
+              showCreateModal.value = false
+            }
+            if (refresh) {
+              loading.value = true;
+            }
             const response = await managerService.affiliates.list({
               search: '',
               page: 1,
@@ -163,11 +169,17 @@ import { notificationService } from '@/services/notificationService'
 
         const handleCreate = async (formData: any) => {
           try {
+            createLoading.value = true
             await managerService.affiliates.create(formData)
             await handleSearch('')
             closeCreateModal()
+            notificationService.success('Afiliado criado com sucesso')
           } catch (e) {
-            throw e
+            console.error('Erro ao criar afiliado:', e)
+            createError.value = 'Erro ao criar afiliado. Por favor, tente novamente.'
+            notificationService.error('Erro ao criar afiliado')
+          } finally {
+            createLoading.value = false
           }
         }
 
@@ -178,7 +190,7 @@ import { notificationService } from '@/services/notificationService'
             } else {
               await managerService.affiliates.block(id);
             }
-            await loadAffiliates();
+            await loadAffiliates(false);
           } catch (e) {
             console.error('Erro ao alterar status do afiliado:', e);
           }
@@ -226,11 +238,12 @@ import { notificationService } from '@/services/notificationService'
           handleCreate,
           handleToggleStatus,
           getStatusClass,
-          handleAction
+          handleAction,
+          loadAffiliates
         }
       }
     })
-  </script>
+</script>
 
     <template>
       <AuthenticatedLayout :loading="loading">
@@ -264,7 +277,7 @@ import { notificationService } from '@/services/notificationService'
 
               <template #id="{ item }">
                 <span class="font-inter text-[14px] font-normal leading-[18px] text-white">{{ item.integration_code
-                  }}</span>
+                }}</span>
               </template>
 
               <template #created_at="{ item }">
@@ -274,7 +287,8 @@ import { notificationService } from '@/services/notificationService'
               <template #updated_at="{ item }">
                 {{ new Date(item.updated_at).toLocaleString('pt-BR', {
                   day: '2-digit', month: '2-digit', year: 'numeric',
-                  hour: '2-digit', minute: '2-digit' }) }}
+                  hour: '2-digit', minute: '2-digit'
+                }) }}
               </template>
 
               <template #status="{ item }">
@@ -292,6 +306,7 @@ import { notificationService } from '@/services/notificationService'
         </section>
 
         <!-- Modal de criação de afiliado -->
-        <CreateAffiliateModal v-if="showCreateModal" @close="closeCreateModal" @submit="handleCreate" />
+        <CreateAffiliateModal v-if="showCreateModal" @close="closeCreateModal" @submit="handleCreate"
+          @refresh="loadAffiliates(true)" />
       </AuthenticatedLayout>
     </template>

@@ -48,7 +48,8 @@
 
           <div class="space-y-2">
             <label class="text-sm text-white">E-mail <span class="text-[#BE3E37]">*</span></label>
-            <BaseInput v-model="form.email" type="email" placeholder="Digite o e-mail do afiliado" required variant="dark">
+            <BaseInput v-model="form.email" type="email" placeholder="Digite o e-mail do afiliado" required
+              variant="dark">
               <template #prefix>
                 <FontAwesomeIcon icon="envelope" class="text-[#85B1FF] mr-3" />
               </template>
@@ -57,7 +58,8 @@
 
           <div class="space-y-2">
             <label class="text-sm text-white">Código de Integração <span class="text-[#BE3E37]">*</span></label>
-            <BaseInput v-model="form.integration_code" placeholder="Digite o código de integração" required variant="dark">
+            <BaseInput v-model="form.integration_code" placeholder="Digite o código de integração" required
+              variant="dark">
               <template #prefix>
                 <FontAwesomeIcon icon="hashtag" class="text-[#85B1FF] mr-3" />
               </template>
@@ -66,7 +68,8 @@
         </div>
 
         <!-- Aplicações -->
-        <div v-if="activeTab === 'apps'" :class="form.applications.length > 1 ? 'mr-2' : ''" class="h-[296px] transition-all duration-300">
+        <div v-if="activeTab === 'apps'" :class="form.applications.length > 1 ? 'mr-2' : ''"
+          class="h-[296px] transition-all duration-300">
           <div class="flex items-center justify-between mb-4">
             <h3 class="text-white text-sm font-medium">Aplicações</h3>
             <BaseButton variant="primary" class="bg-[#e67e22] hover:bg-[#d35400] text-white h-8 px-3 text-xs"
@@ -165,6 +168,8 @@ import { faPlus, faTrashAlt, faChevronDown, faExclamationCircle, faUser, faEnvel
 import BaseInput from '@/components/common/BaseInput.vue'
 import BaseDropdown from '@/components/common/BaseDropdown.vue'
 import { managerService } from '@/services/managerService'
+import { notificationService } from '@/services/notificationService'
+import router from '@/router'
 
 library.add(faPlus, faTrashAlt, faChevronDown, faExclamationCircle, faUser, faEnvelope, faHashtag)
 
@@ -188,7 +193,7 @@ interface Form {
   }[];
 }
 
-const emit = defineEmits(['close', 'submit'])
+const emit = defineEmits(['close', 'submit', 'refresh'])
 
 const loading = ref(false)
 const error = ref('')
@@ -251,7 +256,7 @@ const isFormValid = computed(() => {
   }
 
   // Validar aplicações
-  const hasDuplicateApps = form.value.applications.some((app, index) => 
+  const hasDuplicateApps = form.value.applications.some((app, index) =>
     form.value.applications.findIndex(a => a.id === app.id) !== index
   );
 
@@ -300,13 +305,18 @@ const handleSubmit = async () => {
   error.value = ''
   try {
     await emit('submit', form.value)
+    notificationService.success('Afiliado criado com sucesso')
+    await emit('refresh')
   } catch (e: any) {
     if (e.response?.data?.message) {
       error.value = e.response.data.message
+      notificationService.error(error.value)
     } else if (e.message) {
       error.value = e.message
+      notificationService.error(error.value)
     } else {
       error.value = 'Ocorreu um erro ao criar o afiliado'
+      notificationService.error(error.value)
     }
   } finally {
     loading.value = false
