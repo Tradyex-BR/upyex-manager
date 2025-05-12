@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import { managerService } from '@/services/managerService'
+import { CONTEXT_ROLE_KEY } from '@/config/constants'
 
 interface User {
   id: number
@@ -27,14 +28,14 @@ export const useAuthStore = defineStore('auth', () => {
 
   const logout = () => {
     // Salva o papel do usuário antes de limpar
-    const currentRole = localStorage.getItem('contextRole') || 'manager'
+    const currentRole = localStorage.getItem(CONTEXT_ROLE_KEY) || 'manager'
 
     // Limpa os dados de autenticação
     token.value = ''
     user.value = null
     localStorage.removeItem('token')
     localStorage.removeItem('user')
-    localStorage.setItem('contextRole', currentRole)
+    localStorage.setItem(CONTEXT_ROLE_KEY, currentRole)
 
     // Redireciona para a página de login correspondente
     window.location.href = `/login/${currentRole}`

@@ -14,6 +14,7 @@ import BaseDropdown from '@/components/common/BaseDropdown.vue'
 import BaseTable from '@/components/common/BaseTable.vue'
 
 import { ListWithdrawalsResponse } from '@/services/managerService'
+import { CONTEXT_ROLE_KEY, PAGINATION } from '@/config/constants'
 
 const CheckIcon = defineAsyncComponent(() => import('@/components/icons/CheckIcon.vue'))
 const XIcon = defineAsyncComponent(() => import('@/components/icons/XIcon.vue'))
@@ -155,7 +156,7 @@ export default defineComponent({
     BaseTable
   },
   data() {
-    const role = localStorage.getItem('contextRole')
+    const role = localStorage.getItem(CONTEXT_ROLE_KEY)
     return {
       store: useDashboardStore(),
       showRequestModal: false,
@@ -173,10 +174,10 @@ export default defineComponent({
       withdrawals: [] as Array<any>,
       pagination: {
         current_page: 1,
-        last_page: 1,
-        per_page: 20,
+        per_page: PAGINATION.DEFAULT_PAGE_SIZE,
         total: 0,
-        links: [] as Array<any>
+        last_page: 1,
+        links: []
       },
       role,
       dropdownOptions: [

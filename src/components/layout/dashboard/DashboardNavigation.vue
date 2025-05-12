@@ -36,6 +36,8 @@
 </template>
 
 <script setup lang="ts">
+import { CONTEXT_ROLE_KEY } from '@/config/constants';
+
 interface NavigationItem {
   id: string;
   label: string;
@@ -49,7 +51,7 @@ defineEmits<{
   (e: 'update:modelValue', value: string): void;
 }>();
 
-const role = localStorage.getItem('contextRole')
+const role = localStorage.getItem(CONTEXT_ROLE_KEY)
 const navigationItems: NavigationItem[] = [
   { id: 'cards', label: 'Visão Geral' },
   { id: 'list', label: role === 'manager' ? 'Análise' : 'Vendas' }

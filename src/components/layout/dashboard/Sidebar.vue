@@ -45,6 +45,7 @@
 import { defineComponent } from 'vue'
 import { useRoute } from 'vue-router'
 import MenuIcons from '@/components/icons/MenuIcons.vue'
+import { CONTEXT_ROLE_KEY } from '@/config/constants'
 
 interface MenuItem {
   text: string
@@ -70,7 +71,7 @@ export default defineComponent({
     }
   },
   data() {
-    const role = localStorage.getItem('contextRole')
+    const role = localStorage.getItem(CONTEXT_ROLE_KEY)
 
     return {
       menuItems: [

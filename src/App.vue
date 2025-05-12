@@ -25,6 +25,7 @@ const affiliatesPages = [
 
 const route = useRoute();
 import { ref } from 'vue'
+import { CONTEXT_ROLE_KEY } from './config/constants';
 
 const thisPageHaveSidebar = computed(() =>
   pagesThatDontHaveSidebar.includes(route.path) || route.name === 'NotFoundAffiliate' || route.name === 'NotFoundManager'
@@ -40,9 +41,9 @@ function onSearch(term: string) {
 
 watch(fullPath, (newPath) => {
   if (newPath.includes('manager')) {
-    localStorage.setItem('contextRole', 'manager');
+    localStorage.setItem(CONTEXT_ROLE_KEY, 'manager');
   } else if (affiliatesPages.some(page => newPath.includes(page))) {
-    localStorage.setItem('contextRole', 'affiliate');
+    localStorage.setItem(CONTEXT_ROLE_KEY, 'affiliate');
   }
 });
 </script>

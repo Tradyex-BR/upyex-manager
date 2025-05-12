@@ -32,6 +32,7 @@ import { useAuthStore } from '@/stores/auth'
 import LoginForm from '@/components/layout/login/LoginForm.vue'
 import LoginBackground from '@/components/layout/login/LoginBackground.vue'
 import VerticalLines from '@/components/layout/login/VerticalLines.vue'
+import { CONTEXT_ROLE_KEY, ROUTES } from '@/config/constants'
 
 const router = useRouter()
 const route = useRoute()
@@ -40,22 +41,22 @@ const authStore = useAuthStore()
 onMounted(() => {
   // Se o usuário estiver autenticado, redireciona para o dashboard do contexto atual
   if (authStore.isAuthenticated) {
-    router.replace(localStorage.getItem('contextRole') === 'manager' ? '/dashboard' : '/affiliate/dashboard')
+    router.replace(localStorage.getItem(CONTEXT_ROLE_KEY) === 'manager' ? ROUTES.DASHBOARD : '/affiliate/dashboard')
     return
   }
 
   // Se a rota não tiver um papel definido, verifica o contexto salvo
   if (!route.meta.role) {
-    if (localStorage.getItem('contextRole')) {
+    if (localStorage.getItem(CONTEXT_ROLE_KEY)) {
       // Se tiver um contexto salvo, redireciona para a página de login correspondente
-      router.replace(`/login/${localStorage.getItem('contextRole')?.toLowerCase()}`)
+      router.replace(`/login/${localStorage.getItem(CONTEXT_ROLE_KEY)?.toLowerCase()}`)
     } else {
       // Se não tiver contexto, redireciona para a rota de manager
       router.replace('/login/manager')
     }
   } else {
     // Salva o papel do usuário no store
-    localStorage.setItem('contextRole', route.meta.role as 'manager' | 'affiliate')
+    localStorage.setItem(CONTEXT_ROLE_KEY, route.meta.role as 'manager' | 'affiliate')
   }
 })
 </script>

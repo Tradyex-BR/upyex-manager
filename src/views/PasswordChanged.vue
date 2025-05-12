@@ -42,6 +42,7 @@ import VerticalLines from '@/components/layout/login/VerticalLines.vue'
 import { onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import BaseButton from '@/components/common/BaseButton.vue'
+import { CONTEXT_ROLE_KEY } from '@/config/constants'
 
 const router = useRouter()
 const route = useRoute()
@@ -49,11 +50,11 @@ const route = useRoute()
 onMounted(() => {
   // Salva o papel do usuário no store
   if (route.meta.role) {
-    localStorage.setItem('contextRole', route.meta.role as 'manager' | 'affiliate')
+    localStorage.setItem(CONTEXT_ROLE_KEY, route.meta.role as 'manager' | 'affiliate')
   }
 })
 
 const handleBack = () => {
-  router.push(localStorage.getItem('contextRole') === 'manager' ? '/login/manager' : '/login/affiliate')
+  router.push(localStorage.getItem(CONTEXT_ROLE_KEY) === 'manager' ? '/login/manager' : '/login/affiliate')
 }
 </script>

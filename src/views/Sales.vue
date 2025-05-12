@@ -103,6 +103,7 @@ import CopyIcon from '@/components/icons/CopyIcon.vue'
 import CopyButton from '@/components/common/CopyButton.vue'
 import { formatWalletId, formatTransactionId } from '@/utils/formatters'
 import BaseTable from '@/components/common/BaseTable.vue'
+import { CONTEXT_ROLE_KEY } from '@/config/constants'
 
 export default defineComponent({
   name: 'Sales',
@@ -167,7 +168,7 @@ export default defineComponent({
     }
   },
   async mounted() {
-    this.isManager = localStorage.getItem('contextRole') === 'manager'
+    this.isManager = localStorage.getItem(CONTEXT_ROLE_KEY) === 'manager'
     await this.loadSales()
   },
   methods: {

@@ -1,3 +1,4 @@
+import { CONTEXT_ROLE_KEY } from '@/config/constants'
 import { useAuthStore } from '@/stores/auth'
 import { storeToRefs } from 'pinia'
 
@@ -35,7 +36,7 @@ export const isAuthenticated = () => {
 }
 
 export const getCurrentRole = () => {
-  return localStorage.getItem('contextRole') || 'manager'
+  return localStorage.getItem(CONTEXT_ROLE_KEY) || 'manager'
 }
 
 export const getDashboardPath = () => {

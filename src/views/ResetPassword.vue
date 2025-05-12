@@ -69,6 +69,7 @@ import { useRouter, useRoute } from 'vue-router'
 import BaseButton from '@/components/common/BaseButton.vue'
 import PasswordVisibilityIcon from '@/components/common/icons/PasswordVisibilityIcon.vue'
 import BaseInput from '@/components/common/BaseInput.vue'
+import { CONTEXT_ROLE_KEY } from '@/config/constants'
 
 const router = useRouter()
 const route = useRoute()
@@ -82,7 +83,7 @@ const loading = ref(false)
 onMounted(() => {
   // Salva o papel do usuário no store
   if (route.meta.role) {
-    localStorage.setItem('contextRole', route.meta.role as 'manager' | 'affiliate')
+    localStorage.setItem(CONTEXT_ROLE_KEY, route.meta.role as 'manager' | 'affiliate')
   }
 })
 

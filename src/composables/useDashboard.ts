@@ -4,6 +4,7 @@ import {
   DashboardParams,
   DashboardResponse
 } from '@/types/dashboard'
+import { CONTEXT_ROLE_KEY } from '@/config/constants'
 
 export function useDashboard() {
   const data = ref<DashboardResponse>({
@@ -47,7 +48,7 @@ export function useDashboard() {
   const useMockData = ref(false)
 
   const role = computed(() => {
-    return localStorage.getItem('contextRole') || 'manager'
+    return localStorage.getItem(CONTEXT_ROLE_KEY) || 'manager'
   })
 
   const ManagerMockData: DashboardResponse = {

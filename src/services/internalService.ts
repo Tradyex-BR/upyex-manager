@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { API_BASE_URL, API_TIMEOUT, TOKEN_KEY, CONTEXT_ROLE_KEY } from '@/config/constants'
+import { API_BASE_URL, API_TIMEOUT, TOKEN_KEY, CONTEXT_ROLE_KEY, ERROR_MESSAGES } from '@/config/constants'
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -21,5 +21,25 @@ api.interceptors.request.use((config) => {
   }
   return config
 })
+
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response) {
+      switch (error.response.status) {
+        case 401:
+          throw new Error(ERROR_MESSAGES.UNAUTHORIZED)
+        case 403:
+          throw new Error(ERROR_MESSAGES.FORBIDDEN)
+        case 404:
+          throw new Error(ERROR_MESSAGES.NOT_FOUND)
+        case 500:
+          throw new Error(ERROR_MESSAGES.SERVER_ERROR)
+        default:
+          throw new Error(ERROR_MESSAGES.NETWORK_ERROR)
+      }
+    }
+  }
+)
 
 export default api 

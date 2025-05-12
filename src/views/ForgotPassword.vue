@@ -54,6 +54,7 @@ import LoginBackground from '@/components/layout/login/LoginBackground.vue'
 import VerticalLines from '@/components/layout/login/VerticalLines.vue'
 import BaseButton from '@/components/common/BaseButton.vue'
 import BaseInput from '@/components/common/BaseInput.vue'
+import { CONTEXT_ROLE_KEY, API_BASE_URL } from '@/config/constants'
 
 const router = useRouter()
 const route = useRoute()
@@ -75,7 +76,7 @@ onMounted(() => {
   }
   // Salva o papel do usuário no store
   if (route.meta.role) {
-    localStorage.setItem('contextRole', route.meta.role as 'manager' | 'affiliate')
+    localStorage.setItem(CONTEXT_ROLE_KEY, route.meta.role as 'manager' | 'affiliate')
   }
 })
 
@@ -98,8 +99,8 @@ const handleSubmit = async () => {
   window.localStorage.setItem('recoveryEmail', email.value)
 
   try {
-    const endpoint = localStorage.getItem('contextRole') === 'manager' ? '/manager/auth/password/forgot' : '/affiliate/auth/password/forgot'
-    const url = `${import.meta.env.VITE_API_BASE_URL}${endpoint}?email=${encodeURIComponent(email.value.trim())}`
+    const endpoint = localStorage.getItem(CONTEXT_ROLE_KEY) === 'manager' ? '/manager/auth/password/forgot' : '/affiliate/auth/password/forgot'
+    const url = `${API_BASE_URL}${endpoint}?email=${encodeURIComponent(email.value.trim())}`
     const res = await fetch(url, {
       method: 'GET'
     })
@@ -108,7 +109,7 @@ const handleSubmit = async () => {
       throw new Error(data.message || 'Erro ao solicitar recuperação de senha')
     }
     message.value = data.message || 'Email enviado com instruções para redefinir a senha.'
-    setTimeout(() => router.push(`/email-sent/${localStorage.getItem('contextRole')?.toLowerCase()}`), 1200)
+    setTimeout(() => router.push(`/email-sent/${localStorage.getItem(CONTEXT_ROLE_KEY)?.toLowerCase()}`), 1200)
   } catch (err: any) {
     error.value = err.message || 'Erro ao solicitar recuperação de senha'
   } finally {

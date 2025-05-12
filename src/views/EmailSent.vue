@@ -46,6 +46,7 @@ import LoginBackground from '@/components/layout/login/LoginBackground.vue'
 import VerticalLines from '@/components/layout/login/VerticalLines.vue'
 import BaseButton from '@/components/common/BaseButton.vue'
 import PaperPlaneIcon from '@/components/icons/PaperPlaneIcon.vue'
+import { CONTEXT_ROLE_KEY } from '@/config/constants'
 
 const router = useRouter()
 const route = useRoute()
@@ -58,7 +59,7 @@ const handleLogin = () => {
 const handleBack = async () => {
   try {
     loading.value = true
-    if (localStorage.getItem('contextRole') === 'affiliate') {
+    if (localStorage.getItem(CONTEXT_ROLE_KEY) === 'affiliate') {
       router.push('/forgot-password/affiliate')
     } else {
       router.push('/forgot-password/manager')

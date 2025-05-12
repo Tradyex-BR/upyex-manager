@@ -96,6 +96,7 @@ import BaseDropdown from '@/components/common/BaseDropdown.vue'
 import EditApplicationModal from '@/components/applications/EditApplicationModal.vue'
 import ConfirmResetModal from '@/components/applications/ConfirmResetModal.vue'
 import { notificationService } from '@/services/notificationService'
+import { CONTEXT_ROLE_KEY } from '@/config/constants'
 
 export default defineComponent({
   props: {
@@ -156,7 +157,7 @@ export default defineComponent({
     }
   },
   async mounted() {
-    this.isManager = localStorage.getItem('contextRole') === 'manager'
+    this.isManager = localStorage.getItem(CONTEXT_ROLE_KEY) === 'manager'
     await this.handleSearch('');
   },
   watch: {

@@ -40,6 +40,7 @@ import VerticalLines from '@/components/layout/login/VerticalLines.vue'
 import BaseButton from '@/components/common/BaseButton.vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
+import { CONTEXT_ROLE_KEY } from '@/config/constants'
 
 const router = useRouter()
 const authStore = useAuthStore()
@@ -55,10 +56,10 @@ const handleBack = () => {
     localStorage.removeItem('role')
     localStorage.removeItem('recoveryEmail')
     // Redireciona para a página de login do contexto atual
-    router.push(localStorage.getItem('contextRole') === 'manager' ? '/login/manager' : '/login/affiliate')
+    router.push(localStorage.getItem(CONTEXT_ROLE_KEY) === 'manager' ? '/login/manager' : '/login/affiliate')
   } else {
     // Se não estiver autenticado, vai para a página de login do contexto atual
-    router.push(localStorage.getItem('contextRole') === 'manager' ? '/login/manager' : '/login/affiliate')
+    router.push(localStorage.getItem(CONTEXT_ROLE_KEY) === 'manager' ? '/login/manager' : '/login/affiliate')
   }
 }
 </script>

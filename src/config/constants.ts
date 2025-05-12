@@ -66,4 +66,35 @@ export const ERROR_MESSAGES = {
   FORBIDDEN: 'Você não tem permissão para acessar este recurso.',
   NOT_FOUND: 'Recurso não encontrado.',
   SERVER_ERROR: 'Erro interno do servidor. Tente novamente mais tarde.',
+};
+
+// Novas constantes adicionadas
+export const DATE_FORMATS = {
+  DISPLAY: 'DD/MM/YYYY',
+  API: 'YYYY-MM-DD',
+  DATETIME: 'DD/MM/YYYY HH:mm:ss',
+  TIME: 'HH:mm:ss'
+};
+
+export const HTTP_STATUS = {
+  OK: 200,
+  CREATED: 201,
+  BAD_REQUEST: 400,
+  UNAUTHORIZED: 401,
+  FORBIDDEN: 403,
+  NOT_FOUND: 404,
+  SERVER_ERROR: 500
+};
+
+export const STORAGE_KEYS = {
+  USER_PREFERENCES: 'user_preferences',
+  THEME: 'theme',
+  LANGUAGE: 'language'
+};
+
+export const VALIDATION = {
+  MIN_PASSWORD_LENGTH: 8,
+  MAX_PASSWORD_LENGTH: 32,
+  MIN_USERNAME_LENGTH: 3,
+  MAX_USERNAME_LENGTH: 50
 }; 

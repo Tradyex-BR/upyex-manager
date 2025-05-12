@@ -92,9 +92,10 @@ import AuthenticatedLayout from '@/components/layout/AuthenticatedLayout.vue'
 import BarChart from "@/components/graphics/BarChart.vue"
 import EmptyChart from '@/components/layout/dashboard/EmptyChart.vue'
 import BaseDropdown from '@/components/common/BaseDropdown.vue'
+import { CONTEXT_ROLE_KEY } from '@/config/constants'
 
 const currentView = ref('cards')
-const role = localStorage.getItem('contextRole') || 'manager'
+const role = localStorage.getItem(CONTEXT_ROLE_KEY) || 'manager'
 const currentDropdownAction = ref('Total')
 const isDropdownOpen = ref(false)
 
