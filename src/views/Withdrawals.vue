@@ -2,7 +2,6 @@
 import { defineAsyncComponent, defineComponent } from 'vue'
 import { useDashboardStore } from '@/stores/dashboard'
 import { managerService } from '@/services/managerService'
-import { externalService } from '@/services/externalService'
 import Sidebar from '@/components/layout/dashboard/Sidebar.vue'
 import TopBar from '@/components/layout/dashboard/TopBar.vue'
 import BaseButton from '@/components/common/BaseButton.vue'
@@ -362,16 +361,16 @@ export default defineComponent({
     },
     async aprovar(id: string) {
       try {
-        await externalService.sales.update(id, { status: 'paid' });
-        await this.loadWithdrawals(); // Recarrega a lista após a aprovação
+        console.log('aprovar', id);
+        /* await this.loadWithdrawals(); */ // Recarrega a lista após a aprovação
       } catch (error) {
         console.error('Erro ao aprovar saque:', error);
       }
     },
     async rejeitar(id: string) {
       try {
-        await externalService.sales.update(id, { status: 'rejected' });
-        await this.loadWithdrawals(); // Recarrega a lista após a rejeição
+        console.log('rejeitar', id);
+       /*  await this.loadWithdrawals(); */ // Recarrega a lista após a rejeição
       } catch (error) {
         console.error('Erro ao rejeitar saque:', error);
       }
