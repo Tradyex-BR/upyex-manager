@@ -3,7 +3,7 @@
     <template v-if="vertical">
       <div class="flex flex-col gap-2">
         <StatCard v-for="(card, index) in managerListCards" :key="index" :value="card.value" :label="card.label"
-          :border="card.border" :class="$attrs.class" :index="index" />
+          :border="card.border" :class="$attrs.class" :index="index" :animate="true" />
       </div>
     </template>
     <template v-else>
@@ -61,7 +61,6 @@ const managerListCards = [
     label: 'Novos Clientes',
     border: true
   },
-
 ]
 
 const affiliateCards = [
@@ -87,3 +86,22 @@ defineOptions({
   inheritAttrs: false
 })
 </script>
+
+<style scoped>
+.stat-card {
+  opacity: 0;
+  transform: translateY(20px);
+  animation: fadeInUp 0.5s ease forwards;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+</style>

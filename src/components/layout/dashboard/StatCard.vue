@@ -31,8 +31,6 @@ interface Props {
 }
 
 withDefaults(defineProps<Props>(), {
-  isPositive: true,
-  period: 'Última semana',
   border: false,
   index: 0,
   animate: false
