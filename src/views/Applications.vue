@@ -1,19 +1,18 @@
   <template>
     <AuthenticatedLayout :loading="loading">
-      <div v-if="loading" class="flex items-center justify-center py-10">
-        <span class="text-white text-lg">Carregando ofertas...</span>
-      </div>
-      <div v-else-if="offers.length === 0"
-        class="flex w-full min-h-[200px] items-center justify-center text-gray-400 text-lg">
-        Nenhuma oferta encontrada
-      </div>
-      <div v-else class="overflow-visible">
-        <section class="min-h-[944px] w-full overflow-visible">
-          <div class="flex justify-between items-center mb-6">
-            <p class="text-white text-2xl font-semibold">Aplicações</p>
+      <section class="min-h-[944px] w-full overflow-visible">
+        <div class="flex justify-between items-center mb-6">
+          <p class="text-white text-2xl font-semibold">Aplicações</p>
+        </div>
+        <div class="flex w-full min-h-[calc(100vh-200px)] justify-center text-gray-400">
+          <div v-if="loading" class="flex items-center justify-center py-10">
+            <span class="text-white text-lg">Carregando ofertas...</span>
           </div>
-          <div>
-
+          <div v-else-if="offers.length === 0"
+            class="flex w-full min-h-[200px] items-center justify-center text-gray-400 text-lg">
+            Nenhuma oferta encontrada
+          </div>
+          <div v-else class="overflow-visible w-full">
             <BaseTable :headers="isManager ? [
               { key: 'name', label: 'Nome', align: 'left' },
               { key: 'status', label: 'Status', align: 'center' },
@@ -67,8 +66,8 @@
               </template>
             </BaseTable>
           </div>
-        </section>
-      </div>
+        </div>
+      </section>
 
       <EditApplicationModal v-if="showEditModal" :show="showEditModal" :application-id="selectedApplication?.id"
         @close="showEditModal = false" @submit="handleEditApplication" />
