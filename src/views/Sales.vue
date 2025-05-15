@@ -86,6 +86,7 @@
         </BaseTable>
       </div>
     </section>
+    <BasePagination :meta="pagination" @page-change="handlePageChange" />
   </AuthenticatedLayout>
 </template>
 
@@ -105,6 +106,7 @@ import { formatWalletId, formatTransactionId } from '@/utils/formatters'
 import BaseTable from '@/components/common/BaseTable.vue'
 import { CONTEXT_ROLE_KEY } from '@/config/constants'
 import { logger } from '@/config/logger'
+import BasePagination from '@/components/common/BasePagination.vue'
 
 export default defineComponent({
   name: 'Sales',
@@ -114,7 +116,8 @@ export default defineComponent({
     MenuIcon,
     CopyIcon,
     CopyButton,
-    BaseTable
+    BaseTable,
+    BasePagination
   },
   setup() {
     const store = useDashboardStore()
@@ -124,6 +127,14 @@ export default defineComponent({
     const loading = ref(true)
     const sales = ref<any[]>([])
     const searchQuery = ref('')
+    const pagination = ref({
+      current_page: 1,
+      from: 1,
+      last_page: 1,
+      per_page: 20,
+      to: 1,
+      total: 0
+    })
 
     watch(() => authStore.isAuthenticated, (isAuthenticated) => {
       if (!isAuthenticated) {
@@ -131,22 +142,33 @@ export default defineComponent({
       }
     })
 
-    const handleSearch = async (term: string) => {
+    const handleSearch = async (term: string, page: number = 1) => {
       loading.value = true
       try {
         const response = await managerService.sales.list({
           search: term,
-          page: 1,
-          per_page: 20,
+          page: page,
+          per_page: 10,
           sort_by: 'created_at',
           sort_order: 'desc'
         })
         sales.value = response.data || []
+        if (response.meta) {
+          pagination.value = response.meta
+        }
       } catch (e) {
         logger.error('Erro ao buscar vendas:', e)
       } finally {
         loading.value = false
       }
+    }
+
+    const handlePageChange = async (newPage: number) => {
+      await handleSearch(searchQuery.value, newPage)
+    }
+
+    const loadInitialData = async () => {
+      await handleSearch('', 1)
     }
 
     return {
@@ -157,7 +179,10 @@ export default defineComponent({
       loading,
       sales,
       searchQuery,
+      pagination,
       handleSearch,
+      handlePageChange,
+      loadInitialData,
       formatWalletId,
       formatTransactionId
     }
@@ -170,33 +195,9 @@ export default defineComponent({
   },
   async mounted() {
     this.isManager = localStorage.getItem(CONTEXT_ROLE_KEY) === 'manager'
-    await this.loadSales()
+    await this.loadInitialData()
   },
   methods: {
-    async loadSales() {
-      try {
-        const response = await managerService.sales.list({
-          search: '',
-          page: 1,
-          per_page: 20,
-          sort_by: 'created_at',
-          sort_order: 'desc'
-        });
-
-        this.sales = (response.data || []).map((sale: any) => ({
-          ...sale,
-          customer: sale.customer ? {
-            ...sale.customer,
-            external_id: sale.customer.external_id || '-'
-          } : null
-        }));
-      } catch (e) {
-        logger.error('Erro ao carregar vendas:', e)
-      } finally {
-        this.loading = false
-      }
-    },
-
     mapStatus(status: string): string {
       const statusMap: { [key: string]: string } = {
         'awaiting_payment': 'Pendente',

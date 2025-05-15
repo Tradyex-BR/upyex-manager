@@ -504,7 +504,7 @@ export const managerService = {
       const response = await api.request<ListSalesResponse>({
         method: 'GET',
         url: '/sales',
-        data: params,
+        params: params,
       });
       return response.data;
     },
