@@ -238,7 +238,7 @@ export default defineComponent({
 /*           { key: 'actions', label: 'Ações', align: 'center' }
  */        ]" :items="customers">
           <template #name="{ item }">
-            {{ item.nome }}
+            {{ item.nome || "-" }}
           </template>
 
           <template #email="{ item }">
