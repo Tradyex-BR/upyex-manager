@@ -2,7 +2,7 @@
   <div class="animate-fade-in w-full">
     <table class="w-full text-white border-collapse">
       <thead>
-        <tr class="bg-[#1A1F3C]">
+        <tr>
           <th v-for="header in headers" :key="header.key" 
               :class="[
                 'h-[42px] py-3 px-4 font-inter text-[14px] font-medium leading-[18px] text-white transition-all duration-300 ease-in-out',

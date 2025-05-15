@@ -134,7 +134,7 @@ const AFFILIATE_WITHDRAWALS: ListWithdrawalsResponse = {
 }
 
 // Flag para controlar se usa dados mockados
-const USE_MOCK_DATA = true
+const USE_MOCK_DATA = false
 
 export default defineComponent({
   name: 'Withdrawals',

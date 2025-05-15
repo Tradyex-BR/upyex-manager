@@ -42,11 +42,16 @@
               </template>
 
               <template #base_affiliate_link="{ item }">
-                <div class="flex items-center justify-center gap-2">
+                <div v-if="item.base_affiliate_link" class="flex items-center justify-center gap-2">
                   <span class="font-inter text-[14px] font-normal leading-[18px] text-white truncate max-w-[200px]">
                     {{ item.base_affiliate_link }}
                   </span>
                   <CopyButton :stringToCopy="item.base_affiliate_link" />
+                </div>
+                <div v-else class="flex items-center justify-center gap-2">
+                  <span class="font-inter text-[14px] font-normal leading-[18px] text-white truncate max-w-[200px]">
+                    -
+                  </span>
                 </div>
               </template>
 
