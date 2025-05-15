@@ -1,5 +1,5 @@
 <script lang="ts">
-import { defineAsyncComponent, defineComponent } from 'vue'
+import { computed, defineAsyncComponent, defineComponent } from 'vue'
 import { useDashboardStore } from '@/stores/dashboard'
 import { managerService } from '@/services/managerService'
 import { logger } from '@/config/logger'
@@ -185,14 +185,28 @@ export default defineComponent({
         {
           text: 'Aprovar',
           action: 'aprovar',
-          icon: CheckIcon
+          icon: CheckIcon,
+          role: 'manager'
         },
         {
           text: 'Bloquear',
           action: 'bloquear',
-          icon: XIcon
+          icon: XIcon,
+          role: 'manager'
+        },
+        {
+          text: 'Cancelar',
+          action: 'cancelar',
+          icon: XIcon,
+          role: 'affiliate'
         }
       ]
+    }
+  },
+  computed: {
+    filteredDropdownOptions() {
+      if (!this.role) return []
+      return this.dropdownOptions.filter(option => option.role === this.role)
     }
   },
   watch: {
@@ -328,8 +342,12 @@ export default defineComponent({
           await managerService.withdrawals.approve(id);
         } else if (action === 'bloquear') {
           logger.info('Rejeitando saque:', id);
-          await managerService.withdrawals.reject(id);
+          await managerService.withdrawals.reject();
+        } else if (action === 'cancelar') {
+          logger.info('Cancelando saque:', id);
+          await managerService.withdrawals.cancel(id);
         }
+
         await this.loadWithdrawals();
       } catch (error) {
         logger.error('Erro ao executar ação no saque:', error);
@@ -413,7 +431,7 @@ export default defineComponent({
             { key: 'destination', label: 'Destino (Chave Pix)', align: 'center' },
             { key: 'type', label: 'Tipo', align: 'center' },
             { key: 'status', label: 'Status', align: 'center' },
-            { key: 'actions', label: role === 'manager' ? 'Ações' : 'Link', align: 'center' }
+            { key: 'actions', label: 'Ações', align: 'center' }
           ]" :items="withdrawals">
             <template #date="{ item }">
               {{ item.date }}
@@ -436,15 +454,8 @@ export default defineComponent({
             </template>
 
             <template #actions="{ item }">
-              <template v-if="role === 'manager'">
-                <BaseDropdown :options="dropdownOptions" @select="handleDropdownAction($event, item.id)" :top="50"
-                  class="w-min mx-auto" />
-              </template>
-              <template v-else>
-                <a v-if="item.link" :href="item.link" target="_blank" class="flex items-center justify-center">
-                  <RedirectIcon />
-                </a>
-              </template>
+              <BaseDropdown :options="filteredDropdownOptions" @select="handleDropdownAction($event, item.id)" :top="50"
+                class="w-min mx-auto" />
             </template>
           </BaseTable>
         </div>

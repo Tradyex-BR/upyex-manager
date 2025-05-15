@@ -414,19 +414,23 @@ export const managerService = {
      * Aprova um saque
      */
     approve: async (id: string): Promise<WithdrawalResponse> => {
-      const response = await api.post<WithdrawalResponse>(`/external/sales/${id}`, {
-        status: 'paid'
-      });
+      const response = await api.post<WithdrawalResponse>(`/withdrawals/${id}/approve`);
       return response.data;
     },
 
     /**
      * Rejeita um saque
      */
-    reject: async (id: string): Promise<WithdrawalResponse> => {
-      const response = await api.post<WithdrawalResponse>(`/external/sales/${id}`, {
-        status: 'rejected'
-      });
+    reject: async (): Promise<WithdrawalResponse> => {
+      const response = await api.post<WithdrawalResponse>(`/withdrawals/reject`);
+      return response.data;
+    },
+
+       /**
+     * Cancela um saque
+     */
+    cancel: async (id: string): Promise<WithdrawalResponse> => {
+      const response = await api.post<WithdrawalResponse>(`/withdrawals/${id}/cancel`);
       return response.data;
     },
 
