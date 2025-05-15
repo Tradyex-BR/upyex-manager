@@ -1,5 +1,5 @@
 <template>
-  <div v-if="meta" class="h-[42px] flex items-center justify-between px-4 py-3 sm:px-6" role="navigation" aria-label="Paginação">
+  <div v-if="meta" class="h-[42px] flex items-center justify-between mt-[12px] py-3" role="navigation" aria-label="Paginação">
     <div class="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
       <div>
         <p class="font-inter text-[14px] font-medium leading-[18px] text-white">
@@ -30,7 +30,7 @@
               v-if="page !== '...'"
               @click="handlePageChange(Number(page))"
               :class="[
-                'relative rounded-lg inline-flex items-center px-4 py-2 font-inter text-[14px] font-medium leading-[18px] border transition-all duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-indigo-500',
+                'relative rounded-lg cursor-pointer inline-flex items-center px-4 py-2 font-inter text-[14px] font-medium leading-[18px] border transition-all duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-indigo-500',
                 page === meta.current_page
                   ? 'z-10 border-indigo-500 bg-indigo-600 text-white'
                   : 'border-[#1A1F3C] bg-[#1A1F3C] text-white hover:bg-[#1A1F3C]/50'
@@ -41,7 +41,7 @@
             </button>
             <span
               v-else
-              class="relative rounded-lg inline-flex items-center px-4 py-2 font-inter text-[14px] font-medium leading-[18px] text-white border border-[#1A1F3C] bg-[#1A1F3C]"
+              class="relative rounded-lg cursor-default inline-flex items-center px-4 py-2 font-inter text-[14px] font-medium leading-[18px] text-white border border-[#1A1F3C] bg-[#1A1F3C]"
             >
               ...
             </span>
