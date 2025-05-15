@@ -304,11 +304,15 @@ export default defineComponent({
         this.loading = false;
       }
     },
-    async handleWithdrawalRequest() {
+    async handleWithdrawalRequest(data: { amount: string, pixKey: string }) {
       try {
+        this.lastWithdrawalAmount = data.amount;
+        this.lastWithdrawalPixKey = data.pixKey;
+        
         const response = await managerService.withdrawals.request({
-          amount: Number(this.lastWithdrawalAmount),
-          pix_key: this.lastWithdrawalPixKey
+          amount: Number(this.lastWithdrawalAmount.replace(/[^\d]/g, '')) / 100,
+          method: 'pix',
+          destination: this.lastWithdrawalPixKey
         });
 
         this.showRequestModal = false;
@@ -342,7 +346,7 @@ export default defineComponent({
           await managerService.withdrawals.approve(id);
         } else if (action === 'bloquear') {
           logger.info('Rejeitando saque:', id);
-          await managerService.withdrawals.reject();
+          await managerService.withdrawals.reject(id);
         } else if (action === 'cancelar') {
           logger.info('Cancelando saque:', id);
           await managerService.withdrawals.cancel(id);

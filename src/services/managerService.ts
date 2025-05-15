@@ -143,7 +143,8 @@ export interface Withdrawal {
 
 export interface CreateWithdrawalPayload {
   amount: number;
-  pix_key: string;
+  method: string;
+  destination: string;
 }
 
 export interface WithdrawalResponse {
@@ -421,8 +422,8 @@ export const managerService = {
     /**
      * Rejeita um saque
      */
-    reject: async (): Promise<WithdrawalResponse> => {
-      const response = await api.post<WithdrawalResponse>(`/withdrawals/reject`);
+    reject: async (id: string): Promise<WithdrawalResponse> => {
+      const response = await api.post<WithdrawalResponse>(`/withdrawals/${id}/reject`);
       return response.data;
     },
 
