@@ -61,7 +61,23 @@ export interface ListAffiliatesResponse {
 // Sales interfaces
 export interface Sale {
   id: string;
-  // TODO: add more sale fields as needed
+  created_at: string;
+  updated_at: string;
+  status: string;
+  payment_method: string;
+  products: Array<{
+    amount: number;
+    price: number;
+  }>;
+  customer?: {
+    name: string;
+    external_id: string;
+    application?: {
+      id: string;
+      name: string;
+      logo_url: string;
+    };
+  };
 }
 export interface ListSalesParams {
   search?: string | null;
@@ -75,6 +91,26 @@ export interface ListSalesResponse {
   total: number;
   page: number;
   per_page: number;
+  links: {
+    first: string;
+    last: string;
+    prev: string | null;
+    next: string | null;
+  };
+  meta: {
+    current_page: number;
+    from: number;
+    last_page: number;
+    links: {
+      url: string | null;
+      label: string;
+      active: boolean;
+    }[];
+    path: string;
+    per_page: number;
+    to: number;
+    total: number;
+  };
 }
 
 export interface Application {
@@ -172,7 +208,7 @@ export interface ListWithdrawalsResponse {
   meta: {
     current_page: number;
     from: number;
-    last_page: number;	
+    last_page: number;
     links: {
       url: string | null;
       label: string;
@@ -427,9 +463,9 @@ export const managerService = {
       return response.data;
     },
 
-       /**
-     * Cancela um saque
-     */
+    /**
+  * Cancela um saque
+  */
     cancel: async (id: string): Promise<WithdrawalResponse> => {
       const response = await api.post<WithdrawalResponse>(`/withdrawals/${id}/cancel`);
       return response.data;
