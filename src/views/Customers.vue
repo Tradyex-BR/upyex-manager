@@ -225,47 +225,49 @@ export default defineComponent({
         -->
       </div>
       <div>
-        <div v-if="customers.length === 0"
-          class="flex w-full min-h-[200px] items-center justify-center text-gray-400 text-lg">
-          Nenhum cliente encontrado
+        <div class="flex w-full min-h-[calc(100vh-200px)] justify-center text-gray-400">
+          <div v-if="customers.length === 0"
+            class="flex w-full min-h-[200px] items-center justify-center text-gray-400 text-lg">
+            Nenhum cliente encontrado
+          </div>
+          <BaseTable v-else :headers="[
+            { key: 'name', label: 'Nome', align: 'left' },
+            { key: 'email', label: 'Email', align: 'center' },
+            { key: 'status', label: 'Status', align: 'center' },
+            { key: 'created_at', label: 'Data de cadastro', align: 'center' },
+            { key: 'last_access', label: 'Último acesso', align: 'center' },
+/*             { key: 'actions', label: 'Ações', align: 'center' }
+ */          ]" :items="customers">
+            <template #name="{ item }">
+              {{ item.nome || "-" }}
+            </template>
+
+            <template #email="{ item }">
+              {{ item.email }}
+            </template>
+
+            <template #status="{ item }">
+              <span :class="getStatusClass(item.status)">{{ item.status }}</span>
+            </template>
+
+            <template #created_at="{ item }">
+              {{ item.dataCadastro }}
+            </template>
+
+            <template #last_access="{ item }">
+              {{ item.affiliate?.latest_login_at ? new Date(item.affiliate.latest_login_at).toLocaleString('pt-BR', {
+                day: '2-digit', month: '2-digit',
+                year: 'numeric', hour: '2-digit', minute: '2-digit'
+              }) : '-' }}
+            </template>
+
+            <!-- <template #actions="{ item }">
+              <BaseDropdown :options="dropdownOptions" :model-value="dropdownOpen === item.id"
+                @update:model-value="(value) => dropdownOpen = value ? item.id : null"
+                @select="(action) => handleCustomerAction(item.id, action)" :top="50" class="w-min mx-auto" />
+            </template> -->
+          </BaseTable>
         </div>
-        <BaseTable v-else :headers="[
-          { key: 'name', label: 'Nome', align: 'left' },
-          { key: 'email', label: 'Email', align: 'center' },
-          { key: 'status', label: 'Status', align: 'center' },
-          { key: 'created_at', label: 'Data de cadastro', align: 'center' },
-          { key: 'last_access', label: 'Último acesso', align: 'center' },
-/*           { key: 'actions', label: 'Ações', align: 'center' }
- */        ]" :items="customers">
-          <template #name="{ item }">
-            {{ item.nome || "-" }}
-          </template>
-
-          <template #email="{ item }">
-            {{ item.email }}
-          </template>
-
-          <template #status="{ item }">
-            <span :class="getStatusClass(item.status)">{{ item.status }}</span>
-          </template>
-
-          <template #created_at="{ item }">
-            {{ item.dataCadastro }}
-          </template>
-
-          <template #last_access="{ item }">
-            {{ item.affiliate?.latest_login_at ? new Date(item.affiliate.latest_login_at).toLocaleString('pt-BR', {
-              day: '2-digit', month: '2-digit',
-              year: 'numeric', hour: '2-digit', minute: '2-digit'
-            }) : '-' }}
-          </template>
-
-          <!-- <template #actions="{ item }">
-            <BaseDropdown :options="dropdownOptions" :model-value="dropdownOpen === item.id"
-              @update:model-value="(value) => dropdownOpen = value ? item.id : null"
-              @select="(action) => handleCustomerAction(item.id, action)" :top="50" class="w-min mx-auto" />
-          </template> -->
-        </BaseTable>
       </div>
     </section>
   </AuthenticatedLayout>
