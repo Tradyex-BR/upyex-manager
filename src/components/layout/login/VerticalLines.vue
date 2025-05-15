@@ -19,50 +19,69 @@
 </template>
 
 <script>
+import { ref, onMounted, onBeforeUnmount } from 'vue'
+
 export default {
   name: 'VerticalLines',
-  data() {
-    return {
-      lines: Array(24).fill(null).map(() => this.generateLineConfig()),
-      updateQueue: []
-    }
-  },
-  mounted() {
-    // Inicializa a fila de atualizações para evitar que todas as linhas mudem ao mesmo tempo
-    for (let i = 0; i < this.lines.length; i++) {
-      this.scheduleNextUpdate(i);
-    }
-  },
-  beforeUnmount() {
-    // Limpa todos os timeouts pendentes
-    this.updateQueue.forEach(timeoutId => clearTimeout(timeoutId));
-  },
-  methods: {
-    generateLineConfig() {
+  setup() {
+    const lines = ref(Array(24).fill(null).map(() => generateLineConfig()))
+    const updateQueue = ref([])
+    const animationStates = ref(new Map())
+
+    function generateLineConfig() {
       return {
-        delay: Math.random() * 8, // Aumentado o delay inicial para 0-8s
-        duration: 1 + Math.random() * 2, // Reduzida a duração para 3-5s para movimentos mais rápidos
-        isActive: Math.random() < 0.6 // Reduzida a chance de estar ativo para 60%
+        delay: Math.random() * 8,
+        duration: 1 + Math.random() * 2,
+        isActive: Math.random() < 0.6
       }
-    },
+    }
 
-    scheduleNextUpdate(index) {
-      const currentLine = this.lines[index];
-      const animationTotalTime = (currentLine.delay + currentLine.duration) * 200;
+    function updateLine(index) {
+      const currentLine = lines.value[index]
+      const currentTime = Date.now()
+      const lastUpdate = animationStates.value.get(index) || 0
+      const timeSinceLastUpdate = currentTime - lastUpdate
 
-      // Aumentado o delay entre atualizações para 2-5s
-      const nextUpdateDelay = animationTotalTime + (2000 + Math.random() * 3000);
+      // Só atualiza se passou tempo suficiente desde a última atualização
+      if (timeSinceLastUpdate >= (currentLine.duration * 1000)) {
+        const newConfig = generateLineConfig()
+        // Mantém o delay atual se a animação ainda estiver em andamento
+        if (timeSinceLastUpdate < (currentLine.delay * 1000)) {
+          newConfig.delay = currentLine.delay
+        }
+        lines.value[index] = newConfig
+        animationStates.value.set(index, currentTime)
+      }
+
+      // Agenda a próxima verificação
+      const nextCheckDelay = Math.min(
+        (currentLine.duration * 1000) - timeSinceLastUpdate,
+        1000 // Verifica no máximo a cada segundo
+      )
 
       const timeoutId = setTimeout(() => {
-        // Atualiza apenas esta linha específica
-        this.$set(this.lines, index, this.generateLineConfig());
+        updateLine(index)
+      }, nextCheckDelay)
 
-        // Agenda a próxima atualização
-        this.scheduleNextUpdate(index);
-      }, nextUpdateDelay);
+      updateQueue.value.push(timeoutId)
+    }
 
-      // Armazena o ID do timeout para limpeza posterior
-      this.updateQueue.push(timeoutId);
+    onMounted(() => {
+      // Inicializa todas as linhas com um delay escalonado
+      lines.value.forEach((_, index) => {
+        setTimeout(() => {
+          updateLine(index)
+        }, index * 150) // Aumentado o delay entre linhas para 150ms
+      })
+    })
+
+    onBeforeUnmount(() => {
+      updateQueue.value.forEach(timeoutId => clearTimeout(timeoutId))
+      animationStates.value.clear()
+    })
+
+    return {
+      lines
     }
   }
 }
