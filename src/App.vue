@@ -3,6 +3,7 @@ import { useRoute } from 'vue-router';
 import { computed, watch } from 'vue';
 import Sidebar from './components/layout/dashboard/Sidebar.vue';
 import TopBar from './components/layout/dashboard/TopBar.vue';
+import { logger } from './config/logger';
 
 const pagesThatDontHaveSidebar = [
   '/login/manager',
@@ -35,7 +36,7 @@ const fullPath = computed(() => route.fullPath);
 
 const searchTerm = ref('')
 function onSearch(term: string) {
-  console.log('onSearch (App.vue) recebeu:', term)
+  logger.info('onSearch (App.vue) recebeu:', term)
   searchTerm.value = term
 }
 

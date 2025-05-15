@@ -5,6 +5,8 @@ import {
   DashboardResponse
 } from '@/types/dashboard'
 import { CONTEXT_ROLE_KEY } from '@/config/constants'
+import { logger } from '@/config/logger'
+import { notificationService } from '@/services/notificationService'
 
 export function useDashboard() {
   const data = ref<DashboardResponse>({
@@ -186,10 +188,9 @@ export function useDashboard() {
         const formattedAction = action === 'Pagos' ? 1 : 0
         data.value = await managerService.dashboard.getData(params, formattedAction)
       }
-    } catch (e: any) {
-      console.error('Erro ao buscar dashboard:', e)
-      error.value = e?.message || 'Erro ao carregar dados do dashboard'
-      data.value = {} as DashboardResponse
+    } catch (e) {
+      logger.error('Erro ao buscar dashboard:', e)
+      notificationService.error('Erro ao carregar dados do dashboard')
     } finally {
       loading.value = false
     }

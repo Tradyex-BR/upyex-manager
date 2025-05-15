@@ -2,6 +2,7 @@
 import { defineAsyncComponent, defineComponent } from 'vue'
 import { useDashboardStore } from '@/stores/dashboard'
 import { managerService } from '@/services/managerService'
+import { logger } from '@/config/logger'
 import Sidebar from '@/components/layout/dashboard/Sidebar.vue'
 import TopBar from '@/components/layout/dashboard/TopBar.vue'
 import BaseButton from '@/components/common/BaseButton.vue'
@@ -214,7 +215,7 @@ export default defineComponent({
 
         if (USE_MOCK_DATA) {
           response = this.role === "manager" ? MANAGER_WITHDRAWALS : AFFILIATE_WITHDRAWALS;
-          console.log(response);
+          logger.info('Dados de saques carregados:', response);
         } else {
           response = await managerService.withdrawals.list({
             start_date: '',
@@ -244,7 +245,7 @@ export default defineComponent({
         this.pagination.total = response.total;
         this.pagination.links = [];
       } catch (error) {
-        console.error('Erro ao carregar saques:', error);
+        logger.error('Erro ao carregar saques:', error);
         this.withdrawals = [];
         this.pagination.total = 0;
       } finally {
@@ -253,54 +254,18 @@ export default defineComponent({
     },
     async handleSearch(term: string) {
       try {
-        let response: ListWithdrawalsResponse;
-
-        if (USE_MOCK_DATA) {
-          // Filtra os dados mockados
-          const filteredData = this.role === "manager" ? MANAGER_WITHDRAWALS.data.filter(item =>
-            item.destination.toLowerCase().includes(term.toLowerCase()) ||
-            item.amount.toString().includes(term) ||
-            this.translateStatus(item.status).toLowerCase().includes(term.toLowerCase())
-          ) : AFFILIATE_WITHDRAWALS.data.filter(item =>
-            item.destination.toLowerCase().includes(term.toLowerCase()) ||
-            item.amount.toString().includes(term) ||
-            this.translateStatus(item.status).toLowerCase().includes(term.toLowerCase())
-          );
-          response = {
-            data: filteredData,
-            total: filteredData.length,
-            page: 1,
-            per_page: this.pagination.per_page,
-            links: {
-              first: '',
-              last: '',
-              prev: null,
-              next: null
-            },
-            meta: {
-              current_page: 1,
-              from: 1,
-              last_page: 1,
-              links: [],
-              path: '',
-              per_page: this.pagination.per_page,
-              to: 1,
-              total: filteredData.length
-            }
-          };
-        } else {
-          response = await managerService.withdrawals.list({
-            search: term,
-            start_date: '',
-            end_date: '',
-            status: null,
-            method: null,
-            page: 1,
-            per_page: this.pagination.per_page,
-            sort_by: 'created_at',
-            sort_order: 'desc'
-          });
-        }
+        this.loading = true;
+        const response = await managerService.withdrawals.list({
+          start_date: '',
+          end_date: '',
+          status: null,
+          method: null,
+          page: 1,
+          per_page: this.pagination.per_page,
+          sort_by: 'created_at',
+          sort_order: 'desc',
+          search: term
+        });
 
         this.withdrawals = response.data.map((item) => ({
           id: item.id,
@@ -318,29 +283,25 @@ export default defineComponent({
         this.pagination.total = response.total;
         this.pagination.links = [];
       } catch (error) {
-        console.error('Erro ao pesquisar saques:', error);
+        logger.error('Erro ao pesquisar saques:', error);
+        this.withdrawals = [];
+        this.pagination.total = 0;
+      } finally {
+        this.loading = false;
       }
     },
-    async handleWithdrawalRequest({ amount, pixKey }: { amount: string, pixKey: string }) {
+    async handleWithdrawalRequest() {
       try {
-        await managerService.withdrawals.request({
-          amount: Number(amount),
-          pix_key: pixKey
+        const response = await managerService.withdrawals.request({
+          amount: Number(this.lastWithdrawalAmount),
+          pix_key: this.lastWithdrawalPixKey
         });
 
-        // Salva os dados do último saque para exibir na modal de sucesso
-        this.lastWithdrawalAmount = amount;
-        this.lastWithdrawalPixKey = pixKey;
-
-        // Fecha a modal de solicitação e abre a modal de sucesso
         this.showRequestModal = false;
         this.showSuccessModal = true;
-
-        // Recarrega a lista de saques
         await this.loadWithdrawals();
       } catch (error) {
-        console.error('Erro ao solicitar saque:', error);
-        // Aqui você pode adicionar uma notificação de erro se desejar
+        logger.error('Erro ao solicitar saque:', error);
       }
     },
     getStatusClass(status: string): string {
@@ -360,20 +321,18 @@ export default defineComponent({
           return `${baseClass} bg-yellow-500/20 text-yellow-500`;
       }
     },
-    async aprovar(id: string) {
+    async handleAction(action: string, id: string) {
       try {
-        console.log('aprovar', id);
-        /* await this.loadWithdrawals(); */ // Recarrega a lista após a aprovação
+        if (action === 'aprovar') {
+          logger.info('Aprovando saque:', id);
+          await managerService.withdrawals.approve(id);
+        } else if (action === 'bloquear') {
+          logger.info('Rejeitando saque:', id);
+          await managerService.withdrawals.reject(id);
+        }
+        await this.loadWithdrawals();
       } catch (error) {
-        console.error('Erro ao aprovar saque:', error);
-      }
-    },
-    async rejeitar(id: string) {
-      try {
-        console.log('rejeitar', id);
-        /*  await this.loadWithdrawals(); */ // Recarrega a lista após a rejeição
-      } catch (error) {
-        console.error('Erro ao rejeitar saque:', error);
+        logger.error('Erro ao executar ação no saque:', error);
       }
     },
     goToPageByUrl(url: string) {
@@ -400,11 +359,7 @@ export default defineComponent({
       return statusMap[status] || status;
     },
     handleDropdownAction(action: string, id: string) {
-      if (action === 'approve') {
-        this.aprovar(id);
-      } else if (action === 'reject') {
-        this.rejeitar(id);
-      }
+      this.handleAction(action, id);
     },
     async getBalance() {
       const response = await managerService.withdrawals.information();
@@ -421,7 +376,7 @@ export default defineComponent({
           current_balance: response.current_balance || 0
         };
       } catch (error) {
-        console.error('Erro ao carregar informações de saque:', error);
+        logger.error('Erro ao carregar informações de saque:', error);
       }
     }
   }

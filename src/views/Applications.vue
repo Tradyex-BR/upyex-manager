@@ -97,6 +97,7 @@ import EditApplicationModal from '@/components/applications/EditApplicationModal
 import ConfirmResetModal from '@/components/applications/ConfirmResetModal.vue'
 import { notificationService } from '@/services/notificationService'
 import { CONTEXT_ROLE_KEY } from '@/config/constants'
+import { logger } from '@/config/logger'
 
 export default defineComponent({
   props: {
@@ -181,7 +182,8 @@ export default defineComponent({
         });
         this.offers = response.data;
       } catch (e) {
-        // Trate erro se necessário
+        logger.error('Erro ao buscar aplicações:', e);
+        notificationService.error('Erro ao buscar aplicações');
       } finally {
         this.loading = false;
       }
@@ -214,7 +216,7 @@ export default defineComponent({
 
               notificationService.success('Status atualizado com sucesso')
             } catch (error) {
-              console.error('Erro ao atualizar status:', error)
+              logger.error('Erro ao atualizar status:', error)
               notificationService.error('Erro ao atualizar status da aplicação')
             }
             break;
@@ -233,7 +235,7 @@ export default defineComponent({
               await navigator.clipboard.writeText(apiSecret)
               notificationService.success('Chave API copiada com sucesso')
             } catch (error) {
-              console.error('Erro ao copiar chave API:', error)
+              logger.error('Erro ao copiar chave API:', error)
               notificationService.error('Erro ao copiar chave API')
             }
             break;
@@ -247,7 +249,7 @@ export default defineComponent({
             break;
         }
       } catch (e) {
-        console.error(`Erro ao executar ação ${action}:`, e)
+        logger.error(`Erro ao executar ação ${action}:`, e)
       }
     },
     getStatusClass(isActive: boolean): string {
@@ -261,8 +263,10 @@ export default defineComponent({
         await managerService.applications.create(formData);
         await this.handleSearch('');
         this.showCreateModal = false;
+        notificationService.success('Aplicação criada com sucesso');
       } catch (error) {
-        console.error('Erro ao criar aplicação:', error);
+        logger.error('Erro ao criar aplicação:', error);
+        notificationService.error('Erro ao criar aplicação');
       }
     },
     async handleEditApplication(formData: any) {
@@ -278,7 +282,7 @@ export default defineComponent({
         this.showEditModal = false;
         notificationService.success('Aplicação atualizada com sucesso');
       } catch (error) {
-        console.error('Erro ao editar aplicação:', error);
+        logger.error('Erro ao editar aplicação:', error);
         notificationService.error('Erro ao atualizar aplicação');
       }
     },
@@ -287,7 +291,7 @@ export default defineComponent({
         await managerService.applications.resetSecret(this.selectedApplication.id)
         notificationService.success('Chave API resetada com sucesso')
       } catch (error) {
-        console.error('Erro ao resetar chave API:', error)
+        logger.error('Erro ao resetar chave API:', error)
         notificationService.error('Erro ao resetar chave API')
       }
     },

@@ -70,6 +70,7 @@ import BaseButton from '@/components/common/BaseButton.vue'
 import PasswordVisibilityIcon from '@/components/common/icons/PasswordVisibilityIcon.vue'
 import BaseInput from '@/components/common/BaseInput.vue'
 import { CONTEXT_ROLE_KEY } from '@/config/constants'
+import { logger } from '@/config/logger'
 
 const router = useRouter()
 const route = useRoute()
@@ -114,7 +115,7 @@ const handleSubmit = async () => {
 
     router.push('/password-changed')
   } catch (error) {
-    console.error('Erro ao redefinir senha:', error)
+    logger.error('Erro ao redefinir senha:', error)
   } finally {
     loading.value = false
   }

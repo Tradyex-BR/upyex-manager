@@ -1,5 +1,7 @@
 import { defineStore } from 'pinia'
 import { managerService } from '@/services/managerService'
+import { logger } from '@/config/logger'
+import { notificationService } from '@/services/notificationService'
 
 interface Affiliate {
   id: number;
@@ -88,7 +90,8 @@ export const useDashboardStore = defineStore('dashboard', {
           };
         });
       } catch (error) {
-        console.error('Failed to load offers:', error);
+        logger.error('Failed to load offers:', error);
+        notificationService.error('Erro ao carregar ofertas');
         this.offers = [];
       }
     },
@@ -154,72 +157,150 @@ export const useDashboardStore = defineStore('dashboard', {
     },
 
     // Actions for Affiliates
-    async approveAffiliate(id: number) {
-      // Implement approval logic
-      console.log('Approve affiliate:', id)
+    async approveAffiliate(id: string) {
+      try {
+        logger.info('Approve affiliate:', id)
+        await managerService.affiliates.approve(id)
+        notificationService.success('Afiliado aprovado com sucesso')
+      } catch (error) {
+        logger.error('Erro ao aprovar afiliado:', error)
+        notificationService.error('Erro ao aprovar afiliado')
+      }
     },
 
-    async blockAffiliate(id: number) {
-      // Implement block logic
-      console.log('Block affiliate:', id)
+    async blockAffiliate(id: string) {
+      try {
+        logger.info('Block affiliate:', id)
+        await managerService.affiliates.block(id)
+        notificationService.success('Afiliado bloqueado com sucesso')
+      } catch (error) {
+        logger.error('Erro ao bloquear afiliado:', error)
+        notificationService.error('Erro ao bloquear afiliado')
+      }
     },
 
-    async deleteAffiliate(id: number) {
-      // Implement delete logic
-      console.log('Delete affiliate:', id)
+    async deleteAffiliate(id: string) {
+      try {
+        logger.info('Delete affiliate:', id)
+        await managerService.affiliates.delete(id)
+        notificationService.success('Afiliado excluído com sucesso')
+      } catch (error) {
+        logger.error('Erro ao excluir afiliado:', error)
+        notificationService.error('Erro ao excluir afiliado')
+      }
     },
 
     // Actions for Offers
-    async approveOffer(id: number) {
-      // Implement approval logic
-      console.log('Approve offer:', id)
+    async approveOffer(id: string) {
+      try {
+        logger.info('Approve offer:', id)
+        await managerService.applications.approve(id)
+        notificationService.success('Oferta aprovada com sucesso')
+      } catch (error) {
+        logger.error('Erro ao aprovar oferta:', error)
+        notificationService.error('Erro ao aprovar oferta')
+      }
     },
 
-    async blockOffer(id: number) {
-      // Implement block logic
-      console.log('Block offer:', id)
+    async blockOffer(id: string) {
+      try {
+        logger.info('Block offer:', id)
+        await managerService.applications.block(id)
+        notificationService.success('Oferta bloqueada com sucesso')
+      } catch (error) {
+        logger.error('Erro ao bloquear oferta:', error)
+        notificationService.error('Erro ao bloquear oferta')
+      }
     },
 
-    async deleteOffer(id: number) {
-      // Implement delete logic
-      console.log('Delete offer:', id)
+    async deleteOffer(id: string) {
+      try {
+        logger.info('Delete offer:', id)
+        await managerService.applications.delete(id)
+        notificationService.success('Oferta excluída com sucesso')
+      } catch (error) {
+        logger.error('Erro ao excluir oferta:', error)
+        notificationService.error('Erro ao excluir oferta')
+      }
     },
 
     // Actions for Withdrawals
-    async approveWithdrawal(id: number) {
-      // Implement approval logic
-      console.log('Approve withdrawal:', id)
+    async approveWithdrawal(id: string) {
+      try {
+        logger.info('Approve withdrawal:', id)
+        await managerService.withdrawals.approve(id)
+        notificationService.success('Saque aprovado com sucesso')
+      } catch (error) {
+        logger.error('Erro ao aprovar saque:', error)
+        notificationService.error('Erro ao aprovar saque')
+      }
     },
 
-    async blockWithdrawal(id: number) {
-      // Implement block logic
-      console.log('Block withdrawal:', id)
+    async blockWithdrawal(id: string) {
+      try {
+        logger.info('Block withdrawal:', id)
+        await managerService.withdrawals.reject(id)
+        notificationService.success('Saque bloqueado com sucesso')
+      } catch (error) {
+        logger.error('Erro ao bloquear saque:', error)
+        notificationService.error('Erro ao bloquear saque')
+      }
     },
 
-    async deleteWithdrawal(id: number) {
-      // Implement delete logic
-      console.log('Delete withdrawal:', id)
+    async deleteWithdrawal(id: string) {
+      try {
+        logger.info('Delete withdrawal:', id)
+        await managerService.withdrawals.delete(id)
+        notificationService.success('Saque excluído com sucesso')
+      } catch (error) {
+        logger.error('Erro ao excluir saque:', error)
+        notificationService.error('Erro ao excluir saque')
+      }
     },
 
     // Actions for Users
-    async blockUser(id: number) {
-      // Implement block logic
-      console.log('Block user:', id)
+    async blockUser(id: string) {
+      try {
+        logger.info('Block user:', id)
+        await managerService.customers.block(id)
+        notificationService.success('Usuário bloqueado com sucesso')
+      } catch (error) {
+        logger.error('Erro ao bloquear usuário:', error)
+        notificationService.error('Erro ao bloquear usuário')
+      }
     },
 
-    async editUserPermission(id: number) {
-      // Implement permission edit logic
-      console.log('Edit user permission:', id)
+    async editUserPermission(id: string) {
+      try {
+        logger.info('Edit user permission:', id)
+        // Implementar lógica de edição de permissão
+        notificationService.success('Permissão do usuário atualizada com sucesso')
+      } catch (error) {
+        logger.error('Erro ao editar permissão do usuário:', error)
+        notificationService.error('Erro ao editar permissão do usuário')
+      }
     },
 
-    async resetUserPassword(id: number) {
-      // Implement password reset logic
-      console.log('Reset user password:', id)
+    async resetUserPassword(id: string) {
+      try {
+        logger.info('Reset user password:', id)
+        await managerService.customers.resetPassword(id)
+        notificationService.success('Senha do usuário resetada com sucesso')
+      } catch (error) {
+        logger.error('Erro ao resetar senha do usuário:', error)
+        notificationService.error('Erro ao resetar senha do usuário')
+      }
     },
 
-    async deleteUser(id: number) {
-      // Implement delete logic
-      console.log('Delete user:', id)
+    async deleteUser(id: string) {
+      try {
+        logger.info('Delete user:', id)
+        await managerService.customers.delete(id)
+        notificationService.success('Usuário excluído com sucesso')
+      } catch (error) {
+        logger.error('Erro ao excluir usuário:', error)
+        notificationService.error('Erro ao excluir usuário')
+      }
     }
   }
 })

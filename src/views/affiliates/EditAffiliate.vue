@@ -150,6 +150,8 @@
 import { defineComponent, ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { managerService } from '@/services/managerService'
+import { logger } from '@/config/logger'
+import { notificationService } from '@/services/notificationService'
 
 interface Application {
   id: string;
@@ -194,7 +196,8 @@ export default defineComponent({
           applications: response.applications ? response.applications.map(app => ({ ...app })) : []
         }
       } catch (error) {
-        console.error('Erro ao carregar afiliado:', error)
+        logger.error('Erro ao carregar afiliado:', error)
+        notificationService.error('Erro ao carregar dados do afiliado')
       } finally {
         loading.value = false
       }
@@ -204,9 +207,11 @@ export default defineComponent({
       loading.value = true
       try {
         await managerService.affiliates.update(route.params.id as string, form.value)
+        notificationService.success('Afiliado atualizado com sucesso')
         router.push('/affiliates')
       } catch (error) {
-        console.error('Erro ao atualizar afiliado:', error)
+        logger.error('Erro ao atualizar afiliado:', error)
+        notificationService.error('Erro ao atualizar afiliado')
       } finally {
         loading.value = false
       }

@@ -65,6 +65,7 @@ import ImageIcon from '@/components/icons/ImageIcon.vue'
 import LinkIcon from '@/components/icons/LinkIcon.vue'
 import { managerService } from '@/services/managerService'
 import { notificationService } from '@/services/notificationService'
+import { logger } from '@/config/logger'
 
 export default defineComponent({
   name: 'EditApplicationModal',
@@ -116,7 +117,7 @@ export default defineComponent({
           is_active: application.is_active ?? true
         }
       } catch (error) {
-        console.error('Erro ao carregar dados da aplicação:', error)
+        logger.error('Erro ao carregar dados da aplicação:', error)
         notificationService.error('Erro ao carregar dados da aplicação')
         emit('close')
       } finally {
@@ -132,7 +133,7 @@ export default defineComponent({
         emit('submit', formData.value)
         emit('close')
       } catch (error) {
-        console.error('Erro ao atualizar aplicação:', error)
+        logger.error('Erro ao atualizar aplicação:', error)
         notificationService.error('Erro ao atualizar aplicação')
       } finally {
         loading.value = false

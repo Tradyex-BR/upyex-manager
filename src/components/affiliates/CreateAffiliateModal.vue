@@ -169,6 +169,7 @@ import BaseInput from '@/components/common/BaseInput.vue'
 import BaseDropdown from '@/components/common/BaseDropdown.vue'
 import { managerService } from '@/services/managerService'
 import { notificationService } from '@/services/notificationService'
+import { logger } from '@/config/logger'
 
 library.add(faPlus, faTrashAlt, faChevronDown, faExclamationCircle, faUser, faEnvelope, faHashtag)
 
@@ -282,7 +283,7 @@ const loadApplications = async () => {
     })
     availableApplications.value = response.data
   } catch (e) {
-    console.error('Erro ao carregar aplicações:', e)
+    logger.error('Erro ao carregar aplicações:', e)
     error.value = 'Erro ao carregar aplicações disponíveis'
   }
 }

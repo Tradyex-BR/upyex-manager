@@ -61,6 +61,8 @@ import { useAuthStore } from '@/stores/auth'
 import BaseDropdown from '@/components/common/BaseDropdown.vue'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { faRightFromBracket } from '@fortawesome/free-solid-svg-icons'
+import { logger } from '@/config/logger'
+import { notificationService } from '@/services/notificationService'
 
 const route = useRoute()
 const searchDisabled = computed(() => route.path === '/dashboard') // ajuste para o path correto se necessário
@@ -103,12 +105,13 @@ const handleLogout = async () => {
     await authStore.logout()
     router.push('/login')
   } catch (error) {
-    console.error('Erro ao fazer logout:', error)
+    logger.error('Erro ao fazer logout:', error)
+    notificationService.error('Erro ao fazer logout')
   }
 }
 
 const emitSearch = () => {
-  console.log('emitSearch (TopBar) enviando:', searchQuery.value);
+  logger.info('emitSearch (TopBar) enviando:', searchQuery.value)
   if (searchQuery.value && searchQuery.value.trim() !== '') {
     // Emite o evento para o pai
     // @ts-ignore

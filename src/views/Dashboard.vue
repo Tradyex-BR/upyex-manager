@@ -93,6 +93,7 @@ import BarChart from "@/components/graphics/BarChart.vue"
 import EmptyChart from '@/components/layout/dashboard/EmptyChart.vue'
 import BaseDropdown from '@/components/common/BaseDropdown.vue'
 import { CONTEXT_ROLE_KEY } from '@/config/constants'
+import { logger } from '@/config/logger'
 
 const currentView = ref('cards')
 const role = localStorage.getItem(CONTEXT_ROLE_KEY) || 'manager'
@@ -195,7 +196,7 @@ onMounted(() => {
 })
 
 const handleDropdownAction = (action: string) => {
-  console.log('Ação selecionada:', action)
+  logger.info('Ação selecionada:', action)
   // Aqui você pode implementar a lógica para cada ação
   switch (action) {
     case 'total':

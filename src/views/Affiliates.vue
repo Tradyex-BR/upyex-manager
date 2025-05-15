@@ -12,6 +12,7 @@
     import BaseDropdown from '@/components/common/BaseDropdown.vue'
     import BaseTable from '@/components/common/BaseTable.vue'
     import { notificationService } from '@/services/notificationService'
+    import { logger } from '@/config/logger'
 
     const CheckIcon = defineAsyncComponent(() => import('@/components/icons/CheckIcon.vue'))
     const XIcon = defineAsyncComponent(() => import('@/components/icons/XIcon.vue'))
@@ -112,7 +113,8 @@
             });
             affiliates.value = (response.data || response) as Affiliate[];
           } catch (e) {
-            console.error('Erro ao carregar afiliados:', e)
+            logger.error('Erro ao carregar afiliados:', e)
+            notificationService.error('Erro ao carregar lista de afiliados')
           } finally {
             loading.value = false;
           }
@@ -130,7 +132,8 @@
             });
             affiliates.value = (response.data || response) as Affiliate[];
           } catch (e) {
-            console.error('Erro ao pesquisar afiliados:', e)
+            logger.error('Erro ao pesquisar afiliados:', e)
+            notificationService.error('Erro ao pesquisar afiliados')
           } finally {
             loading.value = false;
           }
@@ -175,7 +178,7 @@
             closeCreateModal()
             notificationService.success('Afiliado criado com sucesso')
           } catch (e) {
-            console.error('Erro ao criar afiliado:', e)
+            logger.error('Erro ao criar afiliado:', e)
             createError.value = 'Erro ao criar afiliado. Por favor, tente novamente.'
             notificationService.error('Erro ao criar afiliado')
           } finally {
@@ -192,7 +195,7 @@
             }
             await loadAffiliates(false);
           } catch (e) {
-            console.error('Erro ao alterar status do afiliado:', e);
+            logger.error('Erro ao alterar status do afiliado:', e);
           }
         }
 

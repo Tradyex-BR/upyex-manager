@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { API_BASE_URL, AUTH_CONFIG, ERROR_MESSAGES } from './constants';
+import { logger } from '@/config/logger';
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -54,8 +55,8 @@ api.interceptors.response.use(
     }
 
     // Tratamento de outros erros
-    const errorMessage = error.response?.data?.message || ERROR_MESSAGES.SERVER_ERROR;
-    console.error('API Error:', errorMessage);
+    const errorMessage = error.response?.data?.message || 'Erro na requisição';
+    logger.error('API Error:', errorMessage);
     
     return Promise.reject(error);
   }

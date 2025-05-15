@@ -7,6 +7,7 @@
 <script setup lang="ts">
 import { ref, onMounted, watch, onBeforeUnmount } from 'vue'
 import Chart, { ChartConfiguration } from 'chart.js/auto'
+import { logger } from '@/config/logger'
 
 // Define a interface para os dados de entrada
 interface ChartDataItem {
@@ -42,7 +43,7 @@ const createOrUpdateChart = () => {
   const labels = chartInput.data.map(item => item.label)
   const values = chartInput.data.map(item => item.value)
 
-  console.log("DATA:", chartInput.data)
+  logger.info("DATA:", chartInput.data)
 
   const chartData = {
     labels: labels,
@@ -130,8 +131,11 @@ const createOrUpdateChart = () => {
   chart = new Chart(chartCanvas.value, config)
 }
 
-watch(() => props.data, () => {
-  createOrUpdateChart()
+watch(() => props.data, (newData) => {
+  if (newData) {
+    logger.info("DATA:", newData)
+    createOrUpdateChart()
+  }
 }, { deep: true })
 
 onMounted(() => {

@@ -63,6 +63,7 @@ import PasswordIcon from '@/components/common/icons/PasswordIcon.vue'
 import PasswordVisibilityIcon from '@/components/common/icons/PasswordVisibilityIcon.vue'
 import { notificationService } from '@/services/notificationService'
 import { CONTEXT_ROLE_KEY } from '@/config/constants'
+import { logger } from '@/config/logger'
 
 const router = useRouter()
 const email = ref('')
@@ -119,26 +120,27 @@ const handleForgotPassword = () => {
 const authStore = useAuthStore()
 
 onMounted(async () => {
-  console.log('Iniciando obtenção do fingerprint...')
+  logger.info('Iniciando obtenção do fingerprint...')
   try {
     if (isDev) {
-      console.log('Ambiente de desenvolvimento: usando mock do fingerprint')
+      logger.info('Ambiente de desenvolvimento: usando mock do fingerprint')
       const mockData = await mockFingerprint?.getData()
-      console.log('Dados do mock:', mockData)
+      logger.info('Dados do mock:', mockData)
       if (mockData) {
         visitorId.value = mockData.visitorId
       }
     } else {
-      console.log('Obtendo dados do visitante...')
+      logger.info('Obtendo dados do visitante...')
       await getFingerprint({ ignoreCache: true })
-      console.log('Dados do visitante obtidos:', visitorData.value)
+      logger.info('Dados do visitante obtidos:', visitorData.value)
       if (visitorData.value) {
         visitorId.value = visitorData.value.visitorId
       }
     }
   } catch (error: any) {
-    console.error('Erro ao obter fingerprint:', error)
+    logger.error('Erro ao obter fingerprint:', error)
     error.value = 'Não foi possível obter o identificador do dispositivo. Por favor, desative temporariamente seu bloqueador de anúncios e tente novamente.'
+    notificationService.error('Erro ao obter identificador do dispositivo')
   } finally {
     isFingerprintLoading.value = false
   }

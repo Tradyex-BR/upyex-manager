@@ -10,6 +10,7 @@ import { useRouter } from 'vue-router'
 import MenuIcon from '@/components/icons/MenuIcon.vue'
 import BaseDropdown from '@/components/common/BaseDropdown.vue'
 import BaseTable from '@/components/common/BaseTable.vue'
+import { logger } from '@/config/logger'
 
 const XIcon = defineAsyncComponent(() => import('@/components/icons/XIcon.vue'))
 const PenIcon = defineAsyncComponent(() => import('@/components/icons/PenIcon.vue'))
@@ -138,7 +139,7 @@ export default defineComponent({
             break;
         }
       } catch (e) {
-        console.error(`Erro ao executar ação ${action}:`, e)
+        logger.error(`Erro ao executar ação ${action}:`, e)
       }
     },
     goToCustomerDetail(id: string) {
@@ -172,7 +173,7 @@ export default defineComponent({
           document_number: item.document_number || ''
         }));
       } catch (e) {
-        console.error('Erro ao pesquisar clientes:', e);
+        logger.error('Erro ao pesquisar clientes:', e);
       } finally {
         this.loading = false;
       }
@@ -201,7 +202,7 @@ export default defineComponent({
           document_number: item.document_number || ''
         }));
       } catch (e) {
-        console.error('Erro ao carregar clientes:', e);
+        logger.error('Erro ao carregar clientes:', e);
       } finally {
         this.loading = false;
       }

@@ -104,6 +104,7 @@ import CopyButton from '@/components/common/CopyButton.vue'
 import { formatWalletId, formatTransactionId } from '@/utils/formatters'
 import BaseTable from '@/components/common/BaseTable.vue'
 import { CONTEXT_ROLE_KEY } from '@/config/constants'
+import { logger } from '@/config/logger'
 
 export default defineComponent({
   name: 'Sales',
@@ -142,7 +143,7 @@ export default defineComponent({
         })
         sales.value = response.data || []
       } catch (e) {
-        console.error('Erro ao buscar vendas:', e)
+        logger.error('Erro ao buscar vendas:', e)
       } finally {
         loading.value = false
       }
@@ -190,7 +191,7 @@ export default defineComponent({
           } : null
         }));
       } catch (e) {
-        console.error('Erro ao carregar vendas:', e)
+        logger.error('Erro ao carregar vendas:', e)
       } finally {
         this.loading = false
       }

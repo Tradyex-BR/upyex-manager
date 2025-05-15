@@ -47,6 +47,7 @@ import VerticalLines from '@/components/layout/login/VerticalLines.vue'
 import BaseButton from '@/components/common/BaseButton.vue'
 import PaperPlaneIcon from '@/components/icons/PaperPlaneIcon.vue'
 import { CONTEXT_ROLE_KEY } from '@/config/constants'
+import { logger } from '@/config/logger'
 
 const router = useRouter()
 const route = useRoute()
@@ -65,7 +66,7 @@ const handleBack = async () => {
       router.push('/forgot-password/manager')
     }
   } catch (error) {
-    console.error('Erro ao solicitar reenvio do email:', error)
+    logger.error('Erro ao solicitar reenvio do email:', error)
   } finally {
     loading.value = false
   }

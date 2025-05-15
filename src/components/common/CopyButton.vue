@@ -15,6 +15,7 @@
 import CopyIcon from '@/components/icons/CopyIcon.vue'
 import { notificationService } from '@/services/notificationService'
 import { ref } from 'vue'
+import { logger } from '@/config/logger'
 
 const copied = ref(false)
 
@@ -29,8 +30,8 @@ const handleCopy = async () => {
       copied.value = false
     }, 2000)
   } catch (err) {
-    notificationService.error('Erro ao copiar ID')
-    console.error('Erro ao copiar para a área de transferência:', err)
+    logger.error('Erro ao copiar para a área de transferência:', err)
+    notificationService.error('Erro ao copiar para a área de transferência')
   }
 }
 
