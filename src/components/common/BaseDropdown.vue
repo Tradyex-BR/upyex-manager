@@ -12,7 +12,7 @@
       <teleport to="body">
         <div v-if="isOpen"
           ref="dropdownMenu"
-          class="absolute rounded-lg shadow-lg z-10"
+          class="absolute rounded-lg shadow-lg z-10 dropdown-scroll"
           :class="[
             variant === 'light' 
               ? 'bg-white border border-[#B8B8B8] shadow-md' 
@@ -34,7 +34,13 @@
             ]"
             @click="handleOptionClick(option)">
             <template v-if="option.icon">
-              <component 
+              <img
+                v-if="option.icon === 'img'"
+                v-bind="option.iconProps || {}"
+                :alt="option.text"
+              />
+              <component
+                v-else
                 :is="option.icon"
                 v-bind="option.iconProps || {}"
                 class="inline-block"
@@ -183,5 +189,9 @@ export default defineComponent({
 .dropdown-fade-enter-to, .dropdown-fade-leave-from {
   opacity: 1;
   transform: translateY(0) scaleY(1);
+}
+.dropdown-scroll {
+  max-height: 320px;
+  overflow-y: auto;
 }
 </style> 

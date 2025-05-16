@@ -170,6 +170,7 @@ import BaseDropdown from '@/components/common/BaseDropdown.vue'
 import { managerService } from '@/services/managerService'
 import { notificationService } from '@/services/notificationService'
 import { logger } from '@/config/logger'
+import { getImageUrl, handleImageError } from '@/utils/imageUtils'
 
 library.add(faPlus, faTrashAlt, faChevronDown, faExclamationCircle, faUser, faEnvelope, faHashtag)
 
@@ -222,8 +223,9 @@ const getDropdownOptions = (currentAppId: string) => {
       action: app.id,
       icon: 'img',
       iconProps: {
-        src: app.logo_url || `https://ui-avatars.com/api/?name=${app.name}&background=random`,
-        class: 'w-6 h-6 rounded-full object-cover'
+        src: getImageUrl(app.name, app.logo_url),
+        class: 'w-6 h-6 rounded-full object-cover',
+        onError: (e: Event) => handleImageError(e, app.name)
       }
     }))
 }
@@ -240,7 +242,7 @@ const getSelectedAppName = (appId: string) => {
 
 const getSelectedAppLogo = (appId: string): string | undefined => {
   const app = availableApplications.value.find(a => a.id === appId)
-  return app?.logo_url || (app ? `https://ui-avatars.com/api/?name=${app.name}&background=random` : undefined)
+  return app ? getImageUrl(app.name, app.logo_url) : undefined
 }
 
 const isFormValid = computed(() => {

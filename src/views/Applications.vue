@@ -26,10 +26,10 @@
               <template #name="{ item }">
                 <div class="flex items-center gap-3">
                   <img 
-                    :src="item.imageError ? `https://ui-avatars.com/api/?name=${item.name}&background=random` : item.logo_url"
+                    :src="getImageUrl(item.name, item.logo_url)"
                     :alt="item.name" 
                     class="w-8 h-8 rounded-full object-cover"
-                    @error="item.imageError = true"
+                    @error="(e) => handleImageError(e, item.name)"
                   />
                   <div class="flex flex-col">
                     <span class="font-inter text-[14px] font-normal leading-[18px] text-white">{{ item.name }}</span>
@@ -109,6 +109,7 @@ import { notificationService } from '@/services/notificationService'
 import { CONTEXT_ROLE_KEY } from '@/config/constants'
 import { logger } from '@/config/logger'
 import BasePagination from '@/components/common/BasePagination.vue'
+import { getImageUrl, handleImageError } from '@/utils/imageUtils'
 
 export default defineComponent({
   props: {
@@ -155,7 +156,7 @@ export default defineComponent({
         icon: TrashIcon
       }
     ]
-    return { store, loading, router, toast, dropdownOptions }
+    return { store, loading, router, toast, dropdownOptions, getImageUrl, handleImageError }
   },
   data() {
     return {

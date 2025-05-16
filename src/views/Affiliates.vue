@@ -15,6 +15,7 @@
     import { logger } from '@/config/logger'
     import BasePagination from '@/components/common/BasePagination.vue'
 import ToggleIcon from '@/components/icons/ToggleIcon.vue'
+import { getImageUrl, handleImageError } from '@/utils/imageUtils'
 
     const CheckIcon = defineAsyncComponent(() => import('@/components/icons/CheckIcon.vue'))
     const XIcon = defineAsyncComponent(() => import('@/components/icons/XIcon.vue'))
@@ -295,7 +296,9 @@ import ToggleIcon from '@/components/icons/ToggleIcon.vue'
           getStatusClass,
           handleAction,
           loadAffiliates,
-          handlePageChange
+          handlePageChange,
+          getImageUrl,
+          handleImageError
         }
       }
     })
@@ -329,8 +332,12 @@ import ToggleIcon from '@/components/icons/ToggleIcon.vue'
               ]" :items="affiliates">
                 <template #name="{ item }">
                   <div class="flex items-center gap-2">
-                    <img :src="`https://ui-avatars.com/api/?name=${item.name}&background=random`" :alt="item.name"
-                      class="w-8 h-w-8 rounded-full" />
+                    <img 
+                      :src="getImageUrl(item.name)" 
+                      :alt="item.name"
+                      class="w-8 h-w-8 rounded-full"
+                      @error="(e) => handleImageError(e, item.name)" 
+                    />
                     <p class="font-inter text-[14px] font-normal leading-[18px] text-white">{{ item.name }}</p>
                   </div>
                 </template>

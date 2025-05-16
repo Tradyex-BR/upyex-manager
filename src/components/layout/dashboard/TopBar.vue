@@ -36,8 +36,10 @@
 
 
                   <img
-                    :src="authStore.user?.avatar_path || `https://ui-avatars.com/api/?name=${authStore.user?.name}&background=random`"
-                    class="aspect-[1.65] object-contain w-[46px] h-[46px] rounded-full shrink-0 bg" alt="User avatar" />
+                    :src="getImageUrl(authStore.user?.name || 'Usuário', authStore.user?.avatar_path)"
+                    class="aspect-[1.65] object-contain w-[46px] h-[46px] rounded-full shrink-0 bg" alt="User avatar"
+                    @error="(e) => handleImageError(e, authStore.user?.name || 'Usuário')"
+                  />
 
                   <svg :class="['w-5 h-5 transition-transform', { 'rotate-180': isDropdownOpen }]"
                     xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
@@ -63,6 +65,7 @@ import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { faRightFromBracket } from '@fortawesome/free-solid-svg-icons'
 import { logger } from '@/config/logger'
 import { notificationService } from '@/services/notificationService'
+import { getImageUrl, handleImageError } from '@/utils/imageUtils'
 
 const route = useRoute()
 const searchDisabled = computed(() => route.path === '/dashboard') // ajuste para o path correto se necessário

@@ -1,18 +1,11 @@
 <template>
   <div class="flex -space-x-4 overflow-visible" style="overflow: visible !important;">
     <template v-for="(product, idx) in displayedProducts" :key="product.id">
-      <div
-        class="relative group"
-        :style="hoveredIdx === idx ? 'z-index: 999;' : 'z-index: 10;'"
-        @mouseenter="showTooltip(idx, $event)"
-        @mouseleave="hideTooltip"
-        :ref="el => setAvatarRef(el, idx)"
-      >
-        <img
-          :src="`https://ui-avatars.com/api/?name=${encodeURIComponent(product.name)}&background=random`"
-          :alt="product.name"
+      <div class="relative group" :style="hoveredIdx === idx ? 'z-index: 999;' : 'z-index: 10;'"
+        @mouseenter="showTooltip(idx, $event)" @mouseleave="hideTooltip" :ref="el => setAvatarRef(el, idx)">
+        <img :src="getImageUrl(product.name)" :alt="product.name"
           class="w-[32px] h-[32px] rounded-full shadow object-cover cursor-pointer"
-        />
+          @error="(e) => handleImageError(e, product.name)" />
       </div>
     </template>
     <div v-if="data.length > maxAvatars"
@@ -20,18 +13,14 @@
       +{{ data.length - maxAvatars }}
     </div>
     <teleport to="body">
-      <div
-        v-if="tooltip.visible"
-        :style="{
-          position: 'fixed',
-          top: tooltip.y + 'px',
-          left: tooltip.x + 'px',
-          minWidth: '120px',
-          zIndex: 2000,
-          pointerEvents: 'none',
-        }"
-        class="px-3 py-2 rounded bg-gray-900 text-white text-xs whitespace-nowrap shadow-lg transition opacity-100"
-      >
+      <div v-if="tooltip.visible" :style="{
+        position: 'fixed',
+        top: tooltip.y + 'px',
+        left: tooltip.x + 'px',
+        minWidth: '120px',
+        zIndex: 2000,
+        pointerEvents: 'none',
+      }" class="px-3 py-2 rounded bg-gray-900 text-white text-xs whitespace-nowrap shadow-lg transition opacity-100">
         <div><span class="font-semibold">{{ tooltip.product?.name }}</span></div>
         <div>Preço: R$ {{ tooltip.product?.price.toFixed(2) }}</div>
         <div>Qtd: {{ tooltip.product?.amount }}</div>
@@ -41,6 +30,7 @@
 </template>
 
 <script lang="ts">
+import { getImageUrl, handleImageError } from '@/utils/imageUtils'
 import { defineComponent, computed, PropType, ref, nextTick } from 'vue'
 import type { ComponentPublicInstance } from 'vue'
 
@@ -93,7 +83,7 @@ export default defineComponent({
       hoveredIdx.value = null
     }
 
-    return { displayedProducts, maxAvatars, hoveredIdx, avatarRefs, setAvatarRef, tooltip, showTooltip, hideTooltip }
+    return { displayedProducts, maxAvatars, hoveredIdx, avatarRefs, setAvatarRef, tooltip, showTooltip, hideTooltip, getImageUrl, handleImageError }
   }
 })
 </script>
