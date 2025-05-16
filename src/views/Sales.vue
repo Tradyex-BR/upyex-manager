@@ -1,6 +1,6 @@
 <template>
   <AuthenticatedLayout :loading="loading">
-    <section class="w-full overflow-hidden">
+    <section class="w-full overflow-visible">
       <div class="flex justify-between items-center mb-6">
         <p class="text-white text-2xl font-semibold">Vendas</p>
       </div>
@@ -28,7 +28,7 @@
           { key: 'status', label: 'Status', align: 'center' },
           { key: 'wallet_id', label: 'Carteira', align: 'center' },
           { key: 'transaction_id', label: 'ID Transação', align: 'center' }
-        ]" :items="sales">
+        ]" :items="sales" class="overflow-y-visible">
           <template #date="{ item }">
             {{ new Date(item.created_at).toLocaleDateString('pt-BR') }}
           </template>
@@ -39,14 +39,7 @@
 
           <template #token="{ item }">
             <div class="flex items-center justify-center gap-3">
-              <img
-                :src="item.customer?.application?.logo_url || `https://ui-avatars.com/api/?name=${item.customer?.application?.name}&background=random`"
-                :alt="item.customer?.application?.name" class="w-8 h-8 rounded-full object-cover" />
-              <div class="flex flex-col">
-                <span class="font-inter text-[14px] font-normal leading-[18px] text-white">
-                  {{ item.customer?.application?.name || '-' }}
-                </span>
-              </div>
+                <BaseAvatarGroup :data="item.products" />
             </div>
           </template>
 
@@ -107,6 +100,7 @@ import BaseTable from '@/components/common/BaseTable.vue'
 import { CONTEXT_ROLE_KEY } from '@/config/constants'
 import { logger } from '@/config/logger'
 import BasePagination from '@/components/common/BasePagination.vue'
+import BaseAvatarGroup from '@/components/common/BaseAvatarGroup.vue'
 
 export default defineComponent({
   name: 'Sales',
@@ -117,7 +111,8 @@ export default defineComponent({
     CopyIcon,
     CopyButton,
     BaseTable,
-    BasePagination
+    BasePagination,
+    BaseAvatarGroup
   },
   setup() {
     const store = useDashboardStore()
@@ -226,7 +221,8 @@ export default defineComponent({
         'awaiting_payment': 'Pendente',
         'paid': 'Pago',
         'refunded': 'Estornado',
-        'cancelled': 'Cancelado'
+        'cancelled': 'Cancelado',
+        'failed': 'Falha'
       };
       return statusMap[status] || status;
     },
