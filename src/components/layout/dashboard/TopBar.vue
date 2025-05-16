@@ -72,6 +72,12 @@ const authStore = useAuthStore()
 const searchQuery = ref('')
 const isDropdownOpen = ref(false)
 
+// Watch para limpar a pesquisa quando mudar de rota
+watch(() => route.path, () => {
+  searchQuery.value = ''
+  emit('search', '')
+})
+
 // Função de debounce
 const debounce = (fn: Function, delay: number) => {
   let timeoutId: ReturnType<typeof setTimeout>
