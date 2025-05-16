@@ -61,7 +61,7 @@ watch(fullPath, (newPath) => {
       <Sidebar />
       <div class="flex-1 flex flex-col overflow-hidden">
         <TopBar @search="onSearch" />
-        <main class="flex-1 overflow-y-auto pt-[32px] pl-[32px] pr-[32px]">
+        <main class="flex-1 overflow-y-auto p-[32px]">
           <router-view v-slot="{ Component }">
             <component :is="Component" :searchTerm="searchTerm" />
           </router-view>

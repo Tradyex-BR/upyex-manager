@@ -22,7 +22,7 @@
                 </div>
               </GraphicSection>
 
-              <div class="grid grid-cols-2 gap-6 mb-8">
+              <div class="grid grid-cols-2 gap-6">
                 <GraphicSection title="Status das vendas" description="Distribuição por status de pagamento"
                   class="min-h-[446px]">
                   <div v-if="totalStatusData > 0" class="flex gap-8 h-full justify-center items-center">

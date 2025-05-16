@@ -1,15 +1,15 @@
 <template>
   <AuthenticatedLayout :loading="loading">
-    <section class="min-h-[944px] w-full overflow-hidden">
+    <section class="w-full overflow-hidden">
       <div class="flex justify-between items-center mb-6">
         <p class="text-white text-2xl font-semibold">Vendas</p>
       </div>
-      <div class="flex w-full min-h-[calc(100vh-200px)] justify-center text-gray-400">
+      <div class="flex w-full justify-center text-gray-400">
         <div v-if="loading" class="flex items-center justify-center py-10">
           <span class="text-white text-lg">Carregando vendas...</span>
         </div>
         <div v-else-if="sales.length === 0"
-          class="flex w-full min-h-[200px] items-center justify-center text-gray-400 text-lg">
+          class="flex w-full min-h-[642.50px] items-center justify-center text-gray-400 text-lg">
           Nenhuma venda encontrada
         </div>
         <BaseTable v-else :headers="isManager ? [
@@ -171,6 +171,23 @@ export default defineComponent({
       await handleSearch('', 1)
     }
 
+    const loadMockData = async () => {
+      loading.value = true
+      try {
+        sales.value = []
+        pagination.value = {
+          current_page: 1,
+          from: 1,
+          last_page: 1,
+          per_page: 20,
+          to: 1,
+          total: 0
+        }
+      } finally {
+        loading.value = false
+      }
+    }
+
     return {
       store,
       router,
@@ -183,6 +200,7 @@ export default defineComponent({
       handleSearch,
       handlePageChange,
       loadInitialData,
+      loadMockData,
       formatWalletId,
       formatTransactionId
     }
@@ -190,12 +208,17 @@ export default defineComponent({
   data() {
     return {
       isManager: false,
-      useMockData: false
+      useMockData: true
     }
   },
   async mounted() {
     this.isManager = localStorage.getItem(CONTEXT_ROLE_KEY) === 'manager'
-    await this.loadInitialData()
+    if (this.useMockData) {
+      await this.loadMockData()
+    } else {
+      await this.loadInitialData()
+    }
+
   },
   methods: {
     mapStatus(status: string): string {
