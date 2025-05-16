@@ -97,6 +97,7 @@ import XIcon from '@/components/icons/XIcon.vue'
 import PenIcon from '@/components/icons/PenIcon.vue'
 import KeyIcon from '@/components/icons/KeyIcon.vue'
 import TrashIcon from '@/components/icons/TrashIcon.vue'
+import ToggleIcon from '@/components/icons/ToggleIcon.vue'
 import BaseDropdown from '@/components/common/BaseDropdown.vue'
 import EditApplicationModal from '@/components/applications/EditApplicationModal.vue'
 import ConfirmResetModal from '@/components/applications/ConfirmResetModal.vue'
@@ -132,7 +133,7 @@ export default defineComponent({
       {
         text: 'Ativar/Desativar',
         action: 'toggle_status',
-        icon: XIcon
+        icon: ToggleIcon
       },
       {
         text: 'Copiar Chave API',

@@ -14,6 +14,7 @@
     import { notificationService } from '@/services/notificationService'
     import { logger } from '@/config/logger'
     import BasePagination from '@/components/common/BasePagination.vue'
+import ToggleIcon from '@/components/icons/ToggleIcon.vue'
 
     const CheckIcon = defineAsyncComponent(() => import('@/components/icons/CheckIcon.vue'))
     const XIcon = defineAsyncComponent(() => import('@/components/icons/XIcon.vue'))
@@ -61,7 +62,8 @@
         BaseTable,
         CheckIcon,
         XIcon,
-        BasePagination
+        BasePagination,
+        ToggleIcon
       },
       setup(props) {
         const router = useRouter()
@@ -92,14 +94,9 @@
 
         const dropdownOptions = [
           {
-            text: 'Aprovar',
-            action: 'aprovar',
-            icon: CheckIcon
-          },
-          {
-            text: 'Bloquear',
-            action: 'bloquear',
-            icon: XIcon
+            text: 'Ativar/Desativar',
+            action: 'toggle_status',
+            icon: ToggleIcon
           }
         ]
 
@@ -267,12 +264,9 @@
           const affiliate = affiliates.value.find(a => a.id === id)
           if (!affiliate) return
 
-          if (action === 'aprovar') {
-            await handleToggleStatus(id, true)
-            notificationService.success('Afiliado aprovado com sucesso')
-          } else if (action === 'bloquear') {
-            await handleToggleStatus(id, false)
-            notificationService.success('Afiliado bloqueado com sucesso')
+          if (action === 'toggle_status') {
+            await handleToggleStatus(id, !affiliate.is_active)
+            notificationService.success('Status do afiliado alterado com sucesso')
           }
         }
 
