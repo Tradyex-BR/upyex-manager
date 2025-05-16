@@ -13,6 +13,7 @@
     import BaseTable from '@/components/common/BaseTable.vue'
     import { notificationService } from '@/services/notificationService'
     import { logger } from '@/config/logger'
+    import BasePagination from '@/components/common/BasePagination.vue'
 
     const CheckIcon = defineAsyncComponent(() => import('@/components/icons/CheckIcon.vue'))
     const XIcon = defineAsyncComponent(() => import('@/components/icons/XIcon.vue'))
@@ -59,7 +60,8 @@
         BaseDropdown,
         BaseTable,
         CheckIcon,
-        XIcon
+        XIcon,
+        BasePagination
       },
       setup(props) {
         const router = useRouter()
@@ -70,6 +72,15 @@
         const selectedAffiliate = ref<Affiliate | null>(null)
         const createLoading = ref(false)
         const createError = ref('')
+        const pagination = ref({
+          current_page: 1,
+          from: 1,
+          last_page: 1,
+          per_page: 10,
+          to: 1,
+          total: 0,
+          links: [] as Array<{ url: string | null; label: string; active: boolean }>
+        })
         const createForm = ref<CreateForm>({
           name: '',
           email: '',
@@ -107,11 +118,20 @@
             const response = await managerService.affiliates.list({
               search: '',
               page: 1,
-              per_page: 20,
+              per_page: 10,
               sort_by: 'name',
               sort_order: 'asc'
             });
-            affiliates.value = (response.data || response) as Affiliate[];
+            affiliates.value = response.data;
+            pagination.value = {
+              current_page: response.meta.current_page,
+              from: response.meta.from,
+              last_page: response.meta.last_page,
+              per_page: response.meta.per_page,
+              to: response.meta.to,
+              total: response.meta.total,
+              links: response.meta.links
+            };
           } catch (e) {
             logger.error('Erro ao carregar afiliados:', e)
             notificationService.error('Erro ao carregar lista de afiliados')
@@ -126,14 +146,51 @@
             const response = await managerService.affiliates.list({
               search: term,
               page: 1,
-              per_page: 20,
+              per_page: 10,
               sort_by: 'name',
               sort_order: 'asc'
             });
-            affiliates.value = (response.data || response) as Affiliate[];
+            affiliates.value = response.data;
+            pagination.value = {
+              current_page: response.meta.current_page,
+              from: response.meta.from,
+              last_page: response.meta.last_page,
+              per_page: response.meta.per_page,
+              to: response.meta.to,
+              total: response.meta.total,
+              links: response.meta.links
+            };
           } catch (e) {
             logger.error('Erro ao pesquisar afiliados:', e)
             notificationService.error('Erro ao pesquisar afiliados')
+          } finally {
+            loading.value = false;
+          }
+        }
+
+        const handlePageChange = async (page: number) => {
+          loading.value = true;
+          try {
+            const response = await managerService.affiliates.list({
+              search: props.searchTerm,
+              page: page,
+              per_page: 10,
+              sort_by: 'name',
+              sort_order: 'asc'
+            });
+            affiliates.value = response.data;
+            pagination.value = {
+              current_page: response.meta.current_page,
+              from: response.meta.from,
+              last_page: response.meta.last_page,
+              per_page: response.meta.per_page,
+              to: response.meta.to,
+              total: response.meta.total,
+              links: response.meta.links
+            };
+          } catch (e) {
+            logger.error('Erro ao carregar página de afiliados:', e)
+            notificationService.error('Erro ao carregar página de afiliados')
           } finally {
             loading.value = false;
           }
@@ -233,6 +290,7 @@
           createError,
           createForm,
           dropdownOptions,
+          pagination,
           openCreateModal,
           closeCreateModal,
           openDetailsModal,
@@ -242,7 +300,8 @@
           handleToggleStatus,
           getStatusClass,
           handleAction,
-          loadAffiliates
+          loadAffiliates,
+          handlePageChange
         }
       }
     })
@@ -250,63 +309,69 @@
 
     <template>
       <AuthenticatedLayout :loading="loading">
-
-        <section class=" min-h-[944px] w-full overflow-visible">
+        <section class="w-full overflow-hidden">
           <div class="flex justify-between items-center mb-6">
             <p class="text-white text-2xl font-semibold">Afiliados</p>
             <BaseButton variant="primary" @click="openCreateModal">
               Novo Afiliado
             </BaseButton>
           </div>
-          <div>
-            <div v-if="affiliates.length === 0" class="flex w-full h-full items-center justify-center text-gray-400">
-              Nenhum afiliado encontrado.
+          <div class="flex w-full justify-center text-gray-400">
+            <div v-if="loading" class="flex items-center justify-center py-10">
+              <span class="text-white text-lg">Carregando afiliados...</span>
             </div>
-            <BaseTable :headers="[
-              { key: 'name', label: 'Nome', align: 'left' },
-              { key: 'id', label: 'ID de Afiliado', align: 'center' },
-              { key: 'created_at', label: 'Data de cadastro', align: 'center' },
-              { key: 'updated_at', label: 'Última atualização', align: 'center' },
-              { key: 'status', label: 'Status', align: 'center' },
-              { key: 'actions', label: 'Ações', align: 'center' }
-            ]" :items="affiliates">
-              <template #name="{ item }">
-                <div class="flex items-center gap-2">
-                  <img :src="`https://ui-avatars.com/api/?name=${item.name}&background=random`" :alt="item.name"
-                    class="w-8 h-w-8 rounded-full" />
-                  <p class="font-inter text-[14px] font-normal leading-[18px] text-white">{{ item.name }}</p>
-                </div>
-              </template>
+            <div v-else-if="affiliates.length === 0"
+              class="flex w-full min-h-[642.50px] items-center justify-center text-gray-400 text-lg">
+              Nenhum afiliado encontrado
+            </div>
+            <div v-else class="overflow-visible w-full">
+              <BaseTable :headers="[
+                { key: 'name', label: 'Nome', align: 'left' },
+                { key: 'id', label: 'ID de Afiliado', align: 'center' },
+                { key: 'created_at', label: 'Data de cadastro', align: 'center' },
+                { key: 'updated_at', label: 'Última atualização', align: 'center' },
+                { key: 'status', label: 'Status', align: 'center' },
+                { key: 'actions', label: 'Ações', align: 'center' }
+              ]" :items="affiliates">
+                <template #name="{ item }">
+                  <div class="flex items-center gap-2">
+                    <img :src="`https://ui-avatars.com/api/?name=${item.name}&background=random`" :alt="item.name"
+                      class="w-8 h-w-8 rounded-full" />
+                    <p class="font-inter text-[14px] font-normal leading-[18px] text-white">{{ item.name }}</p>
+                  </div>
+                </template>
 
-              <template #id="{ item }">
-                <span class="font-inter text-[14px] font-normal leading-[18px] text-white">{{ item.integration_code
-                }}</span>
-              </template>
+                <template #id="{ item }">
+                  <span class="font-inter text-[14px] font-normal leading-[18px] text-white">{{ item.integration_code
+                  }}</span>
+                </template>
 
-              <template #created_at="{ item }">
-                {{ new Date(item.created_at).toLocaleDateString('pt-BR') }}
-              </template>
+                <template #created_at="{ item }">
+                  {{ new Date(item.created_at).toLocaleDateString('pt-BR') }}
+                </template>
 
-              <template #updated_at="{ item }">
-                {{ new Date(item.updated_at).toLocaleString('pt-BR', {
-                  day: '2-digit', month: '2-digit', year: 'numeric',
-                  hour: '2-digit', minute: '2-digit'
-                }) }}
-              </template>
+                <template #updated_at="{ item }">
+                  {{ new Date(item.updated_at).toLocaleString('pt-BR', {
+                    day: '2-digit', month: '2-digit', year: 'numeric',
+                    hour: '2-digit', minute: '2-digit'
+                  }) }}
+                </template>
 
-              <template #status="{ item }">
-                <span :class="getStatusClass(item.is_active ? 'Ativo' : 'Inativo')">
-                  {{ item.is_active ? 'Ativo' : 'Inativo' }}
-                </span>
-              </template>
+                <template #status="{ item }">
+                  <span :class="getStatusClass(item.is_active ? 'Ativo' : 'Inativo')">
+                    {{ item.is_active ? 'Ativo' : 'Inativo' }}
+                  </span>
+                </template>
 
-              <template #actions="{ item }">
-                <BaseDropdown :options="dropdownOptions" @select="handleAction($event, item.id)" :top="50"
-                  class="w-min mx-auto" />
-              </template>
-            </BaseTable>
+                <template #actions="{ item }">
+                  <BaseDropdown :options="dropdownOptions" @select="handleAction($event, item.id)" :top="50"
+                    class="w-min mx-auto" />
+                </template>
+              </BaseTable>
+            </div>
           </div>
         </section>
+        <BasePagination :meta="pagination" @page-change="handlePageChange" />
 
         <!-- Modal de criação de afiliado -->
         <CreateAffiliateModal v-if="showCreateModal" @close="closeCreateModal" @submit="handleCreate"

@@ -40,6 +40,8 @@ export interface Affiliate {
   email: string;
   integration_code: string;
   is_active: boolean;
+  created_at: string;
+  updated_at: string;
   applications: AffiliateApplication[];
 }
 export interface ListAffiliatesParams {
@@ -54,6 +56,26 @@ export interface ListAffiliatesResponse {
   total: number;
   page: number;
   per_page: number;
+  links: {
+    first: string;
+    last: string;
+    prev: string | null;
+    next: string | null;
+  };
+  meta: {
+    current_page: number;
+    from: number;
+    last_page: number;
+    links: {
+      url: string | null;
+      label: string;
+      active: boolean;
+    }[];
+    path: string;
+    per_page: number;
+    to: number;
+    total: number;
+  };
 }
 
 // Application interfaces
