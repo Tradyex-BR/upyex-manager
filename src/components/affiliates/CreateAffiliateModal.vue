@@ -86,8 +86,10 @@
               class="bg-[#131836] rounded-lg border border-[#1e2642] overflow-hidden">
               <div class="flex items-center justify-between p-3">
                 <div class="flex items-center">
-                  <img v-if="getSelectedAppLogo(app.id)" :src="getSelectedAppLogo(app.id)"
-                    :alt="getSelectedAppName(app.id)" class="w-5 h-5 rounded-full object-cover mr-2" />
+                  <img :src="getSelectedAppLogo(app.id)" 
+                    :alt="getSelectedAppName(app.id)" 
+                    class="w-5 h-5 rounded-full object-cover mr-2"
+                    @error="(e) => handleImageError(e, getSelectedAppName(app.id))" />
                   <span class="text-sm font-medium">Aplicação #{{ idx + 1 }}</span>
                 </div>
                 <BaseButton variant="ghost" v-if="form.applications.length > 1"
@@ -107,8 +109,10 @@
                       <template #trigger>
                         <button type="button"
                           class="w-full h-10 px-3 bg-[#1e2642] text-white rounded-lg border border-[#2d3a5a] text-left flex items-center gap-2 text-sm">
-                          <img v-if="getSelectedAppLogo(app.id)" :src="getSelectedAppLogo(app.id)"
-                            :alt="getSelectedAppName(app.id)" class="w-5 h-5 rounded-full object-cover" />
+                          <img :src="getSelectedAppLogo(app.id)" 
+                            :alt="getSelectedAppName(app.id)" 
+                            class="w-5 h-5 rounded-full object-cover"
+                            @error="(e) => handleImageError(e, getSelectedAppName(app.id))" />
                           <span>{{ getSelectedAppName(app.id) }}</span>
                           <FontAwesomeIcon icon="chevron-down" class="ml-auto chevron-icon"
                             :class="{ 'open': openDropdowns[idx] }" />
@@ -159,7 +163,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, nextTick } from 'vue'
 import BaseModal from '@/components/common/BaseModal.vue'
 import BaseButton from '@/components/common/BaseButton.vue'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
@@ -240,9 +244,9 @@ const getSelectedAppName = (appId: string) => {
   return app ? app.name : 'Selecione uma aplicação'
 }
 
-const getSelectedAppLogo = (appId: string): string | undefined => {
+const getSelectedAppLogo = (appId: string): string => {
   const app = availableApplications.value.find(a => a.id === appId)
-  return app ? getImageUrl(app.name, app.logo_url) : undefined
+  return app ? getImageUrl(app.name, app.logo_url) : getImageUrl('Aplicação')
 }
 
 const isFormValid = computed(() => {
