@@ -1,15 +1,15 @@
   <template>
     <AuthenticatedLayout :loading="loading">
-      <section class="min-h-[944px] w-full overflow-visible">
+      <section class="w-full overflow-hidden">
         <div class="flex justify-between items-center mb-6">
           <p class="text-white text-2xl font-semibold">Aplicações</p>
         </div>
-        <div class="flex w-full min-h-[calc(100vh-200px)] justify-center text-gray-400">
+        <div class="flex w-full justify-center text-gray-400">
           <div v-if="loading" class="flex items-center justify-center py-10">
             <span class="text-white text-lg">Carregando ofertas...</span>
           </div>
           <div v-else-if="offers.length === 0"
-            class="flex w-full min-h-[200px] items-center justify-center text-gray-400 text-lg">
+            class="flex w-full min-h-[642.50px] items-center justify-center text-gray-400 text-lg">
             Nenhuma oferta encontrada
           </div>
           <div v-else class="overflow-visible w-full">
@@ -73,6 +73,7 @@
           </div>
         </div>
       </section>
+      <BasePagination :meta="pagination" @page-change="handlePageChange" />
 
       <EditApplicationModal v-if="showEditModal" :show="showEditModal" :application-id="selectedApplication?.id"
         @close="showEditModal = false" @submit="handleEditApplication" />
@@ -102,6 +103,7 @@ import ConfirmResetModal from '@/components/applications/ConfirmResetModal.vue'
 import { notificationService } from '@/services/notificationService'
 import { CONTEXT_ROLE_KEY } from '@/config/constants'
 import { logger } from '@/config/logger'
+import BasePagination from '@/components/common/BasePagination.vue'
 
 export default defineComponent({
   props: {
@@ -118,7 +120,8 @@ export default defineComponent({
     BaseTable,
     BaseDropdown,
     EditApplicationModal,
-    ConfirmResetModal
+    ConfirmResetModal,
+    BasePagination
   },
   setup() {
     const store = useDashboardStore()
@@ -158,7 +161,16 @@ export default defineComponent({
       showResetModal: false,
       selectedApplication: null as any,
       isManager: false,
-      dropdownOpen: null as string | null
+      dropdownOpen: null as string | null,
+      pagination: {
+        current_page: 1,
+        from: 1,
+        last_page: 1,
+        per_page: 10,
+        to: 1,
+        total: 0,
+        links: [] as Array<{ url: string | null; label: string; active: boolean }>
+      }
     }
   },
   async mounted() {
@@ -180,11 +192,47 @@ export default defineComponent({
         const response = await managerService.applications.list({
           search: term,
           page: 1,
-          per_page: 20,
+          per_page: 10,
           sort_by: 'created_at',
           sort_order: 'desc'
         });
         this.offers = response.data;
+        this.pagination = {
+          current_page: response.meta.current_page,
+          from: response.meta.from,
+          last_page: response.meta.last_page,
+          per_page: response.meta.per_page,
+          to: response.meta.to,
+          total: response.meta.total,
+          links: response.meta.links
+        };
+      } catch (e) {
+        logger.error('Erro ao buscar aplicações:', e);
+        notificationService.error('Erro ao buscar aplicações');
+      } finally {
+        this.loading = false;
+      }
+    },
+    async handlePageChange(page: number) {
+      this.loading = true;
+      try {
+        const response = await managerService.applications.list({
+          search: this.searchTerm,
+          page: page,
+          per_page: 10,
+          sort_by: 'created_at',
+          sort_order: 'desc'
+        });
+        this.offers = response.data;
+        this.pagination = {
+          current_page: response.meta.current_page,
+          from: response.meta.from,
+          last_page: response.meta.last_page,
+          per_page: response.meta.per_page,
+          to: response.meta.to,
+          total: response.meta.total,
+          links: response.meta.links
+        };
       } catch (e) {
         logger.error('Erro ao buscar aplicações:', e);
         notificationService.error('Erro ao buscar aplicações');
