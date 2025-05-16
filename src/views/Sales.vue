@@ -34,7 +34,7 @@
           </template>
 
           <template #customer="{ item }">
-            {{ item.customer?.name }}
+            {{ item.customer?.name || '-'	 }}
           </template>
 
           <template #token="{ item }">
