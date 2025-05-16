@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import { useRoute } from 'vue-router';
-import { computed, watch } from 'vue';
+import { computed, watch, ref, onMounted } from 'vue';
 import Sidebar from './components/layout/dashboard/Sidebar.vue';
 import TopBar from './components/layout/dashboard/TopBar.vue';
 import { logger } from './config/logger';
+import { useAuthStore } from '@/stores/auth';
+import { CONTEXT_ROLE_KEY } from './config/constants';
 
 const pagesThatDontHaveSidebar = [
   '/login/manager',
@@ -25,11 +27,11 @@ const affiliatesPages = [
 ]
 
 const route = useRoute();
-import { ref } from 'vue'
-import { CONTEXT_ROLE_KEY } from './config/constants';
+const authStore = useAuthStore();
+const isLoading = ref(true);
 
 const thisPageHaveSidebar = computed(() =>
-  pagesThatDontHaveSidebar.includes(route.path) || route.name === 'NotFoundAffiliate' || route.name === 'NotFoundManager'
+  !pagesThatDontHaveSidebar.includes(route.path) && route.name !== 'NotFoundAffiliate' && route.name !== 'NotFoundManager'
 );
 
 const fullPath = computed(() => route.fullPath);
@@ -47,17 +49,25 @@ watch(fullPath, (newPath) => {
     localStorage.setItem(CONTEXT_ROLE_KEY, 'affiliate');
   }
 });
+
+onMounted(async () => {
+  await authStore.checkAuth();
+  isLoading.value = false;
+});
 </script>
 
 <template>
-  <div class="min-h-screen bg-[#040D25]">
+  <div v-if="isLoading" class="min-h-screen bg-[#040D25] flex items-center justify-center">
+    <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+  </div>
+  <div v-else class="min-h-screen bg-[#040D25]">
     <!-- Layout para páginas de autenticação -->
-    <div v-if="thisPageHaveSidebar" class="min-h-screen flex items-center justify-center">
+    <div v-if="!thisPageHaveSidebar" class="min-h-screen flex items-center justify-center">
       <router-view></router-view>
     </div>
 
     <!-- Layout padrão para o resto da aplicação -->
-    <div v-else class="h-screen flex">
+    <div v-else-if="authStore.isAuthenticated" class="h-screen flex">
       <Sidebar />
       <div class="flex-1 flex flex-col overflow-hidden">
         <TopBar @search="onSearch" />
@@ -67,6 +77,9 @@ watch(fullPath, (newPath) => {
           </router-view>
         </main>
       </div>
+    </div>
+    <div v-else class="min-h-screen flex items-center justify-center">
+      <router-view></router-view>
     </div>
   </div>
 </template>
