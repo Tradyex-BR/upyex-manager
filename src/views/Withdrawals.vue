@@ -13,6 +13,7 @@ import RedirectIcon from '@/components/icons/RedirectIcon.vue'
 import MenuIcon from '@/components/icons/MenuIcon.vue'
 import BaseDropdown from '@/components/common/BaseDropdown.vue'
 import BaseTable from '@/components/common/BaseTable.vue'
+import BasePagination from '@/components/common/BasePagination.vue'
 
 import { ListWithdrawalsResponse } from '@/services/managerService'
 import { CONTEXT_ROLE_KEY, PAGINATION } from '@/config/constants'
@@ -21,34 +22,14 @@ const CheckIcon = defineAsyncComponent(() => import('@/components/icons/CheckIco
 const XIcon = defineAsyncComponent(() => import('@/components/icons/XIcon.vue'))
 
 // Dados mockados para testes
-const MANAGER_WITHDRAWALS: ListWithdrawalsResponse = {
-  data: [
-    {
-      id: "01968d22-3ca1-72a3-afa3-297a68d90ddd",
-      external_id: null,
-      amount: "2684.11",
-      status: "requested",
-      method: "crypto",
-      destination: "pipvhZsOvO7aIB2Ampi2BUixwCZ0yrwIkJBbQAzwdEu0",
-      approved_at: null,
-      rejected_at: null,
-      processing_at: null,
-      processed_at: null,
-      cancelled_at: null,
-      created_at: "2025-05-01T18:35:53.000000Z",
-      updated_at: "2025-05-01T18:35:53.000000Z",
-      links: {
-        api: "http://board-api.upyex.test/api/manager/withdrawals/01968d22-3ca1-72a3-afa3-297a68d90ddd",
-        frontend: "http://board.upyex.test/manager/withdrawals/01968d22-3ca1-72a3-afa3-297a68d90ddd"
-      }
-    }
-  ],
-  total: 1,
+const MOCK_WITHDRAWALS: ListWithdrawalsResponse = {
+  data: [],
+  total: 0,
   page: 1,
-  per_page: 20,
+  per_page: PAGINATION.DEFAULT_PAGE_SIZE,
   links: {
-    first: "http://board-api.upyex.test/api/manager/withdrawals?page=1",
-    last: "http://board-api.upyex.test/api/manager/withdrawals?page=1",
+    first: '',
+    last: '',
     prev: null,
     next: null
   },
@@ -56,80 +37,11 @@ const MANAGER_WITHDRAWALS: ListWithdrawalsResponse = {
     current_page: 1,
     from: 1,
     last_page: 1,
-    links: [
-      {
-        url: null,
-        label: "&laquo; Anterior",
-        active: false
-      },
-      {
-        url: "http://board-api.upyex.test/api/manager/withdrawals?page=1",
-        label: "1",
-        active: true
-      },
-      {
-        url: null,
-        label: "Próximo &raquo;",
-        active: false
-      }
-    ],
-    path: "http://board-api.upyex.test/api/manager/withdrawals",
-    per_page: 20,
+    path: '',
     to: 1,
-    total: 1
-  }
-}
-
-const AFFILIATE_WITHDRAWALS: ListWithdrawalsResponse = {
-  data: [
-    {
-      id: "01968d38-af8b-72c9-9259-d43a00ad8734",
-      amount: "7672.54",
-      status: "requested",
-      method: "pix",
-      destination: "65452036040",
-      created_at: "2025-05-01T19:00:24.000000Z",
-      updated_at: "2025-05-01T19:00:24.000000Z",
-      links: {
-        api: "http://board-api.upyex.test/api/affiliate/withdrawals/01968d38-af8b-72c9-9259-d43a00ad8734",
-        frontend: "http://board.upyex.test/affiliate/withdrawals/01968d38-af8b-72c9-9259-d43a00ad8734"
-      }
-    }
-  ],
-  total: 1,
-  page: 1,
-  per_page: 20,
-  links: {
-    first: "http://board-api.upyex.test/api/affiliate/withdrawals?page=1",
-    last: "http://board-api.upyex.test/api/affiliate/withdrawals?page=1",
-    prev: null,
-    next: null
-  },
-  meta: {
-    current_page: 1,
-    from: 1,
-    last_page: 1,
-    links: [
-      {
-        url: null,
-        label: "&laquo; Anterior",
-        active: false
-      },
-      {
-        url: "http://board-api.upyex.test/api/affiliate/withdrawals?page=1",
-        label: "1",
-        active: true
-      },
-      {
-        url: null,
-        label: "Próximo &raquo;",
-        active: false
-      }
-    ],
-    path: "http://board-api.upyex.test/api/affiliate/withdrawals",
-    per_page: 20,
-    to: 1,
-    total: 1
+    total: 0,
+    links: [],
+    per_page: PAGINATION.DEFAULT_PAGE_SIZE
   }
 }
 
@@ -154,7 +66,8 @@ export default defineComponent({
     RedirectIcon,
     MenuIcon,
     BaseDropdown,
-    BaseTable
+    BaseTable,
+    BasePagination
   },
   data() {
     const role = localStorage.getItem(CONTEXT_ROLE_KEY)
@@ -178,7 +91,9 @@ export default defineComponent({
         per_page: PAGINATION.DEFAULT_PAGE_SIZE,
         total: 0,
         last_page: 1,
-        links: []
+        from: 1,
+        to: 1,
+        links: [] as Array<{ url: string | null; label: string; active: boolean }>
       },
       role,
       dropdownOptions: [
@@ -228,7 +143,7 @@ export default defineComponent({
         let response: ListWithdrawalsResponse;
 
         if (USE_MOCK_DATA) {
-          response = this.role === "manager" ? MANAGER_WITHDRAWALS : AFFILIATE_WITHDRAWALS;
+          response = MOCK_WITHDRAWALS;
           logger.info('Dados de saques carregados:', response);
         } else {
           response = await managerService.withdrawals.list({
@@ -237,7 +152,7 @@ export default defineComponent({
             status: null,
             method: null,
             page: this.pagination.current_page,
-            per_page: this.pagination.per_page,
+            per_page: 10,
             sort_by: 'created_at',
             sort_order: 'desc'
           });
@@ -253,15 +168,27 @@ export default defineComponent({
           link: item.links?.frontend || ''
         }));
 
-        this.pagination.current_page = response.page;
-        this.pagination.last_page = Math.ceil(response.total / response.per_page);
-        this.pagination.per_page = response.per_page;
-        this.pagination.total = response.total;
-        this.pagination.links = [];
+        this.pagination = {
+          current_page: response.meta.current_page,
+          from: response.meta.from,
+          last_page: response.meta.last_page,
+          per_page: response.meta.per_page,
+          to: response.meta.to,
+          total: response.meta.total,
+          links: response.meta.links
+        };
       } catch (error) {
         logger.error('Erro ao carregar saques:', error);
         this.withdrawals = [];
-        this.pagination.total = 0;
+        this.pagination = {
+          current_page: 1,
+          from: 1,
+          last_page: 1,
+          per_page: PAGINATION.DEFAULT_PAGE_SIZE,
+          to: 1,
+          total: 0,
+          links: []
+        };
       } finally {
         this.loading = false;
       }
@@ -275,7 +202,7 @@ export default defineComponent({
           status: null,
           method: null,
           page: 1,
-          per_page: this.pagination.per_page,
+          per_page: 10,
           sort_by: 'created_at',
           sort_order: 'desc',
           search: term
@@ -308,7 +235,7 @@ export default defineComponent({
       try {
         this.lastWithdrawalAmount = data.amount;
         this.lastWithdrawalPixKey = data.pixKey;
-        
+
         const response = await managerService.withdrawals.request({
           amount: Number(this.lastWithdrawalAmount.replace(/[^\d]/g, '')) / 100,
           method: 'pix',
@@ -400,6 +327,9 @@ export default defineComponent({
       } catch (error) {
         logger.error('Erro ao carregar informações de saque:', error);
       }
+    },
+    async handlePageChange(page: number) {
+      await this.goToPage(page);
     }
   }
 })
@@ -407,11 +337,10 @@ export default defineComponent({
 
 <template>
   <AuthenticatedLayout :loading="loading">
-    <section class="min-h-[944px] w-full overflow-visible">
-      <!-- Título e botão sempre visíveis -->
-      <div class="flex justify-between items-center mb-6 overflow-visible">
+    <section class="w-full overflow-hidden">
+      <div class="flex justify-between items-center mb-6">
         <p class="text-white text-2xl font-semibold">Saques</p>
-        <BaseButton v-if="role === 'affiliate'" class="ml-2 " @click="showRequestModal = true">
+        <BaseButton v-if="role === 'affiliate'" class="ml-2" @click="showRequestModal = true">
           Novo Saque
         </BaseButton>
       </div>
@@ -422,60 +351,49 @@ export default defineComponent({
       <WithdrawalSuccessModal v-if="showSuccessModal" :amount="lastWithdrawalAmount" :pix-key="lastWithdrawalPixKey"
         @close="showSuccessModal = false" :show-footer="false" />
 
-      <!-- Conteúdo condicional -->
-      <div class="flex w-full min-h-[calc(100vh-200px)] justify-center text-gray-400">
-        <div v-if="withdrawals.length === 0"
-          class="flex w-full min-h-[200px] items-center justify-center text-gray-400 text-lg">
+      <div class="flex w-full justify-center text-gray-400">
+        <div v-if="loading" class="flex items-center justify-center py-10">
+          <span class="text-white text-lg">Carregando saques...</span>
+        </div>
+        <div v-else-if="withdrawals.length === 0"
+          class="flex w-full min-h-[642.50px] items-center justify-center text-gray-400 text-lg">
           Nenhum saque encontrado
         </div>
-        <div v-else class="w-full">
-          <BaseTable :headers="[
-            { key: 'date', label: 'Data', align: 'left' },
-            { key: 'value', label: 'Valor BRL', align: 'center' },
-            { key: 'destination', label: 'Destino (Chave Pix)', align: 'center' },
-            { key: 'type', label: 'Tipo', align: 'center' },
-            { key: 'status', label: 'Status', align: 'center' },
-            { key: 'actions', label: 'Ações', align: 'center' }
-          ]" :items="withdrawals">
-            <template #date="{ item }">
-              {{ item.date }}
-            </template>
+        <BaseTable v-else :headers="[
+          { key: 'date', label: 'Data', align: 'left' },
+          { key: 'value', label: 'Valor BRL', align: 'center' },
+          { key: 'destination', label: 'Destino (Chave Pix)', align: 'center' },
+          { key: 'type', label: 'Tipo', align: 'center' },
+          { key: 'status', label: 'Status', align: 'center' },
+          { key: 'actions', label: 'Ações', align: 'center' }
+        ]" :items="withdrawals">
+          <template #date="{ item }">
+            {{ item.date }}
+          </template>
 
-            <template #value="{ item }">
-              {{ item.valueBRL }}
-            </template>
+          <template #value="{ item }">
+            {{ item.valueBRL }}
+          </template>
 
-            <template #destination="{ item }">
-              {{ item.destination }}
-            </template>
+          <template #destination="{ item }">
+            {{ item.destination }}
+          </template>
 
-            <template #type="{ item }">
-              {{ item.type }}
-            </template>
+          <template #type="{ item }">
+            {{ item.type }}
+          </template>
 
-            <template #status="{ item }">
-              <span :class="getStatusClass(item.status)">{{ item.status }}</span>
-            </template>
+          <template #status="{ item }">
+            <span :class="getStatusClass(item.status)">{{ item.status }}</span>
+          </template>
 
-            <template #actions="{ item }">
-              <BaseDropdown :options="filteredDropdownOptions" @select="handleDropdownAction($event, item.id)" :top="50"
-                class="w-min mx-auto" />
-            </template>
-          </BaseTable>
-        </div>
+          <template #actions="{ item }">
+            <BaseDropdown :options="filteredDropdownOptions" @select="handleDropdownAction($event, item.id)" :top="50"
+              class="w-min mx-auto" />
+          </template>
+        </BaseTable>
       </div>
-
-      <!-- Paginação -->
-      <!--  <div v-if="pagination && pagination.links && pagination.links.length > 1" class="flex justify-center mt-6">
-                <button
-                  v-for="link in pagination.links"
-                  :key="link.label"
-                  :disabled="!link.url"
-                  @click="goToPageByUrl(link.url)"
-                  :class="['mx-1 px-3 py-1 rounded', link.active ? 'bg-blue-600 text-white' : 'bg-gray-700 text-gray-300', !link.url ? 'opacity-50 cursor-not-allowed' : 'hover:bg-blue-800']"
-                  v-html="link.label"
-                />
-              </div> -->
     </section>
+    <BasePagination :meta="pagination" @page-change="handlePageChange" />
   </AuthenticatedLayout>
 </template>

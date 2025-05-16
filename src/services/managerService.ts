@@ -434,7 +434,7 @@ export const managerService = {
       const response = await api.request<ListWithdrawalsResponse>({
         method: 'GET',
         url: '/withdrawals',
-        data: params,
+        params: params,
       });
       return response.data;
     },
