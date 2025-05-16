@@ -18,7 +18,7 @@
           <button
             v-if="meta.current_page > 1"
             @click="handlePageChange(meta.current_page - 1)"
-            class="relative inline-flex items-center px-4 py-2 font-inter text-[14px] font-medium leading-[18px] text-white bg-[#1A1F3C] border border-[#1A1F3C] rounded-l-md hover:bg-[#1A1F3C]/50 transition-all duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            class="relative inline-flex items-center px-4 py-2 font-inter text-[14px] font-medium leading-[18px] text-white bg-[#1A1F3C] border border-[#1A1F3C] rounded-l-md hover:bg-[#1A1F3C]/50 transition-all duration-300 ease-in-out outline-none focus:outline-none focus:ring-0"
             aria-label="Página anterior"
           >
             Anterior
@@ -30,7 +30,7 @@
               v-if="page !== '...'"
               @click="handlePageChange(Number(page))"
               :class="[
-                'relative rounded-lg cursor-pointer inline-flex items-center px-4 py-2 font-inter text-[14px] font-medium leading-[18px] border transition-all duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-indigo-500',
+                'relative rounded-lg cursor-pointer inline-flex items-center px-4 py-2 font-inter text-[14px] font-medium leading-[18px] border transition-all duration-300 ease-in-out outline-none focus:outline-none focus:ring-0',
                 page === meta.current_page
                   ? 'z-10 border-indigo-500 bg-indigo-600 text-white'
                   : 'border-[#1A1F3C] bg-[#1A1F3C] text-white hover:bg-[#1A1F3C]/50'
@@ -51,7 +51,7 @@
           <button
             v-if="meta.current_page < meta.last_page"
             @click="handlePageChange(meta.current_page + 1)"
-            class="relative inline-flex items-center px-4 py-2 font-inter text-[14px] font-medium leading-[18px] text-white bg-[#1A1F3C] border border-[#1A1F3C] rounded-r-md hover:bg-[#1A1F3C]/50 transition-all duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            class="relative inline-flex items-center px-4 py-2 font-inter text-[14px] font-medium leading-[18px] text-white bg-[#1A1F3C] border border-[#1A1F3C] rounded-r-md hover:bg-[#1A1F3C]/50 transition-all duration-300 ease-in-out outline-none focus:outline-none focus:ring-0"
             aria-label="Próxima página"
           >
             Próximo
