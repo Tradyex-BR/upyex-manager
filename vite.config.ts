@@ -16,6 +16,7 @@ export default defineConfig(({ mode }) => {
     server: {
       host: '0.0.0.0',
       port: env.VITE_PORT ? parseInt(env.VITE_PORT) : 3000,
+      allowedHosts: ['manager.upyex.com'],
       proxy: {
         '/manager': {
           target: 'https://api.manager.upyex.com',
