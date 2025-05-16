@@ -227,7 +227,7 @@ export default defineComponent({
         'paid': 'Pago',
         'refunded': 'Estornado',
         'cancelled': 'Cancelado',
-        'failed': 'Falha'
+        'failed': 'Falha',
       };
       return statusMap[status] || status;
     },
@@ -235,7 +235,9 @@ export default defineComponent({
     mapPaymentMethod(method: string): string {
       const methodMap: { [key: string]: string } = {
         'credit_card': 'Cartão de Crédito',
+        'debit_card': 'Cartão de Débito',
         'pix': 'PIX',
+        'payment_link': 'Link de Pagamento',
         'bank_transfer': 'Transferência Bancária'
       };
       return methodMap[method] || method;
