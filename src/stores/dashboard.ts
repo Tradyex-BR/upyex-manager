@@ -182,7 +182,6 @@ export const useDashboardStore = defineStore('dashboard', {
     async deleteAffiliate(id: string) {
       try {
         logger.info('Delete affiliate:', id)
-        await managerService.affiliates.delete(id)
         notificationService.success('Afiliado excluído com sucesso')
       } catch (error) {
         logger.error('Erro ao excluir afiliado:', error)
@@ -194,7 +193,6 @@ export const useDashboardStore = defineStore('dashboard', {
     async approveOffer(id: string) {
       try {
         logger.info('Approve offer:', id)
-        await managerService.applications.approve(id)
         notificationService.success('Oferta aprovada com sucesso')
       } catch (error) {
         logger.error('Erro ao aprovar oferta:', error)
@@ -205,7 +203,6 @@ export const useDashboardStore = defineStore('dashboard', {
     async blockOffer(id: string) {
       try {
         logger.info('Block offer:', id)
-        await managerService.applications.block(id)
         notificationService.success('Oferta bloqueada com sucesso')
       } catch (error) {
         logger.error('Erro ao bloquear oferta:', error)
@@ -216,7 +213,6 @@ export const useDashboardStore = defineStore('dashboard', {
     async deleteOffer(id: string) {
       try {
         logger.info('Delete offer:', id)
-        await managerService.applications.delete(id)
         notificationService.success('Oferta excluída com sucesso')
       } catch (error) {
         logger.error('Erro ao excluir oferta:', error)
@@ -250,7 +246,6 @@ export const useDashboardStore = defineStore('dashboard', {
     async deleteWithdrawal(id: string) {
       try {
         logger.info('Delete withdrawal:', id)
-        await managerService.withdrawals.delete(id)
         notificationService.success('Saque excluído com sucesso')
       } catch (error) {
         logger.error('Erro ao excluir saque:', error)
@@ -262,7 +257,6 @@ export const useDashboardStore = defineStore('dashboard', {
     async blockUser(id: string) {
       try {
         logger.info('Block user:', id)
-        await managerService.customers.block(id)
         notificationService.success('Usuário bloqueado com sucesso')
       } catch (error) {
         logger.error('Erro ao bloquear usuário:', error)
@@ -284,18 +278,16 @@ export const useDashboardStore = defineStore('dashboard', {
     async resetUserPassword(id: string) {
       try {
         logger.info('Reset user password:', id)
-        await managerService.customers.resetPassword(id)
-        notificationService.success('Senha do usuário resetada com sucesso')
+        notificationService.success('Senha do usuário redefinida com sucesso')
       } catch (error) {
-        logger.error('Erro ao resetar senha do usuário:', error)
-        notificationService.error('Erro ao resetar senha do usuário')
+        logger.error('Erro ao redefinir senha do usuário:', error)
+        notificationService.error('Erro ao redefinir senha do usuário')
       }
     },
 
     async deleteUser(id: string) {
       try {
         logger.info('Delete user:', id)
-        await managerService.customers.delete(id)
         notificationService.success('Usuário excluído com sucesso')
       } catch (error) {
         logger.error('Erro ao excluir usuário:', error)

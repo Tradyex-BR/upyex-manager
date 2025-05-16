@@ -1,5 +1,5 @@
 <script lang="ts">
-import { computed, defineAsyncComponent, defineComponent } from 'vue'
+import { defineAsyncComponent, defineComponent } from 'vue'
 import { useDashboardStore } from '@/stores/dashboard'
 import { managerService } from '@/services/managerService'
 import { logger } from '@/config/logger'
@@ -14,6 +14,7 @@ import MenuIcon from '@/components/icons/MenuIcon.vue'
 import BaseDropdown from '@/components/common/BaseDropdown.vue'
 import BaseTable from '@/components/common/BaseTable.vue'
 import BasePagination from '@/components/common/BasePagination.vue'
+import { notificationService } from '@/services/notificationService'
 
 import { ListWithdrawalsResponse } from '@/services/managerService'
 import { CONTEXT_ROLE_KEY, PAGINATION } from '@/config/constants'
@@ -67,7 +68,9 @@ export default defineComponent({
     MenuIcon,
     BaseDropdown,
     BaseTable,
-    BasePagination
+    BasePagination,
+    BaseModal: defineAsyncComponent(() => import('@/components/common/BaseModal.vue')),
+    BaseInput: defineAsyncComponent(() => import('@/components/common/BaseInput.vue'))
   },
   data() {
     const role = localStorage.getItem(CONTEXT_ROLE_KEY)
@@ -115,7 +118,11 @@ export default defineComponent({
           icon: XIcon,
           role: 'affiliate'
         }
-      ]
+      ],
+      withdrawalAmount: '',
+      selectedMethod: '',
+      destination: '',
+      showModal: false
     }
   },
   computed: {
@@ -236,8 +243,8 @@ export default defineComponent({
         this.lastWithdrawalAmount = data.amount;
         this.lastWithdrawalPixKey = data.pixKey;
 
-        const response = await managerService.withdrawals.request({
-          amount: Number(this.lastWithdrawalAmount.replace(/[^\d]/g, '')) / 100,
+        await managerService.withdrawals.request({
+          amount: Number(this.lastWithdrawalAmount.replace(/[^0-9]/g, '')) / 100,
           method: 'pix',
           destination: this.lastWithdrawalPixKey
         });
@@ -330,6 +337,20 @@ export default defineComponent({
     },
     async handlePageChange(page: number) {
       await this.goToPage(page);
+    },
+    async requestWithdrawal() {
+      try {
+        await managerService.withdrawals.request({
+          amount: Number(this.withdrawalAmount),
+          method: this.selectedMethod,
+          destination: this.destination
+        })
+        notificationService.success('Saque solicitado com sucesso')
+        this.showModal = false
+      } catch (error) {
+        logger.error('Erro ao solicitar saque:', error)
+        notificationService.error('Erro ao solicitar saque')
+      }
     }
   }
 })

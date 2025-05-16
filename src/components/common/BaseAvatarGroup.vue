@@ -2,7 +2,7 @@
   <div class="flex -space-x-4 overflow-visible" style="overflow: visible !important;">
     <template v-for="(product, idx) in displayedProducts" :key="product.id">
       <div class="relative group" :style="hoveredIdx === idx ? 'z-index: 999;' : 'z-index: 10;'"
-        @mouseenter="showTooltip(idx, $event)" @mouseleave="hideTooltip" :ref="el => setAvatarRef(el, idx)">
+        @mouseenter="showTooltip(idx)" @mouseleave="hideTooltip" :ref="el => setAvatarRef(el, idx)">
         <img :src="getImageUrl(product.name)" :alt="product.name"
           class="w-[32px] h-[32px] rounded-full shadow object-cover cursor-pointer"
           @error="(e) => handleImageError(e, product.name)" />
@@ -64,7 +64,7 @@ export default defineComponent({
       product: null as Product | null
     })
 
-    const showTooltip = async (idx: number, event: MouseEvent) => {
+    const showTooltip = async (idx: number) => {
       hoveredIdx.value = idx
       await nextTick()
       const el = avatarRefs.value[idx]
