@@ -114,6 +114,12 @@ export default defineComponent({
     BasePagination,
     BaseAvatarGroup
   },
+  props: {
+    searchTerm: {
+      type: String,
+      default: ''
+    }
+  },
   setup() {
     const store = useDashboardStore()
     const router = useRouter()
@@ -213,7 +219,6 @@ export default defineComponent({
     } else {
       await this.loadInitialData()
     }
-
   },
   methods: {
     mapStatus(status: string): string {
@@ -249,6 +254,11 @@ export default defineComponent({
         'Cancelado': `${baseClass} bg-red-500/20 text-red-500`
       }
       return statusMap[status] || `${baseClass} bg-gray-500/20 text-gray-500`
+    }
+  },
+  watch: {
+    searchTerm(newTerm) {
+      this.handleSearch(newTerm);
     }
   }
 })
