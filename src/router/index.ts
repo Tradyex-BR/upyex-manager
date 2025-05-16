@@ -9,7 +9,7 @@ const routes: Array<RouteRecordRaw> = [
   },
   {
     path: '/login',
-    redirect: '/login/manager'
+    redirect: '/login/affiliate'
   },
   {
     path: '/login/manager',
