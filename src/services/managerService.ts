@@ -336,6 +336,26 @@ export interface ListCustomersResponse {
   total: number;
   page: number;
   per_page: number;
+  links: {
+    first: string;
+    last: string;
+    prev: string | null;
+    next: string | null;
+  };
+  meta: {
+    current_page: number;
+    from: number;
+    last_page: number;
+    links: {
+      url: string | null;
+      label: string;
+      active: boolean;
+    }[];
+    path: string;
+    per_page: number;
+    to: number;
+    total: number;
+  };
 }
 
 export const managerService = {
@@ -530,7 +550,7 @@ export const managerService = {
       const response = await api.request<ListCustomersResponse>({
         method: 'GET',
         url: '/customers',
-        data: params,
+        params: params,
       });
       return response.data;
     },

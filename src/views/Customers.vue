@@ -11,6 +11,7 @@ import MenuIcon from '@/components/icons/MenuIcon.vue'
 import BaseDropdown from '@/components/common/BaseDropdown.vue'
 import BaseTable from '@/components/common/BaseTable.vue'
 import { logger } from '@/config/logger'
+import BasePagination from '@/components/common/BasePagination.vue'
 
 const XIcon = defineAsyncComponent(() => import('@/components/icons/XIcon.vue'))
 const PenIcon = defineAsyncComponent(() => import('@/components/icons/PenIcon.vue'))
@@ -48,6 +49,7 @@ export default defineComponent({
     MenuIcon,
     BaseDropdown,
     BaseTable,
+    BasePagination
   },
   setup() {
     const router = useRouter()
@@ -93,7 +95,16 @@ export default defineComponent({
       showCreateModal: false,
       showDeleteModal: false,
       editingCustomer: null as Usuario | null,
-      deletingCustomer: null as Usuario | null
+      deletingCustomer: null as Usuario | null,
+      pagination: {
+        current_page: 1,
+        from: 1,
+        last_page: 1,
+        per_page: 10,
+        to: 1,
+        total: 0,
+        links: [] as Array<{ url: string | null; label: string; active: boolean }>
+      }
     }
   },
   watch: {
@@ -172,6 +183,15 @@ export default defineComponent({
           phone: item.phone || '',
           document_number: item.document_number || ''
         }));
+        this.pagination = {
+          current_page: response.meta.current_page,
+          from: response.meta.from,
+          last_page: response.meta.last_page,
+          per_page: response.meta.per_page,
+          to: response.meta.to,
+          total: response.meta.total,
+          links: response.meta.links
+        };
       } catch (e) {
         logger.error('Erro ao pesquisar clientes:', e);
       } finally {
@@ -201,43 +221,85 @@ export default defineComponent({
           phone: item.phone || '',
           document_number: item.document_number || ''
         }));
+        this.pagination = {
+          current_page: response.meta.current_page,
+          from: response.meta.from,
+          last_page: response.meta.last_page,
+          per_page: response.meta.per_page,
+          to: response.meta.to,
+          total: response.meta.total,
+          links: response.meta.links
+        };
       } catch (e) {
         logger.error('Erro ao carregar clientes:', e);
       } finally {
         this.loading = false;
       }
     },
+    async handlePageChange(page: number) {
+      this.loading = true;
+      try {
+        const response = await managerService.customers.list({
+          search: this.searchTerm,
+          page: page,
+          per_page: 10,
+          sort_by: 'created_at',
+          sort_order: 'desc'
+        });
+        this.customers = (response.data || []).map((item: any) => ({
+          id: item.id,
+          nome: item.name || '',
+          email: item.email || '',
+          aplicacao: item.application?.name || '',
+          afiliado: item.affiliate?.name || '',
+          status: item.application?.is_active ? 'Ativo' : 'Inativo',
+          dataCadastro: item.created_at ? new Date(item.created_at).toLocaleDateString('pt-BR') : '-',
+          ultimoAcesso: item.updated_at ? new Date(item.updated_at).toLocaleDateString('pt-BR') : '-',
+          linkApi: item.links?.api || '',
+          phone: item.phone || '',
+          document_number: item.document_number || ''
+        }));
+        this.pagination = {
+          current_page: response.meta.current_page,
+          from: response.meta.from,
+          last_page: response.meta.last_page,
+          per_page: response.meta.per_page,
+          to: response.meta.to,
+          total: response.meta.total,
+          links: response.meta.links
+        };
+      } catch (e) {
+        logger.error('Erro ao carregar página de clientes:', e);
+      } finally {
+        this.loading = false;
+      }
+    }
   }
 })
 </script>
 
 <template>
   <AuthenticatedLayout :loading="loading">
-
-    <section class=" min-h-[944px] w-full overflow-visible">
+    <section class="w-full overflow-hidden">
       <div class="flex justify-between items-center mb-6">
         <p class="text-white text-2xl font-semibold">Clientes</p>
-        <!--
-        
-        <BaseButton class="ml-2" @click="showCreateModal = true">
-          Novo Cliente
-        </BaseButton>
-        -->
       </div>
-      <div>
-        <div class="flex w-full min-h-[calc(100vh-200px)] justify-center text-gray-400">
-          <div v-if="customers.length === 0"
-            class="flex w-full min-h-[200px] items-center justify-center text-gray-400 text-lg">
-            Nenhum cliente encontrado
-          </div>
-          <BaseTable v-else :headers="[
+      <div class="flex w-full justify-center text-gray-400">
+        <div v-if="loading" class="flex items-center justify-center py-10">
+          <span class="text-white text-lg">Carregando clientes...</span>
+        </div>
+        <div v-else-if="customers.length === 0"
+          class="flex w-full min-h-[642.50px] items-center justify-center text-gray-400 text-lg">
+          Nenhum cliente encontrado
+        </div>
+        <div v-else class="overflow-visible w-full">
+          <BaseTable :headers="[
             { key: 'name', label: 'Nome', align: 'left' },
             { key: 'email', label: 'Email', align: 'center' },
             { key: 'status', label: 'Status', align: 'center' },
             { key: 'created_at', label: 'Data de cadastro', align: 'center' },
-            { key: 'last_access', label: 'Último acesso', align: 'center' },
-/*             { key: 'actions', label: 'Ações', align: 'center' }
- */          ]" :items="customers">
+            { key: 'last_access', label: 'Último acesso', align: 'center' }
+          ]" :items="customers">
             <template #name="{ item }">
               {{ item.nome || "-" }}
             </template>
@@ -260,15 +322,10 @@ export default defineComponent({
                 year: 'numeric', hour: '2-digit', minute: '2-digit'
               }) : '-' }}
             </template>
-
-            <!-- <template #actions="{ item }">
-              <BaseDropdown :options="dropdownOptions" :model-value="dropdownOpen === item.id"
-                @update:model-value="(value) => dropdownOpen = value ? item.id : null"
-                @select="(action) => handleCustomerAction(item.id, action)" :top="50" class="w-min mx-auto" />
-            </template> -->
           </BaseTable>
         </div>
       </div>
     </section>
+    <BasePagination :meta="pagination" @page-change="handlePageChange" />
   </AuthenticatedLayout>
 </template>
