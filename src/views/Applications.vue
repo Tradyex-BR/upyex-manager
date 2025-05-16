@@ -25,8 +25,12 @@
             ]" :items="offers">
               <template #name="{ item }">
                 <div class="flex items-center gap-3">
-                  <img :src="item.logo_url || `https://ui-avatars.com/api/?name=${item.name}&background=random`"
-                    :alt="item.name" class="w-8 h-8 rounded-full object-cover" />
+                  <img 
+                    :src="item.imageError ? `https://ui-avatars.com/api/?name=${item.name}&background=random` : item.logo_url"
+                    :alt="item.name" 
+                    class="w-8 h-8 rounded-full object-cover"
+                    @error="item.imageError = true"
+                  />
                   <div class="flex flex-col">
                     <span class="font-inter text-[14px] font-normal leading-[18px] text-white">{{ item.name }}</span>
                     <span class="font-inter text-[14px] font-normal leading-[18px] text-white">{{ item.description
