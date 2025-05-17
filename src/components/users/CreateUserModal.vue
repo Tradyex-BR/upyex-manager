@@ -1,8 +1,9 @@
 <template>
-  <BaseModal title="Novo Usuário" :show-footer="false" @close="$emit('update:modelValue', false)" :content-class="'gap-[64px]'">
+  <BaseModal title="Novo Usuário" :show-footer="false" @close="$emit('update:modelValue', false)"
+    :content-class="'gap-[64px]'">
     <div class="flex flex-col gap-6">
-      <BaseInput v-model="formData.name" label="Nome" placeholder="Digite o nome completo do usuário" :disabled="loading"
-        variant="dark">
+      <BaseInput v-model="formData.name" label="Nome" placeholder="Digite o nome completo do usuário"
+        :disabled="loading" variant="dark">
         <template #prefix>
           <UserIcon class="w-5 h-5 text-[#B8B8B8]" />
         </template>
@@ -73,9 +74,7 @@ export default defineComponent({
     const handleSubmit = async () => {
       try {
         loading.value = true
-        const createdUser = await managerService.users.create(formData.value)
-        notificationService.success('Usuário criado com sucesso')
-        emit('submit', createdUser)
+        emit('submit', formData.value)
         emit('update:modelValue', false)
       } catch (error) {
         logger.error('Erro ao criar usuário:', error)
@@ -93,4 +92,4 @@ export default defineComponent({
     }
   }
 })
-</script> 
+</script>
