@@ -18,10 +18,8 @@ import { useAuthStore } from '@/stores/auth'
 import { useToast } from 'vue-toastification'
 import CreateUserModal from '@/components/users/CreateUserModal.vue'
 import EditUserModal from '@/components/users/EditUserModal.vue'
-import DeleteUserModal from '@/components/users/DeleteUserModal.vue'
 
 const PenIcon = defineAsyncComponent(() => import('@/components/icons/PenIcon.vue'))
-const TrashIcon = defineAsyncComponent(() => import('@/components/icons/TrashIcon.vue'))
 
 interface Usuario {
   id: string;
@@ -67,7 +65,6 @@ export default defineComponent({
     BasePagination,
     CreateUserModal,
     EditUserModal,
-    DeleteUserModal
   },
   setup() {
     const store = useDashboardStore()
@@ -140,11 +137,6 @@ export default defineComponent({
         action: 'edit',
         icon: PenIcon
       },
-      {
-        text: 'Excluir',
-        action: 'delete',
-        icon: TrashIcon
-      }
     ]
 
     return {
@@ -228,7 +220,7 @@ export default defineComponent({
     },
     async handleUpdateUser(userData: any) {
       if (!this.editingUser) return;
-      
+
       try {
         this.loading = true;
         await managerService.users.update(this.editingUser.id, userData);
@@ -360,9 +352,5 @@ export default defineComponent({
     <!-- Modal de Edição -->
     <EditUserModal v-if="showDetailModal && editingUser?.id" v-model="showDetailModal" :user-id="editingUser.id"
       @submit="handleUpdateUser" />
-
-    <!-- Modal de Confirmação de Exclusão -->
-    <DeleteUserModal v-if="showDeleteModal && deletingUser?.id && deletingUser?.nome" v-model="showDeleteModal"
-      :user-id="deletingUser.id" :user-name="deletingUser.nome" @submit="handleDeleteUser" />
   </AuthenticatedLayout>
 </template>
