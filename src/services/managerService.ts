@@ -358,6 +358,59 @@ export interface ListCustomersResponse {
   };
 }
 
+export interface User {
+  id: string;
+  name: string;
+  email: string;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface CreateUserPayload {
+  name: string;
+  email: string;
+}
+
+export interface UpdateUserPayload extends CreateUserPayload {
+  is_active: boolean;
+}
+
+export interface ListUsersParams {
+  search: string | null;
+  page: number;
+  per_page: number;
+  sort_by: string;
+  sort_order: string;
+}
+
+export interface ListUsersResponse {
+  data: User[];
+  total: number;
+  page: number;
+  per_page: number;
+  links: {
+    first: string;
+    last: string;
+    prev: string | null;
+    next: string | null;
+  };
+  meta: {
+    current_page: number;
+    from: number;
+    last_page: number;
+    links: {
+      url: string | null;
+      label: string;
+      active: boolean;
+    }[];
+    path: string;
+    per_page: number;
+    to: number;
+    total: number;
+  };
+}
+
 export const managerService = {
   auth: {
     /**
@@ -567,6 +620,51 @@ export const managerService = {
         params: params,
       });
       return response.data;
+    },
+  },
+
+  users: {
+    /**
+     * Lista usuários (users) do manager.
+     */
+    list: async (params: ListUsersParams): Promise<ListUsersResponse> => {
+      const response = await api.request<ListUsersResponse>({
+        method: 'GET',
+        url: '/users',
+        params: params,
+      });
+      return response.data;
+    },
+
+    /**
+     * Cria um novo usuário
+     */
+    create: async (payload: CreateUserPayload): Promise<User> => {
+      const response = await api.post<User>('/users', payload);
+      return response.data;
+    },
+
+    /**
+     * Obtém um usuário específico
+     */
+    get: async (id: string): Promise<User> => {
+      const response = await api.get<User>(`/users/${id}`);
+      return response.data;
+    },
+
+    /**
+     * Atualiza um usuário existente
+     */
+    update: async (id: string, payload: UpdateUserPayload): Promise<User> => {
+      const response = await api.post<User>(`/users/${id}`, payload);
+      return response.data;
+    },
+
+    /**
+     * Remove um usuário
+     */
+    delete: async (id: string): Promise<void> => {
+      await api.delete(`/users/${id}`);
     },
   },
 

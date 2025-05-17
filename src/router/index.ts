@@ -128,6 +128,12 @@ const routes: Array<RouteRecordRaw> = [
     meta: { requiresAuth: true }
   },
   {
+    path: '/users',
+    name: 'Users',
+    component: () => import('../views/Users.vue'),
+    meta: { requiresAuth: true }
+  },
+  {
     path: '/404/manager',
     name: 'NotFoundManager',
     component: () => import('../views/NotFoundManager.vue'),

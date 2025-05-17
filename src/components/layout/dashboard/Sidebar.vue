@@ -112,6 +112,12 @@ export default defineComponent({
           route: '/customers',
           icon: 'svg-vendas',
           visible: role === 'manager'
+        },
+        {
+          text: 'Usuários',
+          route: '/users',
+          icon: 'svg-vendas',
+          visible: role === 'manager'
         }
       ] as MenuItem[]
     }
