@@ -6,6 +6,14 @@
           <section class="min-h-[944px] w-full">
             <div class="flex justify-between items-center mb-6">
               <p class="text-white text-2xl font-semibold">Dashboard</p>
+              <div class="flex items-center gap-4">
+                <flat-pickr
+                  v-model="dateRange"
+                  :config="flatpickrOptions"
+                  class="bg-[#222a3f] border border-[#222a3f] cursor-pointer rounded-lg px-4 py-2 text-white w-min focus:outline-none focus:ring-0"
+                  placeholder="Selecione o período (DD/MM/AAAA)"
+                />
+              </div>
             </div>
             <div>
               <DashboardCards :data="data" :gap="24" :role="role" />
@@ -94,11 +102,14 @@ import EmptyChart from '@/components/layout/dashboard/EmptyChart.vue'
 import BaseDropdown from '@/components/common/BaseDropdown.vue'
 import { CONTEXT_ROLE_KEY } from '@/config/constants'
 import { logger } from '@/config/logger'
+import flatPickr from 'vue-flatpickr-component'
+import 'flatpickr/dist/themes/dark.css'
 
 const currentView = ref('cards')
 const role = localStorage.getItem(CONTEXT_ROLE_KEY) || 'manager'
 const currentDropdownAction = ref('Total')
 const isDropdownOpen = ref(false)
+const dateRange = ref('')
 
 const translateLabel = (label: string): string => {
   const translations: Record<string, string> = {
@@ -186,6 +197,38 @@ const dropdownOptions = computed(() => [
     action: 'paid'
   },
 ])
+
+const flatpickrOptions = {
+  mode: 'range' as const,
+  dateFormat: 'd/m/Y',
+  locale: {
+    firstDayOfWeek: 1,
+    weekdays: {
+      shorthand: ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'] as [string, string, string, string, string, string, string],
+      longhand: ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'] as [string, string, string, string, string, string, string]
+    },
+    months: {
+      shorthand: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'] as [string, string, string, string, string, string, string, string, string, string, string, string],
+      longhand: ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'] as [string, string, string, string, string, string, string, string, string, string, string, string]
+    },
+    rangeSeparator: ' até ',
+    weekAbbreviation: 'Sem',
+    amPM: ['AM', 'PM'] as [string, string],
+    yearAriaLabel: 'Ano',
+    monthAriaLabel: 'Mês',
+    hourAriaLabel: 'Hora',
+    minuteAriaLabel: 'Minuto',
+    time_24hr: false
+  },
+  defaultDate: [new Date().setDate(new Date().getDate() - 7), new Date()],
+  onChange: (selectedDates: Date[]) => {
+    if (selectedDates.length === 2) {
+      const startDate = selectedDates[0].toISOString().split('T')[0]
+      const endDate = selectedDates[1].toISOString().split('T')[0]
+      fetchData(undefined, { start_date: startDate, end_date: endDate })
+    }
+  }
+}
 
 onMounted(() => {
   if (currentDropdownAction.value === 'Total') {

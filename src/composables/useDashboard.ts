@@ -174,7 +174,7 @@
       }
     }
 
-    const fetchData = async (action?: string) => {
+    const fetchData = async (action?: string, dateParams?: { start_date: string; end_date: string }) => {
       loading.value = true
       error.value = ''
       try {
@@ -185,7 +185,7 @@
           const sevenDaysAgo = new Date(today)
           sevenDaysAgo.setDate(today.getDate() - 7)
 
-          const params: DashboardParams = {
+          const params: DashboardParams = dateParams || {
             start_date: sevenDaysAgo.toISOString().split('T')[0],
             end_date: today.toISOString().split('T')[0],
           }
