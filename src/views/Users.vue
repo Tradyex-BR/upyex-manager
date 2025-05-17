@@ -228,8 +228,9 @@ export default defineComponent({
     },
     async handleUpdateUser(userData: any) {
       if (!this.editingUser) return;
-
+      
       try {
+        this.loading = true;
         await managerService.users.update(this.editingUser.id, userData);
         this.toast.success('Usuário atualizado com sucesso!');
         this.showDetailModal = false;
@@ -238,6 +239,8 @@ export default defineComponent({
       } catch (e) {
         logger.error('Erro ao atualizar usuário:', e);
         this.toast.error('Erro ao atualizar usuário');
+      } finally {
+        this.loading = false;
       }
     },
     async handleCreateUser(userData: any) {

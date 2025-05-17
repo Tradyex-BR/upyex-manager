@@ -109,8 +109,6 @@ export default defineComponent({
     const handleSubmit = async () => {
       try {
         loading.value = true
-        await managerService.users.update(props.userId, formData.value)
-        notificationService.success('Usuário atualizado com sucesso')
         emit('submit', formData.value)
         emit('update:modelValue', false)
       } catch (error) {
