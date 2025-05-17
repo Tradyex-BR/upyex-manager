@@ -120,6 +120,11 @@
           handleSearch(searchQuery.value, pagination.value.current_page)
         })
 
+        watch(() => props.searchTerm, (newTerm) => {
+          searchQuery.value = newTerm
+          handleSearch(newTerm, 1)
+        })
+
         const handleSearch = async (term: string, page: number = 1) => {
           loading.value = true
           try {
@@ -202,6 +207,7 @@
             await handleSearch('')
           } catch (e) {
             logger.error('Erro ao alterar status do afiliado:', e);
+            throw e; // Propaga o erro para ser tratado no handleAction
           }
         }
 
@@ -216,9 +222,14 @@
           const affiliate = affiliates.value.find(a => a.id === id)
           if (!affiliate) return
 
-          if (action === 'toggle_status') {
-            await handleToggleStatus(id, !affiliate.is_active)
-            notificationService.success('Status do afiliado alterado com sucesso')
+          try {
+            if (action === 'toggle_status') {
+              await handleToggleStatus(id, !affiliate.is_active)
+              notificationService.success('Status do afiliado alterado com sucesso')
+            }
+          } catch (e) {
+            logger.error('Erro ao alterar status do afiliado:', e)
+            notificationService.error('Erro ao alterar status do afiliado')
           }
         }
 
@@ -252,6 +263,7 @@
           getStatusClass,
           handleAction,
           handlePageChange,
+          handleSearch,
           getImageUrl,
           handleImageError
         }

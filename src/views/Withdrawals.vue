@@ -76,7 +76,7 @@ export default defineComponent({
     BaseModal: defineAsyncComponent(() => import('@/components/common/BaseModal.vue')),
     BaseInput: defineAsyncComponent(() => import('@/components/common/BaseInput.vue'))
   },
-  setup() {
+  setup(props) {
     const store = useDashboardStore()
     const router = useRouter()
     const authStore = useAuthStore()
@@ -128,6 +128,11 @@ export default defineComponent({
       to: 1,
       total: 0,
       links: []
+    })
+
+    watch(() => props.searchTerm, (newTerm) => {
+      searchQuery.value = newTerm
+      handleSearch(newTerm, 1)
     })
 
     watch(() => authStore.isAuthenticated, (isAuthenticated) => {
@@ -371,7 +376,8 @@ export default defineComponent({
       getBalance,
       loadWithdrawalInfo,
       handlePageChange,
-      requestWithdrawal
+      requestWithdrawal,
+      handleSearch
     }
   }
 })

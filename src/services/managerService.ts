@@ -430,8 +430,15 @@ export const managerService = {
       const affiliate = await managerService.affiliates.get(id);
       // Atualiza com todos os dados + is_active true
       const response = await api.post<Affiliate>(`/affiliates/${id}`, {
-        ...affiliate,
-        is_active: true
+        name: affiliate.name,
+        email: affiliate.email,
+        integration_code: affiliate.integration_code,
+        is_active: true,
+        applications: affiliate.applications.map(app => ({
+          id: app.id,
+          commission_percentage: app.commission_percentage,
+          commission_release_days: app.commission_release_days
+        }))
       });
       return response.data;
     },
@@ -440,8 +447,15 @@ export const managerService = {
       const affiliate = await managerService.affiliates.get(id);
       // Atualiza com todos os dados + is_active false
       const response = await api.post<Affiliate>(`/affiliates/${id}`, {
-        ...affiliate,
-        is_active: false
+        name: affiliate.name,
+        email: affiliate.email,
+        integration_code: affiliate.integration_code,
+        is_active: false,
+        applications: affiliate.applications.map(app => ({
+          id: app.id,
+          commission_percentage: app.commission_percentage,
+          commission_release_days: app.commission_release_days
+        }))
       });
       return response.data;
     },
