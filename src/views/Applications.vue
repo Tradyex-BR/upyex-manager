@@ -3,6 +3,9 @@
     <section class="w-full overflow-hidden">
       <div class="flex justify-between items-center mb-6">
         <p class="text-white text-2xl font-semibold">Aplicações</p>
+        <BaseButton variant="primary" @click="showCreateModal = true">
+          Nova Aplicação
+        </BaseButton>
       </div>
       <div class="flex w-full justify-center text-gray-400">
         <div v-if="loading" class="flex items-center justify-center py-10">
@@ -25,12 +28,8 @@
           ]" :items="offers">
             <template #name="{ item }">
               <div class="flex items-center gap-3">
-                <img 
-                  :src="getImageUrl(item.name, item.logo_url)"
-                  :alt="item.name" 
-                  class="w-8 h-8 rounded-full object-cover"
-                  @error="(e) => handleImageError(e, item.name)"
-                />
+                <img :src="getImageUrl(item.name, item.logo_url)" :alt="item.name"
+                  class="w-8 h-8 rounded-full object-cover" @error="(e) => handleImageError(e, item.name)" />
                 <div class="flex flex-col">
                   <span class="font-inter text-[14px] font-normal leading-[18px] text-white">{{ item.name }}</span>
                   <span class="font-inter text-[14px] font-normal leading-[18px] text-white">{{ item.description
@@ -83,6 +82,8 @@
       @close="showEditModal = false" @submit="handleEditApplication" />
     <ConfirmResetModal v-if="showResetModal" :show="showResetModal" :application-id="selectedApplication?.id"
       :api-key="selectedApplication?.api_secret" @close="showResetModal = false" @submit="handleResetApplication" />
+    <CreateApplicationModal v-if="showCreateModal" :show="showCreateModal" @close="showCreateModal = false"
+      @submit="handleCreateApplication" />
   </AuthenticatedLayout>
 </template>
 
@@ -105,6 +106,7 @@ import ToggleIcon from '@/components/icons/ToggleIcon.vue'
 import BaseDropdown from '@/components/common/BaseDropdown.vue'
 import EditApplicationModal from '@/components/applications/EditApplicationModal.vue'
 import ConfirmResetModal from '@/components/applications/ConfirmResetModal.vue'
+import CreateApplicationModal from '@/components/applications/CreateApplicationModal.vue'
 import { notificationService } from '@/services/notificationService'
 import { CONTEXT_ROLE_KEY } from '@/config/constants'
 import { logger } from '@/config/logger'
@@ -112,259 +114,259 @@ import BasePagination from '@/components/common/BasePagination.vue'
 import { getImageUrl, handleImageError } from '@/utils/imageUtils'
 
 export default defineComponent({
-props: {
-  searchTerm: {
-    type: String,
-    default: ''
-  }
-},
-name: 'Applications',
-components: {
-  AuthenticatedLayout,
-  BaseButton,
-  CopyButton,
-  BaseTable,
-  BaseDropdown,
-  EditApplicationModal,
-  ConfirmResetModal,
-  BasePagination
-},
-setup() {
-  const store = useDashboardStore()
-  const loading = ref(true)
-  const router = useRouter()
-  const toast = useToast()
-  const paginationStore = usePaginationStore()
-  const dropdownOptions = [
-    {
-      text: 'Ativar/Desativar',
-      action: 'toggle_status',
-      icon: ToggleIcon
-    },
-    {
-      text: 'Copiar Chave API',
-      action: 'copy_api_key',
-      icon: KeyIcon
-    },
-    {
-      text: 'Editar Aplicação',
-      action: 'edit_application',
-      icon: PenIcon
-    },
-    {
-      text: 'Resetar Chave API',
-      action: 'reset_api_key',
-      icon: TrashIcon
+  props: {
+    searchTerm: {
+      type: String,
+      default: ''
     }
-  ]
-  return { store, loading, router, toast, dropdownOptions, getImageUrl, handleImageError, paginationStore }
-},
-data() {
-  return {
-    offers: [] as any[],
-    loading: true,
-    showCreateModal: false,
-    showEditModal: false,
-    showResetModal: false,
-    selectedApplication: null as any,
-    isManager: false,
-    dropdownOpen: null as string | null,
-    pagination: {
-      current_page: 1,
-      from: 1,
-      last_page: 1,
-      per_page: 10,
-      to: 1,
-      total: 0,
-      links: [] as Array<{ url: string | null; label: string; active: boolean }>
-    }
-  }
-},
-mounted() {
-  this.isManager = localStorage.getItem(CONTEXT_ROLE_KEY) === 'manager'
-  this.handleSearch('')
-},
-watch: {
-  'paginationStore.perPage': {
-    handler(newValue: number) {
-      this.pagination.per_page = newValue
-      this.handleSearch(this.searchTerm)
-    },
-    immediate: true
   },
-  searchTerm(newTerm) {
-    this.handleSearch(newTerm)
-  }
-},
-methods: {
-  formatLink(link: string): string {
-    return formatLink(link);
+  name: 'Applications',
+  components: {
+    AuthenticatedLayout,
+    BaseButton,
+    CopyButton,
+    BaseTable,
+    BaseDropdown,
+    EditApplicationModal,
+    ConfirmResetModal,
+    CreateApplicationModal,
+    BasePagination
   },
-  async handleSearch(term: string) {
-    this.loading = true
-    try {
-      const response = await managerService.applications.list({
-        search: term,
-        page: 1,
-        per_page: this.paginationStore.perPage,
-        sort_by: 'name',
-        sort_order: 'asc'
-      })
-      this.offers = response.data
-      this.pagination = {
-        current_page: response.meta.current_page,
-        from: response.meta.from,
-        last_page: response.meta.last_page,
-        per_page: response.meta.per_page,
-        to: response.meta.to,
-        total: response.meta.total,
-        links: response.meta.links
+  setup() {
+    const store = useDashboardStore()
+    const loading = ref(true)
+    const router = useRouter()
+    const toast = useToast()
+    const paginationStore = usePaginationStore()
+    const dropdownOptions = [
+      {
+        text: 'Ativar/Desativar',
+        action: 'toggle_status',
+        icon: ToggleIcon
+      },
+      {
+        text: 'Copiar Chave API',
+        action: 'copy_api_key',
+        icon: KeyIcon
+      },
+      {
+        text: 'Editar Aplicação',
+        action: 'edit_application',
+        icon: PenIcon
+      },
+      {
+        text: 'Resetar Chave API',
+        action: 'reset_api_key',
+        icon: TrashIcon
       }
-    } catch (e) {
-      logger.error('Erro ao buscar aplicações:', e)
-      notificationService.error('Erro ao buscar aplicações')
-    } finally {
-      this.loading = false
-    }
+    ]
+    return { store, loading, router, toast, dropdownOptions, getImageUrl, handleImageError, paginationStore }
   },
-  async handlePageChange(page: number) {
-    this.loading = true
-    try {
-      const response = await managerService.applications.list({
-        search: this.searchTerm,
-        page: page,
-        per_page: this.paginationStore.perPage,
-        sort_by: 'name',
-        sort_order: 'asc'
-      })
-      this.offers = response.data
-      this.pagination = {
-        current_page: response.meta.current_page,
-        from: response.meta.from,
-        last_page: response.meta.last_page,
-        per_page: response.meta.per_page,
-        to: response.meta.to,
-        total: response.meta.total,
-        links: response.meta.links
+  data() {
+    return {
+      offers: [] as any[],
+      loading: true,
+      showCreateModal: false,
+      showEditModal: false,
+      showResetModal: false,
+      selectedApplication: null as any,
+      isManager: false,
+      dropdownOpen: null as string | null,
+      pagination: {
+        current_page: 1,
+        from: 1,
+        last_page: 1,
+        per_page: 10,
+        to: 1,
+        total: 0,
+        links: [] as Array<{ url: string | null; label: string; active: boolean }>
       }
-    } catch (e) {
-      logger.error('Erro ao buscar aplicações:', e)
-      notificationService.error('Erro ao buscar aplicações')
-    } finally {
-      this.loading = false
     }
   },
-  handleDropdownToggle(id: string, value: boolean) {
-    this.dropdownOpen = value ? id : null;
+  mounted() {
+    this.isManager = localStorage.getItem(CONTEXT_ROLE_KEY) === 'manager'
+    this.handleSearch('')
   },
-  async handleApplicationAction(id: string, action: string) {
-    try {
-      switch (action) {
-        case 'toggle_status':
-          try {
-            const application = this.offers.find(o => o.id === id)
-            if (!application) {
-              throw new Error('Aplicação não encontrada')
-            }
-
-            const payload = {
-              ...application,
-              is_active: !application.is_active
-            }
-
-            await managerService.applications.update(id, payload)
-
-            // Atualiza o estado local
-            const index = this.offers.findIndex(o => o.id === id)
-            if (index !== -1) {
-              this.offers[index] = { ...this.offers[index], is_active: !application.is_active }
-            }
-
-            notificationService.success('Status atualizado com sucesso')
-          } catch (error) {
-            logger.error('Erro ao atualizar status:', error)
-            notificationService.error('Erro ao atualizar status da aplicação')
-          }
-          break;
-        case 'copy_api_key':
-          try {
-            const application = await managerService.applications.get(id)
-            if (!application) {
-              throw new Error('Aplicação não encontrada')
-            }
-
-            const apiSecret = application.api_secret
-            if (!apiSecret) {
-              throw new Error('Chave API não encontrada')
-            }
-
-            await navigator.clipboard.writeText(apiSecret)
-            notificationService.success('Chave API copiada com sucesso')
-          } catch (error) {
-            logger.error('Erro ao copiar chave API:', error)
-            notificationService.error('Erro ao copiar chave API')
-          }
-          break;
-        case 'edit_application':
-          this.selectedApplication = this.offers.find(o => o.id === id);
-          this.showEditModal = true;
-          break;
-        case 'reset_api_key':
-          this.selectedApplication = this.offers.find(o => o.id === id);
-          this.showResetModal = true;
-          break;
+  watch: {
+    'paginationStore.perPage': {
+      handler(newValue: number) {
+        this.pagination.per_page = newValue
+        this.handleSearch(this.searchTerm)
+      },
+      immediate: true
+    },
+    searchTerm(newTerm) {
+      this.handleSearch(newTerm)
+    }
+  },
+  methods: {
+    formatLink(link: string): string {
+      return formatLink(link);
+    },
+    async handleSearch(term: string) {
+      this.loading = true
+      try {
+        const response = await managerService.applications.list({
+          search: term,
+          page: 1,
+          per_page: this.paginationStore.perPage,
+          sort_by: 'name',
+          sort_order: 'asc'
+        })
+        this.offers = response.data
+        this.pagination = {
+          current_page: response.meta.current_page,
+          from: response.meta.from,
+          last_page: response.meta.last_page,
+          per_page: response.meta.per_page,
+          to: response.meta.to,
+          total: response.meta.total,
+          links: response.meta.links
+        }
+      } catch (e) {
+        logger.error('Erro ao buscar aplicações:', e)
+        notificationService.error('Erro ao buscar aplicações')
+      } finally {
+        this.loading = false
       }
-    } catch (e) {
-      logger.error(`Erro ao executar ação ${action}:`, e)
-    }
-  },
-  getStatusClass(isActive: boolean): string {
-    const baseClass = 'font-inter text-[14px] font-medium leading-[18px] inline-flex h-6 px-2 justify-center items-center gap-1 rounded-[6px] w-fit mx-auto'
-    return isActive
-      ? `${baseClass} bg-green-500/20 text-green-500`
-      : `${baseClass} bg-red-500/20 text-red-500`
-  },
-  async handleCreateApplication(formData: any) {
-    try {
-      await managerService.applications.create(formData);
-      await this.handleSearch('');
-      this.showCreateModal = false;
-      notificationService.success('Aplicação criada com sucesso');
-    } catch (error) {
-      logger.error('Erro ao criar aplicação:', error);
-      notificationService.error('Erro ao criar aplicação');
-    }
-  },
-  async handleEditApplication(formData: any) {
-    try {
-      const updatedApplication = await managerService.applications.update(this.selectedApplication.id, formData);
-
-      // Atualiza o item localmente
-      const index = this.offers.findIndex(o => o.id === this.selectedApplication.id);
-      if (index !== -1) {
-        this.offers[index] = { ...this.offers[index], ...updatedApplication };
+    },
+    async handlePageChange(page: number) {
+      this.loading = true
+      try {
+        const response = await managerService.applications.list({
+          search: this.searchTerm,
+          page: page,
+          per_page: this.paginationStore.perPage,
+          sort_by: 'name',
+          sort_order: 'asc'
+        })
+        this.offers = response.data
+        this.pagination = {
+          current_page: response.meta.current_page,
+          from: response.meta.from,
+          last_page: response.meta.last_page,
+          per_page: response.meta.per_page,
+          to: response.meta.to,
+          total: response.meta.total,
+          links: response.meta.links
+        }
+      } catch (e) {
+        logger.error('Erro ao buscar aplicações:', e)
+        notificationService.error('Erro ao buscar aplicações')
+      } finally {
+        this.loading = false
       }
+    },
+    handleDropdownToggle(id: string, value: boolean) {
+      this.dropdownOpen = value ? id : null;
+    },
+    async handleApplicationAction(id: string, action: string) {
+      try {
+        switch (action) {
+          case 'toggle_status':
+            try {
+              const application = this.offers.find(o => o.id === id)
+              if (!application) {
+                throw new Error('Aplicação não encontrada')
+              }
 
-      this.showEditModal = false;
-      notificationService.success('Aplicação atualizada com sucesso');
-    } catch (error) {
-      logger.error('Erro ao editar aplicação:', error);
-      notificationService.error('Erro ao atualizar aplicação');
+              const payload = {
+                ...application,
+                is_active: !application.is_active
+              }
+
+              await managerService.applications.update(id, payload)
+
+              // Atualiza o estado local
+              const index = this.offers.findIndex(o => o.id === id)
+              if (index !== -1) {
+                this.offers[index] = { ...this.offers[index], is_active: !application.is_active }
+              }
+
+              notificationService.success('Status atualizado com sucesso')
+            } catch (error) {
+              logger.error('Erro ao atualizar status:', error)
+              notificationService.error('Erro ao atualizar status da aplicação')
+            }
+            break;
+          case 'copy_api_key':
+            try {
+              const application = await managerService.applications.get(id)
+              if (!application) {
+                throw new Error('Aplicação não encontrada')
+              }
+
+              const apiSecret = application.api_secret
+              if (!apiSecret) {
+                throw new Error('Chave API não encontrada')
+              }
+
+              await navigator.clipboard.writeText(apiSecret)
+              notificationService.success('Chave API copiada com sucesso')
+            } catch (error) {
+              logger.error('Erro ao copiar chave API:', error)
+              notificationService.error('Erro ao copiar chave API')
+            }
+            break;
+          case 'edit_application':
+            this.selectedApplication = this.offers.find(o => o.id === id);
+            this.showEditModal = true;
+            break;
+          case 'reset_api_key':
+            this.selectedApplication = this.offers.find(o => o.id === id);
+            this.showResetModal = true;
+            break;
+        }
+      } catch (e) {
+        logger.error(`Erro ao executar ação ${action}:`, e)
+      }
+    },
+    getStatusClass(isActive: boolean): string {
+      const baseClass = 'font-inter text-[14px] font-medium leading-[18px] inline-flex h-6 px-2 justify-center items-center gap-1 rounded-[6px] w-fit mx-auto'
+      return isActive
+        ? `${baseClass} bg-green-500/20 text-green-500`
+        : `${baseClass} bg-red-500/20 text-red-500`
+    },
+    async handleCreateApplication(createdApplication: any) {
+      try {
+        // Adiciona a nova aplicação à lista
+        this.offers.unshift(createdApplication);
+        this.showCreateModal = false;
+      } catch (error) {
+        logger.error('Erro ao criar aplicação:', error);
+        notificationService.error('Erro ao criar aplicação');
+      }
+    },
+    async handleEditApplication(formData: any) {
+      try {
+        const updatedApplication = await managerService.applications.update(this.selectedApplication.id, formData);
+
+        // Atualiza o item localmente
+        const index = this.offers.findIndex(o => o.id === this.selectedApplication.id);
+        if (index !== -1) {
+          this.offers[index] = { ...this.offers[index], ...updatedApplication };
+        }
+
+        this.showEditModal = false;
+        notificationService.success('Aplicação atualizada com sucesso');
+      } catch (error) {
+        logger.error('Erro ao editar aplicação:', error);
+        notificationService.error('Erro ao atualizar aplicação');
+      }
+    },
+    async handleResetApplication() {
+      try {
+        await managerService.applications.resetSecret(this.selectedApplication.id)
+        notificationService.success('Chave API resetada com sucesso')
+      } catch (error) {
+        logger.error('Erro ao resetar chave API:', error)
+        notificationService.error('Erro ao resetar chave API')
+      }
+    },
+    handleGenerateLink(offer: any) {
+      this.selectedApplication = offer
+      this.showCreateModal = true
     }
-  },
-  async handleResetApplication() {
-    try {
-      await managerService.applications.resetSecret(this.selectedApplication.id)
-      notificationService.success('Chave API resetada com sucesso')
-    } catch (error) {
-      logger.error('Erro ao resetar chave API:', error)
-      notificationService.error('Erro ao resetar chave API')
-    }
-  },
-  handleGenerateLink(offer: any) {
-    this.selectedApplication = offer
-    this.showCreateModal = true
   }
-}
 })
 </script>
