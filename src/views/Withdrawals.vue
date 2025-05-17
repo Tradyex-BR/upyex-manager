@@ -93,7 +93,7 @@ export default defineComponent({
         role: 'manager'
       },
       {
-        text: 'Bloquear',
+        text: 'Recusar',
         action: 'bloquear',
         icon: XIcon,
         role: 'manager'
@@ -160,7 +160,7 @@ export default defineComponent({
           status: null,
           method: null
         })
-        
+
         withdrawals.value = response.data.map((item) => ({
           id: item.id,
           date: item.created_at ? new Date(item.created_at).toLocaleString('pt-BR') : '',
@@ -266,12 +266,15 @@ export default defineComponent({
         if (action === 'aprovar') {
           logger.info('Aprovando saque:', id)
           await managerService.withdrawals.approve(id)
+          notificationService.success('Saque aprovado com sucesso')
         } else if (action === 'bloquear') {
           logger.info('Rejeitando saque:', id)
           await managerService.withdrawals.reject(id)
+          notificationService.success('Saque rejeitado com sucesso')
         } else if (action === 'cancelar') {
           logger.info('Cancelando saque:', id)
           await managerService.withdrawals.cancel(id)
+          notificationService.success('Saque cancelado com sucesso')
         }
 
         await handleSearch(searchQuery.value)
@@ -436,8 +439,10 @@ export default defineComponent({
           </template>
 
           <template #actions="{ item }">
-            <BaseDropdown :options="filteredDropdownOptions" @select="handleDropdownAction($event, item.id)" :top="50"
-              class="w-min mx-auto" />
+            <div v-if="item.status === 'Solicitado'">
+              <BaseDropdown :options="filteredDropdownOptions" @select="handleDropdownAction($event, item.id)" :top="50"
+                class="w-min mx-auto" />
+            </div>
           </template>
         </BaseTable>
       </div>
