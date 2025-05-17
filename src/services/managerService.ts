@@ -43,6 +43,10 @@ export interface Affiliate {
   created_at: string;
   updated_at: string;
   applications: AffiliateApplication[];
+  links?: {
+    api?: string;
+    frontend?: string;
+  };
 }
 export interface ListAffiliatesParams {
   search: string | null;
@@ -213,6 +217,12 @@ export interface Withdrawal {
   cancelled_at?: string | null;
   created_at: string;
   updated_at: string;
+  retrieved_at?: string | null;
+  account?: {
+    id: string;
+    name: string;
+    affiliate?: Affiliate;
+  };
   links?: {
     api?: string;
     frontend?: string;

@@ -133,6 +133,7 @@ export default defineComponent({
 
         withdrawals.value = response.data.map((item) => ({
           id: item.id,
+          name: item.account?.affiliate?.name || '-',
           date: item.created_at ? new Date(item.created_at).toLocaleString('pt-BR') : '',
           valueBRL: Number(item.amount).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }),
           destination: item.destination,
@@ -381,13 +382,18 @@ export default defineComponent({
           Nenhum saque encontrado
         </div>
         <BaseTable v-else :headers="[
-          { key: 'date', label: 'Data', align: 'left' },
+          { key: 'name', label: 'Nome', align: 'left' },
+          { key: 'date', label: 'Data', align: 'center' },
           { key: 'value', label: 'Valor BRL', align: 'center' },
           { key: 'destination', label: 'Destino (Chave Pix)', align: 'center' },
           { key: 'type', label: 'Tipo', align: 'center' },
           { key: 'status', label: 'Status', align: 'center' },
           { key: 'actions', label: 'Ações', align: 'center' }
         ]" :items="withdrawals">
+          <template #name="{ item }">
+            {{ item.name }}
+          </template>
+
           <template #date="{ item }">
             {{ item.date }}
           </template>
