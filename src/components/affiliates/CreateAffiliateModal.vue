@@ -57,8 +57,8 @@
           </div>
 
           <div class="space-y-2">
-            <label class="text-sm text-white">Código de Integração <span class="text-[#BE3E37]">*</span></label>
-            <BaseInput v-model="form.integration_code" placeholder="Digite o código de integração" required
+            <label class="text-sm text-white">Código de afiliado <span class="text-[#BE3E37]">*</span></label>
+            <BaseInput v-model="form.integration_code" placeholder="Digite o código de afiliado" required
               variant="dark">
               <template #prefix>
                 <FontAwesomeIcon icon="hashtag" class="text-[#85B1FF] mr-3" />

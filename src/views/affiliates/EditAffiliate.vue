@@ -54,7 +54,7 @@
               </div>
             </div>
             <div>
-              <label class="block text-gray-400 mb-2">Código de Integração</label>
+              <label class="block text-gray-400 mb-2">Código de afiliado</label>
               <div class="relative">
                 <i class="fas fa-code absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
                 <input v-model="form.integration_code" type="text" required
