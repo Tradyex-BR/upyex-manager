@@ -35,7 +35,6 @@ import BaseInput from '@/components/common/BaseInput.vue'
 import BaseButton from '@/components/common/BaseButton.vue'
 import UserIcon from '@/components/icons/UserIcon.vue'
 import EmailConfigIcon from '@/components/icons/EmailConfigIcon.vue'
-import { managerService } from '@/services/managerService'
 import { notificationService } from '@/services/notificationService'
 import { logger } from '@/config/logger'
 
