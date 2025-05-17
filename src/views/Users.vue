@@ -16,6 +16,9 @@ import { usePaginationStore } from '@/stores/pagination'
 import { useDashboardStore } from '@/stores/dashboard'
 import { useAuthStore } from '@/stores/auth'
 import { useToast } from 'vue-toastification'
+import CreateUserModal from '@/components/users/CreateUserModal.vue'
+import EditUserModal from '@/components/users/EditUserModal.vue'
+import DeleteUserModal from '@/components/users/DeleteUserModal.vue'
 
 const PenIcon = defineAsyncComponent(() => import('@/components/icons/PenIcon.vue'))
 const TrashIcon = defineAsyncComponent(() => import('@/components/icons/TrashIcon.vue'))
@@ -61,7 +64,10 @@ export default defineComponent({
     MenuIcon,
     BaseDropdown,
     BaseTable,
-    BasePagination
+    BasePagination,
+    CreateUserModal,
+    EditUserModal,
+    DeleteUserModal
   },
   setup() {
     const store = useDashboardStore()
@@ -156,11 +162,7 @@ export default defineComponent({
       showCreateModal: false,
       showDeleteModal: false,
       editingUser: null as Usuario | null,
-      deletingUser: null as Usuario | null,
-      newUser: {
-        name: '',
-        email: ''
-      }
+      deletingUser: null as Usuario | null
     }
   },
   watch: {
@@ -203,7 +205,7 @@ export default defineComponent({
         logger.error(`Erro ao executar ação ${action}:`, e)
       }
     },
-    async deleteUser() {
+    async handleDeleteUser() {
       if (!this.deletingUser) return;
       
       try {
@@ -217,15 +219,11 @@ export default defineComponent({
         this.toast.error('Erro ao excluir usuário');
       }
     },
-    async updateUser(userData: any) {
+    async handleUpdateUser(userData: any) {
       if (!this.editingUser) return;
       
       try {
-        await managerService.users.update(this.editingUser.id, {
-          name: userData.name,
-          email: userData.email,
-          is_active: userData.is_active
-        });
+        await managerService.users.update(this.editingUser.id, userData);
         this.toast.success('Usuário atualizado com sucesso!');
         this.showDetailModal = false;
         this.editingUser = null;
@@ -235,15 +233,11 @@ export default defineComponent({
         this.toast.error('Erro ao atualizar usuário');
       }
     },
-    async createUser(userData: any) {
+    async handleCreateUser(userData: any) {
       try {
-        await managerService.users.create({
-          name: userData.name,
-          email: userData.email
-        });
+        await managerService.users.create(userData);
         this.toast.success('Usuário criado com sucesso!');
         this.showCreateModal = false;
-        this.newUser = { name: '', email: '' };
         await this.loadUsers();
       } catch (e) {
         logger.error('Erro ao criar usuário:', e);
@@ -345,77 +339,27 @@ export default defineComponent({
     <BasePagination :meta="pagination" @page-change="handlePageChange" />
 
     <!-- Modal de Criação -->
-    <BaseModal v-if="showCreateModal" v-model="showCreateModal" title="Novo Usuário">
-      <template #default>
-        <form @submit.prevent="createUser(newUser)">
-          <div class="space-y-4">
-            <div>
-              <label class="block text-sm font-medium text-gray-300">Nome</label>
-              <input type="text" v-model="newUser.name" class="mt-1 block w-full rounded-md border-gray-600 bg-gray-700 text-white" required />
-            </div>
-            <div>
-              <label class="block text-sm font-medium text-gray-300">Email</label>
-              <input type="email" v-model="newUser.email" class="mt-1 block w-full rounded-md border-gray-600 bg-gray-700 text-white" required />
-            </div>
-          </div>
-          <div class="mt-6 flex justify-end space-x-3">
-            <BaseButton type="button" @click="showCreateModal = false" class="bg-gray-600 hover:bg-gray-700">
-              Cancelar
-            </BaseButton>
-            <BaseButton type="submit" class="bg-primary-500 hover:bg-primary-600">
-              Criar
-            </BaseButton>
-          </div>
-        </form>
-      </template>
-    </BaseModal>
+    <CreateUserModal 
+      v-if="showCreateModal" 
+      v-model="showCreateModal" 
+      @submit="handleCreateUser"
+    />
 
     <!-- Modal de Edição -->
-    <BaseModal v-if="showDetailModal" v-model="showDetailModal" title="Editar Usuário">
-      <template #default>
-        <form v-if="editingUser" @submit.prevent="updateUser(editingUser)">
-          <div class="space-y-4">
-            <div>
-              <label class="block text-sm font-medium text-gray-300">Nome</label>
-              <input type="text" v-model="editingUser.nome" class="mt-1 block w-full rounded-md border-gray-600 bg-gray-700 text-white" required />
-            </div>
-            <div>
-              <label class="block text-sm font-medium text-gray-300">Email</label>
-              <input type="email" v-model="editingUser.email" class="mt-1 block w-full rounded-md border-gray-600 bg-gray-700 text-white" required />
-            </div>
-            <div>
-              <label class="block text-sm font-medium text-gray-300">Status</label>
-              <select v-model="editingUser.status" class="mt-1 block w-full rounded-md border-gray-600 bg-gray-700 text-white">
-                <option value="Ativo">Ativo</option>
-                <option value="Inativo">Inativo</option>
-              </select>
-            </div>
-          </div>
-          <div class="mt-6 flex justify-end space-x-3">
-            <BaseButton type="button" @click="showDetailModal = false" class="bg-gray-600 hover:bg-gray-700">
-              Cancelar
-            </BaseButton>
-            <BaseButton type="submit" class="bg-primary-500 hover:bg-primary-600">
-              Salvar
-            </BaseButton>
-          </div>
-        </form>
-      </template>
-    </BaseModal>
+    <EditUserModal
+      v-if="showDetailModal && editingUser?.id"
+      v-model="showDetailModal"
+      :user-id="editingUser.id"
+      @submit="handleUpdateUser"
+    />
 
     <!-- Modal de Confirmação de Exclusão -->
-    <BaseModal v-if="showDeleteModal" v-model="showDeleteModal" title="Confirmar Exclusão">
-      <template #default>
-        <p class="text-gray-300">Tem certeza que deseja excluir este usuário?</p>
-        <div class="mt-6 flex justify-end space-x-3">
-          <BaseButton type="button" @click="showDeleteModal = false" class="bg-gray-600 hover:bg-gray-700">
-            Cancelar
-          </BaseButton>
-          <BaseButton type="button" @click="deleteUser" class="bg-red-500 hover:bg-red-600">
-            Excluir
-          </BaseButton>
-        </div>
-      </template>
-    </BaseModal>
+    <DeleteUserModal
+      v-if="showDeleteModal && deletingUser?.id && deletingUser?.nome"
+      v-model="showDeleteModal"
+      :user-id="deletingUser.id"
+      :user-name="deletingUser.nome"
+      @submit="handleDeleteUser"
+    />
   </AuthenticatedLayout>
 </template>
