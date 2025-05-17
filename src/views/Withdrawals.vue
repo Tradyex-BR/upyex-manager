@@ -85,13 +85,49 @@ export default defineComponent({
     const withdrawals = ref<any[]>([])
     const searchQuery = ref('')
     const paginationStore = usePaginationStore()
-    const pagination = ref({
+    const dropdownOptions = ref([
+      {
+        text: 'Aprovar',
+        action: 'aprovar',
+        icon: CheckIcon,
+        role: 'manager'
+      },
+      {
+        text: 'Bloquear',
+        action: 'bloquear',
+        icon: XIcon,
+        role: 'manager'
+      },
+      {
+        text: 'Cancelar',
+        action: 'cancelar',
+        icon: XIcon,
+        role: 'affiliate'
+      }
+    ])
+    const withdrawalAmount = ref('')
+    const selectedMethod = ref('')
+    const destination = ref('')
+    const showModal = ref(false)
+
+    interface PaginationMeta {
+      current_page: number
+      from: number
+      last_page: number
+      per_page: number
+      to: number
+      total: number
+      links: Array<{ url: string | null; label: string; active: boolean }>
+    }
+
+    const pagination = ref<PaginationMeta>({
       current_page: 1,
       from: 1,
       last_page: 1,
       per_page: paginationStore.perPage,
       to: 1,
-      total: 0
+      total: 0,
+      links: []
     })
 
     watch(() => authStore.isAuthenticated, (isAuthenticated) => {
@@ -119,12 +155,40 @@ export default defineComponent({
           status: null,
           method: null
         })
-        withdrawals.value = response.data || []
+        
+        withdrawals.value = response.data.map((item) => ({
+          id: item.id,
+          date: item.created_at ? new Date(item.created_at).toLocaleString('pt-BR') : '',
+          valueBRL: Number(item.amount).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }),
+          destination: item.destination,
+          type: item.method === 'pix' ? 'PIX' : item.method === 'crypto' ? 'Criptomoeda' : item.method,
+          status: translateStatus(item.status),
+          link: item.links?.frontend || ''
+        }))
+
         if (response.meta) {
-          pagination.value = response.meta
+          pagination.value = {
+            current_page: response.meta.current_page,
+            from: response.meta.from,
+            last_page: response.meta.last_page,
+            per_page: response.meta.per_page,
+            to: response.meta.to,
+            total: response.meta.total,
+            links: response.meta.links
+          }
         }
       } catch (e) {
         logger.error('Erro ao buscar saques:', e)
+        withdrawals.value = []
+        pagination.value = {
+          current_page: 1,
+          from: 1,
+          last_page: 1,
+          per_page: paginationStore.perPage,
+          to: 1,
+          total: 0,
+          links: []
+        }
       } finally {
         loading.value = false
       }
@@ -149,27 +213,6 @@ export default defineComponent({
       withdrawals_today: 0,
       current_balance: 0
     })
-    const dropdownOptions = ref([
-      {
-        text: 'Aprovar',
-        action: 'aprovar',
-        role: 'manager'
-      },
-      {
-        text: 'Bloquear',
-        action: 'bloquear',
-        role: 'manager'
-      },
-      {
-        text: 'Cancelar',
-        action: 'cancelar',
-        role: 'affiliate'
-      }
-    ])
-    const withdrawalAmount = ref('')
-    const selectedMethod = ref('')
-    const destination = ref('')
-    const showModal = ref(false)
 
     const filteredDropdownOptions = computed(() => {
       if (!role.value) return []
