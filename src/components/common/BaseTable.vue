@@ -5,7 +5,7 @@
         <tr>
           <th v-for="header in headers" :key="header.key" 
               :class="[
-                'h-[42px] py-3 px-4 font-inter text-[14px] font-medium leading-[18px] text-white transition-all duration-300 ease-in-out',
+                'py-3 px-4 font-inter text-[14px] font-medium leading-[18px] text-white transition-all duration-300 ease-in-out',
                 header.align === 'center' ? 'text-center' : 'text-left'
               ]">
             {{ header.label }}
@@ -14,11 +14,11 @@
       </thead>
       <tbody>
         <tr v-for="(item, index) in items" :key="index" 
-            class="max-h-[60px] border-b border-[#1A1F3C] transition-all duration-300 ease-in-out hover:bg-[#1A1F3C]/50"
+            class="border-b border-[#1A1F3C] transition-all duration-300 ease-in-out hover:bg-[#1A1F3C]/50"
             :style="{ animationDelay: `${index * 50}ms` }">
           <td v-for="header in headers" :key="header.key"
               :class="[
-                'max-h-[60px] p-3 font-inter text-[14px] font-normal leading-[18px] text-white transition-all duration-300 ease-in-out',
+                'p-3 font-inter text-[14px] font-normal leading-[18px] text-white transition-all duration-300 ease-in-out',
                 header.align === 'center' ? 'text-center' : 'text-left'
               ]">
             <slot :name="header.key" :item="item">

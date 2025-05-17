@@ -1,5 +1,5 @@
 <script lang="ts">
-import { defineAsyncComponent, defineComponent } from 'vue'
+import { defineAsyncComponent, defineComponent, ref, watch } from 'vue'
 import { managerService } from '@/services/managerService'
 import Sidebar from '@/components/layout/dashboard/Sidebar.vue'
 import TopBar from '@/components/layout/dashboard/TopBar.vue'
@@ -12,6 +12,10 @@ import BaseDropdown from '@/components/common/BaseDropdown.vue'
 import BaseTable from '@/components/common/BaseTable.vue'
 import { logger } from '@/config/logger'
 import BasePagination from '@/components/common/BasePagination.vue'
+import { usePaginationStore } from '@/stores/pagination'
+import { useDashboardStore } from '@/stores/dashboard'
+import { useAuthStore } from '@/stores/auth'
+import { useToast } from 'vue-toastification'
 
 const XIcon = defineAsyncComponent(() => import('@/components/icons/XIcon.vue'))
 const PenIcon = defineAsyncComponent(() => import('@/components/icons/PenIcon.vue'))
@@ -52,59 +56,99 @@ export default defineComponent({
     BasePagination
   },
   setup() {
+    const store = useDashboardStore()
     const router = useRouter()
+    const authStore = useAuthStore()
+    const toast = useToast()
+    const loading = ref(true)
+    const customers = ref<any[]>([])
+    const searchQuery = ref('')
+    const paginationStore = usePaginationStore()
+    const pagination = ref({
+      current_page: 1,
+      from: 1,
+      last_page: 1,
+      per_page: paginationStore.perPage,
+      to: 1,
+      total: 0
+    })
 
-    const navigateToEdit = (customer: Usuario) => {
+    watch(() => authStore.isAuthenticated, (isAuthenticated: boolean) => {
+      if (!isAuthenticated) {
+        router.push('/login')
+      }
+    })
+
+    watch(() => paginationStore.perPage, (newValue: number) => {
+      pagination.value.per_page = newValue
+      handleSearch(searchQuery.value, pagination.value.current_page)
+    })
+
+    const handleSearch = async (term: string, page: number = 1) => {
+      loading.value = true
+      try {
+        const response = await managerService.customers.list({
+          search: term,
+          page: page,
+          per_page: paginationStore.perPage,
+          sort_by: 'created_at',
+          sort_order: 'desc'
+        })
+        customers.value = response.data || []
+        if (response.meta) {
+          pagination.value = response.meta
+        }
+      } catch (e) {
+        logger.error('Erro ao buscar clientes:', e)
+      } finally {
+        loading.value = false
+      }
+    }
+
+    const handlePageChange = async (newPage: number) => {
+      await handleSearch(searchQuery.value, newPage)
+    }
+
+    const navigateToEdit = (customer: any) => {
       router.push(`/customers/${customer.id}/edit`)
     }
 
     const dropdownOptions = [
       {
-        text: 'Bloquear',
-        action: 'bloquear',
-        icon: XIcon
-      },
-      {
-        text: 'Editar Permissão',
-        action: 'editar_permissao',
+        text: 'Editar',
+        action: 'edit',
         icon: PenIcon
       },
       {
-        text: 'Resetar Senha',
-        action: 'resetar_senha',
-        icon: KeyIcon
-      },
-      {
         text: 'Excluir',
-        action: 'excluir',
+        action: 'delete',
         icon: TrashIcon
       }
     ]
 
     return {
+      store,
+      router,
+      authStore,
+      toast,
+      loading,
+      customers,
+      searchQuery,
+      pagination,
+      handleSearch,
+      handlePageChange,
       navigateToEdit,
       dropdownOptions
     }
   },
   data() {
     return {
-      customers: [] as Usuario[],
       dropdownOpen: null as string | null,
-      loading: true,
       showDetailModal: false,
       showCreateModal: false,
       showDeleteModal: false,
       editingCustomer: null as Usuario | null,
-      deletingCustomer: null as Usuario | null,
-      pagination: {
-        current_page: 1,
-        from: 1,
-        last_page: 1,
-        per_page: 10,
-        to: 1,
-        total: 0,
-        links: [] as Array<{ url: string | null; label: string; active: boolean }>
-      }
+      deletingCustomer: null as Usuario | null
     }
   },
   watch: {
@@ -160,44 +204,6 @@ export default defineComponent({
         this.showDetailModal = true
       }
     },
-    async handleSearch(term: string) {
-      this.loading = true;
-      try {
-        const response = await managerService.customers.list({
-          search: term,
-          page: 1,
-          per_page: 10,
-          sort_by: 'created_at',
-          sort_order: 'desc'
-        });
-        this.customers = (response.data || []).map((item: any) => ({
-          id: item.id,
-          nome: item.name || '',
-          email: item.email || '',
-          aplicacao: item.application?.name || '',
-          afiliado: item.affiliate?.name || '',
-          status: item.application?.is_active ? 'Ativo' : 'Inativo',
-          dataCadastro: item.created_at ? new Date(item.created_at).toLocaleDateString('pt-BR') : '-',
-          ultimoAcesso: item.updated_at ? new Date(item.updated_at).toLocaleDateString('pt-BR') : '-',
-          linkApi: item.links?.api || '',
-          phone: item.phone || '',
-          document_number: item.document_number || ''
-        }));
-        this.pagination = {
-          current_page: response.meta.current_page,
-          from: response.meta.from,
-          last_page: response.meta.last_page,
-          per_page: response.meta.per_page,
-          to: response.meta.to,
-          total: response.meta.total,
-          links: response.meta.links
-        };
-      } catch (e) {
-        logger.error('Erro ao pesquisar clientes:', e);
-      } finally {
-        this.loading = false;
-      }
-    },
     async loadCustomers() {
       this.loading = true;
       try {
@@ -232,44 +238,6 @@ export default defineComponent({
         };
       } catch (e) {
         logger.error('Erro ao carregar clientes:', e);
-      } finally {
-        this.loading = false;
-      }
-    },
-    async handlePageChange(page: number) {
-      this.loading = true;
-      try {
-        const response = await managerService.customers.list({
-          search: this.searchTerm,
-          page: page,
-          per_page: 10,
-          sort_by: 'created_at',
-          sort_order: 'desc'
-        });
-        this.customers = (response.data || []).map((item: any) => ({
-          id: item.id,
-          nome: item.name || '',
-          email: item.email || '',
-          aplicacao: item.application?.name || '',
-          afiliado: item.affiliate?.name || '',
-          status: item.application?.is_active ? 'Ativo' : 'Inativo',
-          dataCadastro: item.created_at ? new Date(item.created_at).toLocaleDateString('pt-BR') : '-',
-          ultimoAcesso: item.updated_at ? new Date(item.updated_at).toLocaleDateString('pt-BR') : '-',
-          linkApi: item.links?.api || '',
-          phone: item.phone || '',
-          document_number: item.document_number || ''
-        }));
-        this.pagination = {
-          current_page: response.meta.current_page,
-          from: response.meta.from,
-          last_page: response.meta.last_page,
-          per_page: response.meta.per_page,
-          to: response.meta.to,
-          total: response.meta.total,
-          links: response.meta.links
-        };
-      } catch (e) {
-        logger.error('Erro ao carregar página de clientes:', e);
       } finally {
         this.loading = false;
       }

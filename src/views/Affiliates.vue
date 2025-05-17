@@ -14,8 +14,12 @@
     import { notificationService } from '@/services/notificationService'
     import { logger } from '@/config/logger'
     import BasePagination from '@/components/common/BasePagination.vue'
-import ToggleIcon from '@/components/icons/ToggleIcon.vue'
-import { getImageUrl, handleImageError } from '@/utils/imageUtils'
+    import ToggleIcon from '@/components/icons/ToggleIcon.vue'
+    import { getImageUrl, handleImageError } from '@/utils/imageUtils'
+    import { usePaginationStore } from '@/stores/pagination'
+    import { useDashboardStore } from '@/stores/dashboard'
+    import { useAuthStore } from '@/stores/auth'
+    import { useToast } from 'vue-toastification'
 
     const CheckIcon = defineAsyncComponent(() => import('@/components/icons/CheckIcon.vue'))
     const XIcon = defineAsyncComponent(() => import('@/components/icons/XIcon.vue'))
@@ -67,7 +71,10 @@ import { getImageUrl, handleImageError } from '@/utils/imageUtils'
         ToggleIcon
       },
       setup(props) {
+        const store = useDashboardStore()
         const router = useRouter()
+        const authStore = useAuthStore()
+        const toast = useToast()
         const loading = ref(true)
         const affiliates = ref<Affiliate[]>([])
         const showCreateModal = ref(false)
@@ -75,14 +82,15 @@ import { getImageUrl, handleImageError } from '@/utils/imageUtils'
         const selectedAffiliate = ref<Affiliate | null>(null)
         const createLoading = ref(false)
         const createError = ref('')
+        const searchQuery = ref('')
+        const paginationStore = usePaginationStore()
         const pagination = ref({
           current_page: 1,
           from: 1,
           last_page: 1,
-          per_page: 10,
+          per_page: paginationStore.perPage,
           to: 1,
-          total: 0,
-          links: [] as Array<{ url: string | null; label: string; active: boolean }>
+          total: 0
         })
         const createForm = ref<CreateForm>({
           name: '',
@@ -101,97 +109,40 @@ import { getImageUrl, handleImageError } from '@/utils/imageUtils'
           }
         ]
 
-        watch(() => props.searchTerm, (newTerm) => {
-          handleSearch(newTerm)
+        watch(() => authStore.isAuthenticated, (isAuthenticated: boolean) => {
+          if (!isAuthenticated) {
+            router.push('/login')
+          }
         })
 
-        const loadAffiliates = async (refresh = true) => {
-          try {
-            if (showCreateModal.value) {
-              showCreateModal.value = false
-            }
-            if (refresh) {
-              loading.value = true;
-            }
-            const response = await managerService.affiliates.list({
-              search: '',
-              page: 1,
-              per_page: 10,
-              sort_by: 'name',
-              sort_order: 'asc'
-            });
-            affiliates.value = response.data;
-            pagination.value = {
-              current_page: response.meta.current_page,
-              from: response.meta.from,
-              last_page: response.meta.last_page,
-              per_page: response.meta.per_page,
-              to: response.meta.to,
-              total: response.meta.total,
-              links: response.meta.links
-            };
-          } catch (e) {
-            logger.error('Erro ao carregar afiliados:', e)
-            notificationService.error('Erro ao carregar lista de afiliados')
-          } finally {
-            loading.value = false;
-          }
-        }
+        watch(() => paginationStore.perPage, (newValue: number) => {
+          pagination.value.per_page = newValue
+          handleSearch(searchQuery.value, pagination.value.current_page)
+        })
 
-        const handleSearch = async (term: string) => {
-          loading.value = true;
+        const handleSearch = async (term: string, page: number = 1) => {
+          loading.value = true
           try {
             const response = await managerService.affiliates.list({
               search: term,
-              page: 1,
-              per_page: 10,
-              sort_by: 'name',
-              sort_order: 'asc'
-            });
-            affiliates.value = response.data;
-            pagination.value = {
-              current_page: response.meta.current_page,
-              from: response.meta.from,
-              last_page: response.meta.last_page,
-              per_page: response.meta.per_page,
-              to: response.meta.to,
-              total: response.meta.total,
-              links: response.meta.links
-            };
+              page: page,
+              per_page: paginationStore.perPage,
+              sort_by: 'created_at',
+              sort_order: 'desc'
+            })
+            affiliates.value = response.data || []
+            if (response.meta) {
+              pagination.value = response.meta
+            }
           } catch (e) {
-            logger.error('Erro ao pesquisar afiliados:', e)
-            notificationService.error('Erro ao pesquisar afiliados')
+            logger.error('Erro ao buscar afiliados:', e)
           } finally {
-            loading.value = false;
+            loading.value = false
           }
         }
 
-        const handlePageChange = async (page: number) => {
-          loading.value = true;
-          try {
-            const response = await managerService.affiliates.list({
-              search: props.searchTerm,
-              page: page,
-              per_page: 10,
-              sort_by: 'name',
-              sort_order: 'asc'
-            });
-            affiliates.value = response.data;
-            pagination.value = {
-              current_page: response.meta.current_page,
-              from: response.meta.from,
-              last_page: response.meta.last_page,
-              per_page: response.meta.per_page,
-              to: response.meta.to,
-              total: response.meta.total,
-              links: response.meta.links
-            };
-          } catch (e) {
-            logger.error('Erro ao carregar página de afiliados:', e)
-            notificationService.error('Erro ao carregar página de afiliados')
-          } finally {
-            loading.value = false;
-          }
+        const handlePageChange = async (newPage: number) => {
+          await handleSearch(searchQuery.value, newPage)
         }
 
         const openCreateModal = () => {
@@ -248,7 +199,7 @@ import { getImageUrl, handleImageError } from '@/utils/imageUtils'
             } else {
               await managerService.affiliates.block(id);
             }
-            await loadAffiliates(false);
+            await handleSearch('')
           } catch (e) {
             logger.error('Erro ao alterar status do afiliado:', e);
           }
@@ -272,10 +223,14 @@ import { getImageUrl, handleImageError } from '@/utils/imageUtils'
         }
 
         onMounted(() => {
-          loadAffiliates()
+          handleSearch('')
         })
 
         return {
+          store,
+          router,
+          authStore,
+          toast,
           loading,
           affiliates,
           showCreateModal,
@@ -283,9 +238,10 @@ import { getImageUrl, handleImageError } from '@/utils/imageUtils'
           selectedAffiliate,
           createLoading,
           createError,
+          searchQuery,
+          pagination,
           createForm,
           dropdownOptions,
-          pagination,
           openCreateModal,
           closeCreateModal,
           openDetailsModal,
@@ -295,7 +251,6 @@ import { getImageUrl, handleImageError } from '@/utils/imageUtils'
           handleToggleStatus,
           getStatusClass,
           handleAction,
-          loadAffiliates,
           handlePageChange,
           getImageUrl,
           handleImageError
@@ -376,6 +331,6 @@ import { getImageUrl, handleImageError } from '@/utils/imageUtils'
 
         <!-- Modal de criação de afiliado -->
         <CreateAffiliateModal v-if="showCreateModal" @close="closeCreateModal" @submit="handleCreate"
-          @refresh="loadAffiliates(true)" />
+          @refresh="handleSearch('', 1)" />
       </AuthenticatedLayout>
     </template>

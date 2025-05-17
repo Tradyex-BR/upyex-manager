@@ -84,10 +84,11 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, watch } from 'vue'
+import { defineComponent, ref, watch, onMounted, onBeforeUnmount } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useDashboardStore } from '@/stores/dashboard'
+import { usePaginationStore } from '@/stores/pagination'
 import { managerService } from '@/services/managerService'
 import AuthenticatedLayout from '@/components/layout/AuthenticatedLayout.vue'
 import BaseButton from '@/components/common/BaseButton.vue'
@@ -128,11 +129,12 @@ export default defineComponent({
     const loading = ref(true)
     const sales = ref<any[]>([])
     const searchQuery = ref('')
+    const paginationStore = usePaginationStore()
     const pagination = ref({
       current_page: 1,
       from: 1,
       last_page: 1,
-      per_page: 20,
+      per_page: paginationStore.perPage,
       to: 1,
       total: 0
     })
@@ -143,13 +145,18 @@ export default defineComponent({
       }
     })
 
+    watch(() => paginationStore.perPage, (newValue) => {
+      pagination.value.per_page = newValue
+      handleSearch(searchQuery.value, pagination.value.current_page)
+    })
+
     const handleSearch = async (term: string, page: number = 1) => {
       loading.value = true
       try {
         const response = await managerService.sales.list({
           search: term,
           page: page,
-          per_page: 10,
+          per_page: paginationStore.perPage,
           sort_by: 'created_at',
           sort_order: 'desc'
         })
@@ -212,12 +219,12 @@ export default defineComponent({
       useMockData: false
     }
   },
-  async mounted() {
+  mounted() {
     this.isManager = localStorage.getItem(CONTEXT_ROLE_KEY) === 'manager'
     if (this.useMockData) {
-      await this.loadMockData()
+      this.loadMockData()
     } else {
-      await this.loadInitialData()
+      this.loadInitialData()
     }
   },
   methods: {

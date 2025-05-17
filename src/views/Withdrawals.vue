@@ -1,5 +1,5 @@
 <script lang="ts">
-import { defineAsyncComponent, defineComponent } from 'vue'
+import { defineAsyncComponent, defineComponent, ref, watch, computed, onMounted } from 'vue'
 import { useDashboardStore } from '@/stores/dashboard'
 import { managerService } from '@/services/managerService'
 import { logger } from '@/config/logger'
@@ -15,6 +15,10 @@ import BaseDropdown from '@/components/common/BaseDropdown.vue'
 import BaseTable from '@/components/common/BaseTable.vue'
 import BasePagination from '@/components/common/BasePagination.vue'
 import { notificationService } from '@/services/notificationService'
+import { usePaginationStore } from '@/stores/pagination'
+import { useRouter } from 'vue-router'
+import { useAuthStore } from '@/stores/auth'
+import { useToast } from 'vue-toastification'
 
 import { ListWithdrawalsResponse } from '@/services/managerService'
 import { CONTEXT_ROLE_KEY, PAGINATION } from '@/config/constants'
@@ -72,238 +76,177 @@ export default defineComponent({
     BaseModal: defineAsyncComponent(() => import('@/components/common/BaseModal.vue')),
     BaseInput: defineAsyncComponent(() => import('@/components/common/BaseInput.vue'))
   },
-  data() {
-    const role = localStorage.getItem(CONTEXT_ROLE_KEY)
-    return {
-      store: useDashboardStore(),
-      showRequestModal: false,
-      showSuccessModal: false,
-      lastWithdrawalAmount: '',
-      lastWithdrawalPixKey: '',
-      loading: true,
-      withdrawalInfo: {
-        minimum_amount: 0,
-        maximum_amount: 0,
-        daily_limit: 0,
-        withdrawals_today: 0,
-        current_balance: 0
-      },
-      withdrawals: [] as Array<any>,
-      pagination: {
-        current_page: 1,
-        per_page: PAGINATION.DEFAULT_PAGE_SIZE,
-        total: 0,
-        last_page: 1,
-        from: 1,
-        to: 1,
-        links: [] as Array<{ url: string | null; label: string; active: boolean }>
-      },
-      role,
-      dropdownOptions: [
-        {
-          text: 'Aprovar',
-          action: 'aprovar',
-          icon: CheckIcon,
-          role: 'manager'
-        },
-        {
-          text: 'Bloquear',
-          action: 'bloquear',
-          icon: XIcon,
-          role: 'manager'
-        },
-        {
-          text: 'Cancelar',
-          action: 'cancelar',
-          icon: XIcon,
-          role: 'affiliate'
-        }
-      ],
-      withdrawalAmount: '',
-      selectedMethod: '',
-      destination: '',
-      showModal: false
-    }
-  },
-  computed: {
-    filteredDropdownOptions() {
-      if (!this.role) return []
-      return this.dropdownOptions.filter(option => option.role === this.role)
-    }
-  },
-  watch: {
-    searchTerm(newTerm) {
-      this.handleSearch(newTerm);
-    }
-  },
-  async mounted() {
-    await this.loadWithdrawals();
+  setup() {
+    const store = useDashboardStore()
+    const router = useRouter()
+    const authStore = useAuthStore()
+    const toast = useToast()
+    const loading = ref(true)
+    const withdrawals = ref<any[]>([])
+    const searchQuery = ref('')
+    const paginationStore = usePaginationStore()
+    const pagination = ref({
+      current_page: 1,
+      from: 1,
+      last_page: 1,
+      per_page: paginationStore.perPage,
+      to: 1,
+      total: 0
+    })
 
-    if (this.role === "affiliate") {
-      await this.loadWithdrawalInfo();
-    }
-  },
-  methods: {
-    async loadWithdrawals() {
-      try {
-        this.loading = true;
-        let response: ListWithdrawalsResponse;
-
-        if (USE_MOCK_DATA) {
-          response = MOCK_WITHDRAWALS;
-          logger.info('Dados de saques carregados:', response);
-        } else {
-          response = await managerService.withdrawals.list({
-            start_date: '',
-            end_date: '',
-            status: null,
-            method: null,
-            page: this.pagination.current_page,
-            per_page: 10,
-            sort_by: 'created_at',
-            sort_order: 'desc'
-          });
-        }
-
-        this.withdrawals = response.data.map((item) => ({
-          id: item.id,
-          date: item.created_at ? new Date(item.created_at).toLocaleString('pt-BR') : '',
-          valueBRL: Number(item.amount).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }),
-          destination: item.destination,
-          type: item.method === 'pix' ? 'PIX' : item.method === 'crypto' ? 'Criptomoeda' : item.method,
-          status: this.translateStatus(item.status),
-          link: item.links?.frontend || ''
-        }));
-
-        this.pagination = {
-          current_page: response.meta.current_page,
-          from: response.meta.from,
-          last_page: response.meta.last_page,
-          per_page: response.meta.per_page,
-          to: response.meta.to,
-          total: response.meta.total,
-          links: response.meta.links
-        };
-      } catch (error) {
-        logger.error('Erro ao carregar saques:', error);
-        this.withdrawals = [];
-        this.pagination = {
-          current_page: 1,
-          from: 1,
-          last_page: 1,
-          per_page: PAGINATION.DEFAULT_PAGE_SIZE,
-          to: 1,
-          total: 0,
-          links: []
-        };
-      } finally {
-        this.loading = false;
+    watch(() => authStore.isAuthenticated, (isAuthenticated) => {
+      if (!isAuthenticated) {
+        router.push('/login')
       }
-    },
-    async handleSearch(term: string) {
+    })
+
+    watch(() => paginationStore.perPage, (newValue) => {
+      pagination.value.per_page = newValue
+      handleSearch(searchQuery.value, pagination.value.current_page)
+    })
+
+    const handleSearch = async (term: string, page: number = 1) => {
+      loading.value = true
       try {
-        this.loading = true;
         const response = await managerService.withdrawals.list({
+          search: term,
+          page: page,
+          per_page: paginationStore.perPage,
+          sort_by: 'created_at',
+          sort_order: 'desc',
           start_date: '',
           end_date: '',
           status: null,
-          method: null,
-          page: 1,
-          per_page: 10,
-          sort_by: 'created_at',
-          sort_order: 'desc',
-          search: term
-        });
-
-        this.withdrawals = response.data.map((item) => ({
-          id: item.id,
-          date: item.created_at ? new Date(item.created_at).toLocaleString('pt-BR') : '',
-          valueBRL: Number(item.amount).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }),
-          destination: item.destination,
-          type: item.method === 'pix' ? 'PIX' : item.method === 'crypto' ? 'Criptomoeda' : item.method,
-          status: this.translateStatus(item.status),
-          link: item.links?.frontend || ''
-        }));
-
-        this.pagination.current_page = response.page;
-        this.pagination.last_page = Math.ceil(response.total / response.per_page);
-        this.pagination.per_page = response.per_page;
-        this.pagination.total = response.total;
-        this.pagination.links = [];
-      } catch (error) {
-        logger.error('Erro ao pesquisar saques:', error);
-        this.withdrawals = [];
-        this.pagination.total = 0;
+          method: null
+        })
+        withdrawals.value = response.data || []
+        if (response.meta) {
+          pagination.value = response.meta
+        }
+      } catch (e) {
+        logger.error('Erro ao buscar saques:', e)
       } finally {
-        this.loading = false;
+        loading.value = false
       }
-    },
-    async handleWithdrawalRequest(data: { amount: string, pixKey: string }) {
+    }
+
+    onMounted(() => {
+      handleSearch('')
+      if (role.value === "affiliate") {
+        loadWithdrawalInfo()
+      }
+    })
+
+    const role = ref(localStorage.getItem(CONTEXT_ROLE_KEY))
+    const showRequestModal = ref(false)
+    const showSuccessModal = ref(false)
+    const lastWithdrawalAmount = ref('')
+    const lastWithdrawalPixKey = ref('')
+    const withdrawalInfo = ref({
+      minimum_amount: 0,
+      maximum_amount: 0,
+      daily_limit: 0,
+      withdrawals_today: 0,
+      current_balance: 0
+    })
+    const dropdownOptions = ref([
+      {
+        text: 'Aprovar',
+        action: 'aprovar',
+        role: 'manager'
+      },
+      {
+        text: 'Bloquear',
+        action: 'bloquear',
+        role: 'manager'
+      },
+      {
+        text: 'Cancelar',
+        action: 'cancelar',
+        role: 'affiliate'
+      }
+    ])
+    const withdrawalAmount = ref('')
+    const selectedMethod = ref('')
+    const destination = ref('')
+    const showModal = ref(false)
+
+    const filteredDropdownOptions = computed(() => {
+      if (!role.value) return []
+      return dropdownOptions.value.filter(option => option.role === role.value)
+    })
+
+    const handleWithdrawalRequest = async (data: { amount: string, pixKey: string }) => {
       try {
-        this.lastWithdrawalAmount = data.amount;
-        this.lastWithdrawalPixKey = data.pixKey;
+        lastWithdrawalAmount.value = data.amount
+        lastWithdrawalPixKey.value = data.pixKey
 
         await managerService.withdrawals.request({
-          amount: Number(this.lastWithdrawalAmount.replace(/[^0-9]/g, '')) / 100,
+          amount: Number(lastWithdrawalAmount.value.replace(/[^0-9]/g, '')) / 100,
           method: 'pix',
-          destination: this.lastWithdrawalPixKey
-        });
+          destination: lastWithdrawalPixKey.value
+        })
 
-        this.showRequestModal = false;
-        this.showSuccessModal = true;
-        await this.loadWithdrawals();
+        showRequestModal.value = false
+        showSuccessModal.value = true
+        await handleSearch(searchQuery.value)
       } catch (error) {
-        logger.error('Erro ao solicitar saque:', error);
+        logger.error('Erro ao solicitar saque:', error)
       }
-    },
-    getStatusClass(status: string): string {
+    }
+
+    const getStatusClass = (status: string): string => {
       const baseClass = 'font-inter text-[14px] font-medium leading-[18px] inline-flex h-6 px-2 justify-center items-center gap-1 rounded-[6px] w-fit mx-auto'
       switch (status) {
         case 'Aprovado':
-          return `${baseClass} bg-green-500/20 text-green-500`;
+          return `${baseClass} bg-green-500/20 text-green-500`
         case 'Rejeitado':
-          return `${baseClass} bg-red-500/20 text-red-500`;
+          return `${baseClass} bg-red-500/20 text-red-500`
         case 'Processado':
-          return `${baseClass} bg-green-500/20 text-green-500`;
+          return `${baseClass} bg-green-500/20 text-green-500`
         case 'Cancelado':
-          return `${baseClass} bg-red-500/20 text-red-500`;
+          return `${baseClass} bg-red-500/20 text-red-500`
         case 'Processando':
-          return `${baseClass} bg-blue-500/20 text-blue-500`;
+          return `${baseClass} bg-blue-500/20 text-blue-500`
         default: // Solicitação
-          return `${baseClass} bg-yellow-500/20 text-yellow-500`;
+          return `${baseClass} bg-yellow-500/20 text-yellow-500`
       }
-    },
-    async handleAction(action: string, id: string) {
+    }
+
+    const handleAction = async (action: string, id: string) => {
       try {
         if (action === 'aprovar') {
-          logger.info('Aprovando saque:', id);
-          await managerService.withdrawals.approve(id);
+          logger.info('Aprovando saque:', id)
+          await managerService.withdrawals.approve(id)
         } else if (action === 'bloquear') {
-          logger.info('Rejeitando saque:', id);
-          await managerService.withdrawals.reject(id);
+          logger.info('Rejeitando saque:', id)
+          await managerService.withdrawals.reject(id)
         } else if (action === 'cancelar') {
-          logger.info('Cancelando saque:', id);
-          await managerService.withdrawals.cancel(id);
+          logger.info('Cancelando saque:', id)
+          await managerService.withdrawals.cancel(id)
         }
 
-        await this.loadWithdrawals();
+        await handleSearch(searchQuery.value)
       } catch (error) {
-        logger.error('Erro ao executar ação no saque:', error);
+        logger.error('Erro ao executar ação no saque:', error)
       }
-    },
-    goToPageByUrl(url: string) {
+    }
+
+    const goToPageByUrl = (url: string) => {
       // Extrai o número da página da URL e chama goToPage
-      const match = url && url.match(/page=(\d+)/);
+      const match = url && url.match(/page=(\d+)/)
       if (match && match[1]) {
-        this.goToPage(Number(match[1]));
+        goToPage(Number(match[1]))
       }
-    },
-    async goToPage(page: number) {
-      if (page < 1 || page > this.pagination.last_page) return;
-      this.pagination.current_page = page;
-      await this.loadWithdrawals();
-    },
-    translateStatus(status: string): string {
+    }
+
+    const goToPage = async (page: number) => {
+      if (page < 1 || page > pagination.value.last_page) return
+      pagination.value.current_page = page
+      await handleSearch(searchQuery.value, page)
+    }
+
+    const translateStatus = (status: string): string => {
       const statusMap: { [key: string]: string } = {
         'requested': 'Solicitado',
         'approved': 'Aprovado',
@@ -311,46 +254,81 @@ export default defineComponent({
         'processing': 'Processando',
         'processed': 'Processado',
         'cancelled': 'Cancelado'
-      };
-      return statusMap[status] || status;
-    },
-    handleDropdownAction(action: string, id: string) {
-      this.handleAction(action, id);
-    },
-    async getBalance() {
-      const response = await managerService.withdrawals.information();
-      return Number(response.message) || 0;
-    },
-    async loadWithdrawalInfo() {
+      }
+      return statusMap[status] || status
+    }
+
+    const handleDropdownAction = (action: string, id: string) => {
+      handleAction(action, id)
+    }
+
+    const getBalance = async () => {
+      const response = await managerService.withdrawals.information()
+      return Number(response.message) || 0
+    }
+
+    const loadWithdrawalInfo = async () => {
       try {
-        const response = await managerService.withdrawals.information();
-        this.withdrawalInfo = {
+        const response = await managerService.withdrawals.information()
+        withdrawalInfo.value = {
           minimum_amount: response.minimum_amount || 0,
           maximum_amount: response.maximum_amount || 0,
           daily_limit: response.daily_limit || 0,
           withdrawals_today: response.withdrawals_today || 0,
           current_balance: response.current_balance || 0
-        };
+        }
       } catch (error) {
-        logger.error('Erro ao carregar informações de saque:', error);
+        logger.error('Erro ao carregar informações de saque:', error)
       }
-    },
-    async handlePageChange(page: number) {
-      await this.goToPage(page);
-    },
-    async requestWithdrawal() {
+    }
+
+    const handlePageChange = async (page: number) => {
+      await goToPage(page)
+    }
+
+    const requestWithdrawal = async () => {
       try {
         await managerService.withdrawals.request({
-          amount: Number(this.withdrawalAmount),
-          method: this.selectedMethod,
-          destination: this.destination
+          amount: Number(withdrawalAmount.value),
+          method: selectedMethod.value,
+          destination: destination.value
         })
         notificationService.success('Saque solicitado com sucesso')
-        this.showModal = false
+        showModal.value = false
       } catch (error) {
         logger.error('Erro ao solicitar saque:', error)
         notificationService.error('Erro ao solicitar saque')
       }
+    }
+
+    return {
+      store,
+      showRequestModal,
+      showSuccessModal,
+      lastWithdrawalAmount,
+      lastWithdrawalPixKey,
+      loading,
+      withdrawalInfo,
+      withdrawals,
+      pagination,
+      role,
+      dropdownOptions,
+      withdrawalAmount,
+      selectedMethod,
+      destination,
+      showModal,
+      filteredDropdownOptions,
+      handleWithdrawalRequest,
+      getStatusClass,
+      handleAction,
+      goToPageByUrl,
+      goToPage,
+      translateStatus,
+      handleDropdownAction,
+      getBalance,
+      loadWithdrawalInfo,
+      handlePageChange,
+      requestWithdrawal
     }
   }
 })

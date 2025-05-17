@@ -89,6 +89,7 @@
 <script lang="ts">
 import { defineComponent, ref } from 'vue'
 import { useDashboardStore } from '@/stores/dashboard'
+import { usePaginationStore } from '@/stores/pagination'
 import AuthenticatedLayout from '@/components/layout/AuthenticatedLayout.vue'
 import BaseButton from '@/components/common/BaseButton.vue'
 import { managerService } from '@/services/managerService'
@@ -133,6 +134,7 @@ setup() {
   const loading = ref(true)
   const router = useRouter()
   const toast = useToast()
+  const paginationStore = usePaginationStore()
   const dropdownOptions = [
     {
       text: 'Ativar/Desativar',
@@ -155,7 +157,7 @@ setup() {
       icon: TrashIcon
     }
   ]
-  return { store, loading, router, toast, dropdownOptions, getImageUrl, handleImageError }
+  return { store, loading, router, toast, dropdownOptions, getImageUrl, handleImageError, paginationStore }
 },
 data() {
   return {
@@ -178,13 +180,20 @@ data() {
     }
   }
 },
-async mounted() {
+mounted() {
   this.isManager = localStorage.getItem(CONTEXT_ROLE_KEY) === 'manager'
-  await this.handleSearch('');
+  this.handleSearch('')
 },
 watch: {
+  'paginationStore.perPage': {
+    handler(newValue: number) {
+      this.pagination.per_page = newValue
+      this.handleSearch(this.searchTerm)
+    },
+    immediate: true
+  },
   searchTerm(newTerm) {
-    this.handleSearch(newTerm);
+    this.handleSearch(newTerm)
   }
 },
 methods: {
@@ -192,16 +201,16 @@ methods: {
     return formatLink(link);
   },
   async handleSearch(term: string) {
-    this.loading = true;
+    this.loading = true
     try {
       const response = await managerService.applications.list({
         search: term,
         page: 1,
-        per_page: 10,
+        per_page: this.paginationStore.perPage,
         sort_by: 'name',
         sort_order: 'asc'
-      });
-      this.offers = response.data;
+      })
+      this.offers = response.data
       this.pagination = {
         current_page: response.meta.current_page,
         from: response.meta.from,
@@ -210,25 +219,25 @@ methods: {
         to: response.meta.to,
         total: response.meta.total,
         links: response.meta.links
-      };
+      }
     } catch (e) {
-      logger.error('Erro ao buscar aplicações:', e);
-      notificationService.error('Erro ao buscar aplicações');
+      logger.error('Erro ao buscar aplicações:', e)
+      notificationService.error('Erro ao buscar aplicações')
     } finally {
-      this.loading = false;
+      this.loading = false
     }
   },
   async handlePageChange(page: number) {
-    this.loading = true;
+    this.loading = true
     try {
       const response = await managerService.applications.list({
         search: this.searchTerm,
         page: page,
-        per_page: 20,
+        per_page: this.paginationStore.perPage,
         sort_by: 'name',
         sort_order: 'asc'
-      });
-      this.offers = response.data;
+      })
+      this.offers = response.data
       this.pagination = {
         current_page: response.meta.current_page,
         from: response.meta.from,
@@ -237,12 +246,12 @@ methods: {
         to: response.meta.to,
         total: response.meta.total,
         links: response.meta.links
-      };
+      }
     } catch (e) {
-      logger.error('Erro ao buscar aplicações:', e);
-      notificationService.error('Erro ao buscar aplicações');
+      logger.error('Erro ao buscar aplicações:', e)
+      notificationService.error('Erro ao buscar aplicações')
     } finally {
-      this.loading = false;
+      this.loading = false
     }
   },
   handleDropdownToggle(id: string, value: boolean) {
@@ -351,9 +360,6 @@ methods: {
       logger.error('Erro ao resetar chave API:', error)
       notificationService.error('Erro ao resetar chave API')
     }
-  },
-  async loadOffers() {
-    await this.handleSearch('');
   },
   handleGenerateLink(offer: any) {
     this.selectedApplication = offer
