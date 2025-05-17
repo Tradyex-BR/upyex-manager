@@ -108,7 +108,14 @@ export default defineComponent({
           sort_by: 'created_at',
           sort_order: 'desc'
         })
-        users.value = response.data || []
+        users.value = (response.data || []).map((item: any) => ({
+          id: item.id,
+          nome: item.name || '',
+          email: item.email || '',
+          status: item.is_active ? 'Ativo' : 'Inativo',
+          dataCadastro: item.created_at ? new Date(item.created_at).toLocaleDateString('pt-BR') : '-',
+          ultimoAcesso: item.updated_at ? new Date(item.updated_at).toLocaleDateString('pt-BR') : '-'
+        }))
         if (response.meta) {
           pagination.value = response.meta
         }
