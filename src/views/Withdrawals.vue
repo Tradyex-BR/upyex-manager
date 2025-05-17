@@ -18,40 +18,11 @@ import { notificationService } from '@/services/notificationService'
 import { usePaginationStore } from '@/stores/pagination'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
-import { useToast } from 'vue-toastification'
 
-import { ListWithdrawalsResponse } from '@/services/managerService'
-import { CONTEXT_ROLE_KEY, PAGINATION } from '@/config/constants'
+import { CONTEXT_ROLE_KEY } from '@/config/constants'
 
 const CheckIcon = defineAsyncComponent(() => import('@/components/icons/CheckIcon.vue'))
 const XIcon = defineAsyncComponent(() => import('@/components/icons/XIcon.vue'))
-
-// Dados mockados para testes
-const MOCK_WITHDRAWALS: ListWithdrawalsResponse = {
-  data: [],
-  total: 0,
-  page: 1,
-  per_page: PAGINATION.DEFAULT_PAGE_SIZE,
-  links: {
-    first: '',
-    last: '',
-    prev: null,
-    next: null
-  },
-  meta: {
-    current_page: 1,
-    from: 1,
-    last_page: 1,
-    path: '',
-    to: 1,
-    total: 0,
-    links: [],
-    per_page: PAGINATION.DEFAULT_PAGE_SIZE
-  }
-}
-
-// Flag para controlar se usa dados mockados
-const USE_MOCK_DATA = false
 
 export default defineComponent({
   name: 'Withdrawals',
@@ -80,7 +51,6 @@ export default defineComponent({
     const store = useDashboardStore()
     const router = useRouter()
     const authStore = useAuthStore()
-    const toast = useToast()
     const loading = ref(true)
     const withdrawals = ref<any[]>([])
     const searchQuery = ref('')

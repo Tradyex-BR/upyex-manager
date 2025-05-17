@@ -65,14 +65,8 @@ export default defineComponent({
     ImageIcon,
     LinkIcon
   },
-  props: {
-    show: {
-      type: Boolean,
-      required: true
-    }
-  },
   emits: ['close', 'submit'],
-  setup(props, { emit }) {
+  setup(_, { emit }) {
     const loading = ref(false)
     const formData = ref({
       name: '',

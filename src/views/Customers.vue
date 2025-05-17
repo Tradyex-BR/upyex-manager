@@ -17,9 +17,7 @@ import { useDashboardStore } from '@/stores/dashboard'
 import { useAuthStore } from '@/stores/auth'
 import { useToast } from 'vue-toastification'
 
-const XIcon = defineAsyncComponent(() => import('@/components/icons/XIcon.vue'))
 const PenIcon = defineAsyncComponent(() => import('@/components/icons/PenIcon.vue'))
-const KeyIcon = defineAsyncComponent(() => import('@/components/icons/KeyIcon.vue'))
 const TrashIcon = defineAsyncComponent(() => import('@/components/icons/TrashIcon.vue'))
 
 interface Usuario {
@@ -34,6 +32,16 @@ interface Usuario {
   linkApi: string;
   phone?: string;
   document_number?: string;
+}
+
+interface PaginationMeta {
+  current_page: number;
+  from: number;
+  last_page: number;
+  per_page: number;
+  to: number;
+  total: number;
+  links?: any;
 }
 
 export default defineComponent({
@@ -64,7 +72,7 @@ export default defineComponent({
     const customers = ref<any[]>([])
     const searchQuery = ref('')
     const paginationStore = usePaginationStore()
-    const pagination = ref({
+    const pagination = ref<PaginationMeta>({
       current_page: 1,
       from: 1,
       last_page: 1,
