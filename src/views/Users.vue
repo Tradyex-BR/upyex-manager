@@ -214,7 +214,7 @@ export default defineComponent({
     },
     async handleDeleteUser() {
       if (!this.deletingUser) return;
-      
+
       try {
         await managerService.users.delete(this.deletingUser.id);
         this.toast.success('Usuário excluído com sucesso!');
@@ -228,7 +228,7 @@ export default defineComponent({
     },
     async handleUpdateUser(userData: any) {
       if (!this.editingUser) return;
-      
+
       try {
         await managerService.users.update(this.editingUser.id, userData);
         this.toast.success('Usuário atualizado com sucesso!');
@@ -318,7 +318,8 @@ export default defineComponent({
             { key: 'email', label: 'Email', align: 'center' },
             { key: 'status', label: 'Status', align: 'center' },
             { key: 'created_at', label: 'Data de cadastro', align: 'center' },
-            { key: 'last_access', label: 'Último acesso', align: 'center' }
+            { key: 'last_access', label: 'Último acesso', align: 'center' },
+            { key: 'actions', label: 'Ações', align: 'center' }
           ]" :items="users">
             <template #name="{ item }">
               {{ item.nome || "-" }}
@@ -339,6 +340,11 @@ export default defineComponent({
             <template #last_access="{ item }">
               {{ item.ultimoAcesso }}
             </template>
+
+            <template #actions="{ item }">
+              <BaseDropdown :options="dropdownOptions" @select="handleUserAction(item.id, $event)" :top="50"
+                class="w-min mx-auto" />
+            </template>
           </BaseTable>
         </div>
       </div>
@@ -346,27 +352,14 @@ export default defineComponent({
     <BasePagination :meta="pagination" @page-change="handlePageChange" />
 
     <!-- Modal de Criação -->
-    <CreateUserModal 
-      v-if="showCreateModal" 
-      v-model="showCreateModal" 
-      @submit="handleCreateUser"
-    />
+    <CreateUserModal v-if="showCreateModal" v-model="showCreateModal" @submit="handleCreateUser" />
 
     <!-- Modal de Edição -->
-    <EditUserModal
-      v-if="showDetailModal && editingUser?.id"
-      v-model="showDetailModal"
-      :user-id="editingUser.id"
-      @submit="handleUpdateUser"
-    />
+    <EditUserModal v-if="showDetailModal && editingUser?.id" v-model="showDetailModal" :user-id="editingUser.id"
+      @submit="handleUpdateUser" />
 
     <!-- Modal de Confirmação de Exclusão -->
-    <DeleteUserModal
-      v-if="showDeleteModal && deletingUser?.id && deletingUser?.nome"
-      v-model="showDeleteModal"
-      :user-id="deletingUser.id"
-      :user-name="deletingUser.nome"
-      @submit="handleDeleteUser"
-    />
+    <DeleteUserModal v-if="showDeleteModal && deletingUser?.id && deletingUser?.nome" v-model="showDeleteModal"
+      :user-id="deletingUser.id" :user-name="deletingUser.nome" @submit="handleDeleteUser" />
   </AuthenticatedLayout>
 </template>
