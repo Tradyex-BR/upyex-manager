@@ -7,12 +7,17 @@
             <div class="flex justify-between items-center mb-6">
               <p class="text-white text-2xl font-semibold">Dashboard</p>
               <div class="flex items-center gap-4">
-                <flat-pickr
-                  v-model="dateRange"
-                  :config="flatpickrOptions"
-                  class="bg-[#222a3f] border border-[#222a3f] cursor-pointer rounded-lg px-4 py-2 text-white w-min focus:outline-none focus:ring-0"
-                  placeholder="Selecione o período (DD/MM/AAAA)"
-                />
+                <div class="relative flex items-center">
+                  <flat-pickr
+                    v-model="dateRange"
+                    :config="flatpickrOptions"
+                    class="bg-[#222a3f] border border-[#222a3f] cursor-pointer rounded-lg px-4 py-2 text-white w-[255px] focus:outline-none focus:ring-0 pr-10"
+                    placeholder="Selecione o período (DD/MM/AAAA)"
+                  />
+                  <svg class="absolute right-3 w-5 h-5 text-[#CF631C] pointer-events-none" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                  </svg>
+                </div>
               </div>
             </div>
             <div>
