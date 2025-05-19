@@ -20,6 +20,8 @@
     import { useDashboardStore } from '@/stores/dashboard'
     import { useAuthStore } from '@/stores/auth'
     import { useToast } from 'vue-toastification'
+    import PenIcon from '@/components/icons/PenIcon.vue'
+    import EditAffiliateModal from '@/components/affiliates/EditAffiliateModal.vue'
 
     const CheckIcon = defineAsyncComponent(() => import('@/components/icons/CheckIcon.vue'))
     const XIcon = defineAsyncComponent(() => import('@/components/icons/XIcon.vue'))
@@ -62,13 +64,15 @@
         BaseModal,
         BaseButton,
         CreateAffiliateModal,
+        EditAffiliateModal,
         MenuIcon,
         BaseDropdown,
         BaseTable,
         CheckIcon,
         XIcon,
         BasePagination,
-        ToggleIcon
+        ToggleIcon,
+        PenIcon
       },
       setup(props) {
         const store = useDashboardStore()
@@ -79,6 +83,7 @@
         const affiliates = ref<Affiliate[]>([])
         const showCreateModal = ref(false)
         const showDetailsModal = ref(false)
+        const showEditModal = ref(false)
         const selectedAffiliate = ref<Affiliate | null>(null)
         const createLoading = ref(false)
         const createError = ref('')
@@ -106,6 +111,11 @@
             text: 'Ativar/Desativar',
             action: 'toggle_status',
             icon: ToggleIcon
+          },
+          {
+            text: 'Editar Afiliado',
+            action: 'edit',
+            icon: PenIcon
           }
         ]
 
@@ -197,6 +207,25 @@
           }
         }
 
+        const handleEditAffiliate = async (formData: any) => {
+          loading.value = true
+          try {
+            if (!selectedAffiliate.value?.id) {
+              notificationService.error('Afiliado não encontrado')
+              return
+            }
+            await managerService.affiliates.update(selectedAffiliate.value?.id, formData)
+            await handleSearch('')
+            showEditModal.value = false
+          } catch (e) {
+            logger.error('Erro ao editar afiliado:', e)
+            createError.value = 'Erro ao editar afiliado. Por favor, tente novamente.'
+            notificationService.error('Erro ao editar afiliado')
+          } finally {
+            loading.value = false
+          }
+        }
+
         const handleToggleStatus = async (id: string, is_active: boolean) => {
           try {
             if (is_active) {
@@ -227,6 +256,10 @@
               await handleToggleStatus(id, !affiliate.is_active)
               notificationService.success('Status do afiliado alterado com sucesso')
             }
+            if (action === 'edit') {
+              selectedAffiliate.value = affiliate
+              showEditModal.value = true
+            }
           } catch (e) {
             logger.error('Erro ao alterar status do afiliado:', e)
             notificationService.error('Erro ao alterar status do afiliado')
@@ -246,6 +279,7 @@
           affiliates,
           showCreateModal,
           showDetailsModal,
+          showEditModal,
           selectedAffiliate,
           createLoading,
           createError,
@@ -259,6 +293,7 @@
           closeDetailsModal,
           navigateToEdit,
           handleCreate,
+          handleEditAffiliate,
           handleToggleStatus,
           getStatusClass,
           handleAction,
@@ -299,12 +334,8 @@
               ]" :items="affiliates">
                 <template #name="{ item }">
                   <div class="flex items-center gap-2">
-                    <img 
-                      :src="getImageUrl(item.name)" 
-                      :alt="item.name"
-                      class="w-8 h-w-8 rounded-full"
-                      @error="(e) => handleImageError(e, item.name)" 
-                    />
+                    <img :src="getImageUrl(item.name)" :alt="item.name" class="w-8 h-w-8 rounded-full"
+                      @error="(e) => handleImageError(e, item.name)" />
                     <p class="font-inter text-[14px] font-normal leading-[18px] text-white">{{ item.name }}</p>
                   </div>
                 </template>
@@ -344,5 +375,12 @@
         <!-- Modal de criação de afiliado -->
         <CreateAffiliateModal v-if="showCreateModal" @close="closeCreateModal" @submit="handleCreate"
           @refresh="handleSearch('', 1)" />
+        <EditAffiliateModal 
+          v-if="showEditModal && selectedAffiliate?.id" 
+          :show="showEditModal" 
+          :affiliate-id="selectedAffiliate.id"
+          @close="showEditModal = false" 
+          @submit="handleEditAffiliate" 
+        />
       </AuthenticatedLayout>
     </template>
