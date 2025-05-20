@@ -42,6 +42,17 @@
       applications: Application[];
     }
 
+    interface AffiliateRules {
+      commission_percentage: {
+        min: number;
+        max: number;
+      };
+      commission_release_days: {
+        min: number;
+        max: number;
+      };
+    }
+
     interface CreateForm {
       name: string;
       email: string;
@@ -105,6 +116,7 @@
             { id: '', commission_percentage: 20, commission_release_days: 7 }
           ]
         })
+        const affiliateRules = ref<AffiliateRules | null>(null)
 
         const dropdownOptions = [
           {
@@ -191,6 +203,15 @@
           router.push(`/affiliates/${affiliate.id}/edit`)
         }
 
+        const loadRules = async () => {
+          try {
+            const response = await managerService.affiliates.rules()
+            affiliateRules.value = response
+          } catch (error) {
+            logger.error('Erro ao carregar regras de afiliado:', error)
+          }
+        }
+
         const handleCreate = async (formData: any) => {
           try {
             createLoading.value = true
@@ -268,6 +289,7 @@
 
         onMounted(() => {
           handleSearch('')
+          loadRules()
         })
 
         return {
@@ -300,7 +322,9 @@
           handlePageChange,
           handleSearch,
           getImageUrl,
-          handleImageError
+          handleImageError,
+          loadRules,
+          affiliateRules
         }
       }
     })
@@ -373,8 +397,13 @@
         <BasePagination :meta="pagination" @page-change="handlePageChange" />
 
         <!-- Modal de criação de afiliado -->
-        <CreateAffiliateModal v-if="showCreateModal" @close="closeCreateModal" @submit="handleCreate"
-          @refresh="handleSearch('', 1)" />
+        <CreateAffiliateModal 
+          v-if="showCreateModal" 
+          @close="closeCreateModal" 
+          @submit="handleCreate"
+          @refresh="handleSearch('', 1)"
+          :rules="affiliateRules" 
+        />
         <EditAffiliateModal 
           v-if="showEditModal && selectedAffiliate?.id" 
           :show="showEditModal" 

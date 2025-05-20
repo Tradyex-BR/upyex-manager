@@ -48,6 +48,18 @@ export interface Affiliate {
     frontend?: string;
   };
 }
+
+export interface AffiliateRules {
+  commission_percentage: {
+    min: number;
+    max: number;
+  };
+  commission_release_days: {
+    min: number;
+    max: number;
+  };
+}
+
 export interface ListAffiliatesParams {
   search: string | null;
   page: number;
@@ -470,6 +482,10 @@ export const managerService = {
   affiliates: {
     create: async (payload: CreateAffiliatePayload): Promise<Affiliate> => {
       const response = await api.post<Affiliate>('/affiliates', payload);
+      return response.data;
+    },
+    rules: async (): Promise<AffiliateRules> => {
+      const response = await api.get<AffiliateRules>('/affiliates/rules');
       return response.data;
     },
     list: async (params: ListAffiliatesParams): Promise<ListAffiliatesResponse> => {

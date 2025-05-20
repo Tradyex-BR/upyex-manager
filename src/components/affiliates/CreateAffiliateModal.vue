@@ -121,15 +121,22 @@
 
                   <div class="grid grid-cols-2 gap-4">
                     <div class="space-y-1">
-                      <label class="text-white text-xs">Comissão (%)<span class="text-[#BE3E37]">*</span></label>
-                      <BaseInput v-model.number="app.commission_percentage" type="number" step="0.01" min="0" max="100"
-                        placeholder="0.00" required variant="darker" custom-class="h-10" />
+                      <label class="text-white text-xs">Comissão (%)<span class="text-[#BE3E37]">*</span></label>
+                      <BaseInput v-model.number="app.commission_percentage" type="number" step="0.01"
+                        :min="props.rules ? props.rules.commission_percentage.min * 100 : 0"
+                        :max="props.rules ? props.rules.commission_percentage.max * 100 : 100"
+                        @blur="() => handleBlurValidation(app, 'commission_percentage')" placeholder="0.00" required
+                        variant="darker" custom-class="h-10" :error="getCommissionError(app.commission_percentage)" />
                     </div>
                     <div class="space-y-1">
                       <label class="text-white text-xs">Dias para Liberação <span
                           class="text-[#BE3E37]">*</span></label>
-                      <BaseInput v-model.number="app.commission_release_days" type="number" min="0" placeholder="0"
-                        required variant="darker" custom-class="h-10" />
+                      <BaseInput v-model.number="app.commission_release_days" type="number"
+                        :min="props.rules ? props.rules.commission_release_days.min : 0"
+                        :max="props.rules ? props.rules.commission_release_days.max : 30"
+                        @blur="() => handleBlurValidation(app, 'commission_release_days')" placeholder="0" required
+                        variant="darker" custom-class="h-10"
+                        :error="getReleaseDaysError(app.commission_release_days)" />
                     </div>
                   </div>
                 </div>
@@ -161,7 +168,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import BaseModal from '@/components/common/BaseModal.vue'
 import BaseButton from '@/components/common/BaseButton.vue'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
@@ -196,6 +203,21 @@ interface Form {
   }[];
 }
 
+interface Rules {
+  commission_percentage: {
+    min: number;
+    max: number;
+  };
+  commission_release_days: {
+    min: number;
+    max: number;
+  };
+}
+
+const props = defineProps<{
+  rules: Rules | null;
+}>()
+
 const emit = defineEmits(['close', 'submit', 'refresh'])
 
 const loading = ref(false)
@@ -211,6 +233,42 @@ const form = ref<Form>({
     { id: '', commission_percentage: 20, commission_release_days: 7 }
   ]
 })
+
+const validateCommission = (value: number, index: number) => {
+  if (!props.rules) return true;
+  const commissionDecimal = value / 100;
+  return commissionDecimal >= props.rules.commission_percentage.min &&
+    commissionDecimal <= props.rules.commission_percentage.max;
+}
+
+const validateReleaseDays = (value: number, index: number) => {
+  if (!props.rules) return true;
+  return value >= props.rules.commission_release_days.min &&
+    value <= props.rules.commission_release_days.max;
+}
+
+const getCommissionError = (value: number) => {
+  if (!props.rules) return '';
+  const commissionDecimal = value / 100;
+  if (commissionDecimal < props.rules.commission_percentage.min) {
+    return `A comissão mínima é ${props.rules.commission_percentage.min * 100}%`;
+  }
+  if (commissionDecimal > props.rules.commission_percentage.max) {
+    return `A comissão máxima é ${props.rules.commission_percentage.max * 100}%`;
+  }
+  return '';
+}
+
+const getReleaseDaysError = (value: number) => {
+  if (!props.rules) return '';
+  if (value < props.rules.commission_release_days.min) {
+    return `O mínimo de dias é ${props.rules.commission_release_days.min}`;
+  }
+  if (value > props.rules.commission_release_days.max) {
+    return `O máximo de dias é ${props.rules.commission_release_days.max}`;
+  }
+  return '';
+}
 
 const getDropdownOptions = (currentAppId: string) => {
   return availableApplications.value
@@ -268,12 +326,21 @@ const isFormValid = computed(() => {
     return false;
   }
 
-  return form.value.applications.every(app =>
-    app.id.trim() &&
-    app.commission_percentage >= 0 &&
-    app.commission_percentage <= 100 &&
-    app.commission_release_days >= 0
-  )
+  return form.value.applications.every((app, index) => {
+    if (!app.id.trim()) return false;
+
+    // Validar comissão
+    if (!validateCommission(app.commission_percentage, index)) {
+      return false;
+    }
+
+    // Validar dias de liberação
+    if (!validateReleaseDays(app.commission_release_days, index)) {
+      return false;
+    }
+
+    return true;
+  })
 })
 
 const formDataForApi = computed(() => {
@@ -343,6 +410,76 @@ const tabs = [
 ]
 
 const activeTab = ref('info')
+
+const handleBlurValidation = (app: Form['applications'][0], field: keyof Pick<Form['applications'][0], 'commission_percentage' | 'commission_release_days'>) => {
+  if (!props.rules) return;
+
+  if (field === 'commission_percentage') {
+    const minComm = props.rules.commission_percentage.min * 100;
+    const maxComm = props.rules.commission_percentage.max * 100;
+    let value = parseFloat(String(app.commission_percentage)); // Certifique-se que é número
+    if (isNaN(value)) value = minComm; // Ou algum valor padrão
+
+    if (value < minComm) {
+      app.commission_percentage = minComm;
+    } else if (value > maxComm) {
+      app.commission_percentage = maxComm;
+    }
+  } else if (field === 'commission_release_days') {
+    const minDays = props.rules.commission_release_days.min;
+    const maxDays = props.rules.commission_release_days.max;
+    let value = parseInt(String(app.commission_release_days), 10); // Certifique-se que é número
+    if (isNaN(value)) value = minDays; // Ou algum valor padrão
+
+    if (value < minDays) {
+      app.commission_release_days = minDays;
+    } else if (value > maxDays) {
+      app.commission_release_days = maxDays;
+    }
+  }
+};
+
+watch(() => form.value.applications, (newApplications) => {
+  newApplications.forEach((app) => {
+    // Garantir que estamos lidando com números para a lógica de clamping
+    let currentCommission = parseFloat(String(app.commission_percentage));
+    let currentReleaseDays = parseInt(String(app.commission_release_days), 10);
+
+    // Se não for um número válido, podemos definir um padrão ou usar o mínimo.
+    // Exemplo: se for NaN, usar o mínimo.
+    if (isNaN(currentCommission) && props.rules) currentCommission = props.rules.commission_percentage.min * 100;
+    if (isNaN(currentReleaseDays) && props.rules) currentReleaseDays = props.rules.commission_release_days.min;
+
+
+    if (props.rules) {
+      const minComm = props.rules.commission_percentage.min * 100;
+      const maxComm = props.rules.commission_percentage.max * 100;
+      if (currentCommission < minComm) {
+        app.commission_percentage = minComm;
+      } else if (currentCommission > maxComm) {
+        app.commission_percentage = maxComm;
+      } else if (app.commission_percentage !== currentCommission && !isNaN(currentCommission)) {
+        // Se o valor original não era um número, mas foi convertido e está no range
+        app.commission_percentage = currentCommission;
+      }
+
+
+      const minDays = props.rules.commission_release_days.min;
+      const maxDays = props.rules.commission_release_days.max;
+      if (currentReleaseDays < minDays) {
+        app.commission_release_days = minDays;
+      } else if (currentReleaseDays > maxDays) {
+        app.commission_release_days = maxDays;
+      } else if (app.commission_release_days !== currentReleaseDays && !isNaN(currentReleaseDays)) {
+        app.commission_release_days = currentReleaseDays;
+      }
+    }
+  });
+
+  // O console.log aqui é útil para verificar o estado dos dados APÓS o watch.
+  // console.log('Após watch:', JSON.parse(JSON.stringify(form.value.applications)));
+
+}, { deep: true });
 </script>
 
 <style scoped>
@@ -372,5 +509,16 @@ const activeTab = ref('info')
 
 .chevron-icon.open {
   transform: rotate(180deg);
+}
+
+/* Remove as setas dos inputs numéricos */
+::v-deep input[type="number"]::-webkit-inner-spin-button,
+::v-deep input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+::v-deep input[type="number"] {
+  -moz-appearance: textfield;
 }
 </style>
