@@ -29,8 +29,8 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
-    const originalRequest = error.config;
-
+/*     const originalRequest = error.config;
+ */
     // Tratamento de erro 401 (Unauthorized)
     if (error.response?.status === 401) {
       const authStore = useAuthStore();
@@ -41,7 +41,7 @@ api.interceptors.response.use(
     // Tratamento de outros erros
     const errorMessage = error.response?.data?.message || 'Erro na requisição';
     logger.error('API Error:', errorMessage);
-    
+
     return Promise.reject(error);
   }
 );
