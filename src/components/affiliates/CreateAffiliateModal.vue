@@ -123,7 +123,7 @@
 
                   <div class="grid grid-cols-2 gap-4">
                     <div class="space-y-1">
-                      <label class="text-white text-xs">% Comissão <span class="text-[#BE3E37]">*</span></label>
+                      <label class="text-white text-xs">Comissão (%)<span class="text-[#BE3E37]">*</span></label>
                       <BaseInput v-model.number="app.commission_percentage" type="number" step="0.01" min="0" max="1"
                         placeholder="0.00" required variant="darker" custom-class="h-10" />
                     </div>
