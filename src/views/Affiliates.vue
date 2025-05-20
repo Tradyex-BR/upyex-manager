@@ -102,7 +102,7 @@
           email: '',
           integration_code: '',
           applications: [
-            { id: '', commission_percentage: 0.2, commission_release_days: 7 }
+            { id: '', commission_percentage: 20, commission_release_days: 7 }
           ]
         })
 
@@ -167,7 +167,7 @@
             email: '',
             integration_code: '',
             applications: [
-              { id: '', commission_percentage: 0.2, commission_release_days: 7 }
+              { id: '', commission_percentage: 20, commission_release_days: 7 }
             ]
           }
           createError.value = ''

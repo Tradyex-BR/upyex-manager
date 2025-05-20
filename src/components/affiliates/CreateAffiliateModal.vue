@@ -86,8 +86,7 @@
               class="bg-[#131836] rounded-lg border border-[#1e2642] overflow-hidden">
               <div class="flex items-center justify-between p-3">
                 <div class="flex items-center">
-                  <img :src="getSelectedAppLogo(app.id)" 
-                    :alt="getSelectedAppName(app.id)" 
+                  <img :src="getSelectedAppLogo(app.id)" :alt="getSelectedAppName(app.id)"
                     class="w-5 h-5 rounded-full object-cover mr-2"
                     @error="(e) => handleImageError(e, getSelectedAppName(app.id))" />
                   <span class="text-sm font-medium">Aplicação #{{ idx + 1 }}</span>
@@ -109,8 +108,7 @@
                       <template #trigger>
                         <button type="button"
                           class="w-full h-10 px-3 bg-[#1e2642] text-white rounded-lg border border-[#2d3a5a] text-left flex items-center gap-2 text-sm">
-                          <img :src="getSelectedAppLogo(app.id)" 
-                            :alt="getSelectedAppName(app.id)" 
+                          <img :src="getSelectedAppLogo(app.id)" :alt="getSelectedAppName(app.id)"
                             class="w-5 h-5 rounded-full object-cover"
                             @error="(e) => handleImageError(e, getSelectedAppName(app.id))" />
                           <span>{{ getSelectedAppName(app.id) }}</span>
@@ -124,7 +122,7 @@
                   <div class="grid grid-cols-2 gap-4">
                     <div class="space-y-1">
                       <label class="text-white text-xs">Comissão (%)<span class="text-[#BE3E37]">*</span></label>
-                      <BaseInput v-model.number="app.commission_percentage" type="number" step="0.01" min="0" max="1"
+                      <BaseInput v-model.number="app.commission_percentage" type="number" step="0.01" min="0" max="100"
                         placeholder="0.00" required variant="darker" custom-class="h-10" />
                     </div>
                     <div class="space-y-1">
@@ -210,7 +208,7 @@ const form = ref<Form>({
   email: '',
   integration_code: '',
   applications: [
-    { id: '', commission_percentage: 0.2, commission_release_days: 7 }
+    { id: '', commission_percentage: 20, commission_release_days: 7 }
   ]
 })
 
@@ -273,9 +271,19 @@ const isFormValid = computed(() => {
   return form.value.applications.every(app =>
     app.id.trim() &&
     app.commission_percentage >= 0 &&
-    app.commission_percentage <= 1 &&
+    app.commission_percentage <= 100 &&
     app.commission_release_days >= 0
   )
+})
+
+const formDataForApi = computed(() => {
+  return {
+    ...form.value,
+    applications: form.value.applications.map(app => ({
+      ...app,
+      commission_percentage: app.commission_percentage / 100
+    }))
+  }
 })
 
 const loadApplications = async () => {
@@ -297,7 +305,7 @@ const loadApplications = async () => {
 onMounted(loadApplications)
 
 const addApp = () => {
-  form.value.applications.push({ id: '', commission_percentage: 0.2, commission_release_days: 7 })
+  form.value.applications.push({ id: '', commission_percentage: 20, commission_release_days: 7 })
 }
 
 const removeApp = (idx: number) => {
@@ -310,7 +318,7 @@ const handleSubmit = async () => {
   loading.value = true
   error.value = ''
   try {
-    await emit('submit', form.value)
+    await emit('submit', formDataForApi.value)
     notificationService.success('Afiliado criado com sucesso')
     await emit('refresh')
   } catch (e: any) {
