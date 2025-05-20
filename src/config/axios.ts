@@ -1,6 +1,7 @@
 import axios from 'axios';
 import { API_BASE_URL, AUTH_CONFIG } from './constants';
 import { logger } from '@/config/logger';
+import { useAuthStore } from '@/stores/auth';
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -31,27 +32,10 @@ api.interceptors.response.use(
     const originalRequest = error.config;
 
     // Tratamento de erro 401 (Unauthorized)
-    if (error.response?.status === 401 && !originalRequest._retry) {
-      originalRequest._retry = true;
-
-      try {
-        const refreshToken = localStorage.getItem(AUTH_CONFIG.REFRESH_TOKEN_KEY);
-        if (!refreshToken) {
-          throw new Error('No refresh token available');
-        }
-
-        // Aqui você pode implementar a lógica de refresh token
-        // const response = await api.post('/auth/refresh', { refreshToken });
-        // localStorage.setItem(AUTH_CONFIG.TOKEN_KEY, response.data.token);
-        
-        // return api(originalRequest);
-      } catch (refreshError) {
-        // Redirecionar para login ou mostrar mensagem de erro
-        localStorage.removeItem(AUTH_CONFIG.TOKEN_KEY);
-        localStorage.removeItem(AUTH_CONFIG.REFRESH_TOKEN_KEY);
-        window.location.href = '/login';
-        return Promise.reject(refreshError);
-      }
+    if (error.response?.status === 401) {
+      const authStore = useAuthStore();
+      authStore.handleUnauthorized();
+      return Promise.reject(error);
     }
 
     // Tratamento de outros erros

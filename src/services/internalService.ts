@@ -1,5 +1,6 @@
 import axios from 'axios'
 import { API_BASE_URL, API_TIMEOUT, TOKEN_KEY, CONTEXT_ROLE_KEY, ERROR_MESSAGES } from '@/config/constants'
+import { useAuthStore } from '@/stores/auth'
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -28,7 +29,9 @@ api.interceptors.response.use(
     if (error.response) {
       switch (error.response.status) {
         case 401:
-          throw new Error(ERROR_MESSAGES.UNAUTHORIZED)
+          const authStore = useAuthStore()
+          authStore.handleUnauthorized()
+          break
         case 403:
           throw new Error(ERROR_MESSAGES.FORBIDDEN)
         case 404:
@@ -39,6 +42,7 @@ api.interceptors.response.use(
           throw new Error(ERROR_MESSAGES.NETWORK_ERROR)
       }
     }
+    return Promise.reject(error)
   }
 )
 

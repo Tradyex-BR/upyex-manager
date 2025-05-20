@@ -19,14 +19,7 @@ export const useAuthStore = defineStore('auth', () => {
     return !!token.value && !!user.value
   })
 
-  const setAuth = (newToken: string, newUser: User) => {
-    token.value = newToken
-    user.value = newUser
-    localStorage.setItem('token', newToken)
-    localStorage.setItem('user', JSON.stringify(newUser))
-  }
-
-  const logout = () => {
+  const handleUnauthorized = () => {
     // Salva o papel do usuário antes de limpar
     const currentRole = localStorage.getItem(CONTEXT_ROLE_KEY) || 'manager'
 
@@ -41,6 +34,17 @@ export const useAuthStore = defineStore('auth', () => {
     window.location.href = `/login/${currentRole}`
   }
 
+  const setAuth = (newToken: string, newUser: User) => {
+    token.value = newToken
+    user.value = newUser
+    localStorage.setItem('token', newToken)
+    localStorage.setItem('user', JSON.stringify(newUser))
+  }
+
+  const logout = () => {
+    handleUnauthorized()
+  }
+
   const login = async (credentials: { email: string; password: string; fingerprint: string }) => {
     try {
       const response = await managerService.auth.login({
@@ -53,7 +57,10 @@ export const useAuthStore = defineStore('auth', () => {
 
       setAuth(token, user)
       return user
-    } catch (error) {
+    } catch (error: any) {
+      if (error.response?.status === 401) {
+        handleUnauthorized()
+      }
       throw error
     }
   }
@@ -75,6 +82,7 @@ export const useAuthStore = defineStore('auth', () => {
     setAuth,
     logout,
     login,
-    checkAuth
+    checkAuth,
+    handleUnauthorized
   }
 }) 
