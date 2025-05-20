@@ -350,10 +350,13 @@
             <div v-else class="overflow-visible w-full">
               <BaseTable :headers="[
                 { key: 'name', label: 'Nome', align: 'left' },
-                { key: 'id', label: 'ID de Afiliado', align: 'center' },
-                { key: 'created_at', label: 'Data de cadastro', align: 'center' },
-                { key: 'updated_at', label: 'Última atualização', align: 'center' },
+                { key: 'email', label: 'Email', align: 'center' },
+                { key: 'integration_code', label: 'Código de afiliado', align: 'center' },
                 { key: 'status', label: 'Status', align: 'center' },
+                { key: 'withdrawal_enabled', label: 'Saque habilitado', align: 'center' },
+                { key: 'latest_login_at', label: 'Último acesso', align: 'center' },
+                { key: 'created_at', label: 'Cadastro', align: 'center' },
+                { key: 'updated_at', label: 'Última alteração', align: 'center' },
                 { key: 'actions', label: 'Ações', align: 'center' }
               ]" :items="affiliates">
                 <template #name="{ item }">
@@ -364,24 +367,46 @@
                   </div>
                 </template>
 
-                <template #id="{ item }">
-                  <span class="font-inter text-[14px] font-normal leading-[18px] text-white">{{ item.integration_code
-                  }}</span>
+                <template #email="{ item }">
+                  <p class="font-inter text-[14px] font-normal leading-[18px] text-white">{{ item.email }}</p>
+                </template>
+
+                <template #integration_code="{ item }">
+                  <p class="font-inter text-[14px] font-normal leading-[18px] text-white">{{ item.integration_code }}
+                  </p>
+                </template>
+
+                <template #withdrawal_enabled="{ item }">
+                  <p :class="getStatusClass(item.withdrawal_enabled ? 'Sim' : 'Não')">{{ item.withdrawal_enabled ?
+                    'Sim' : 'Não' }}</p>
+                </template>
+
+                <template #latest_login_at="{ item }">
+                  <p class="font-inter text-[14px] font-normal leading-[18px] text-white">{{ item.latest_login_at ? new
+                    Date(item.latest_login_at).toLocaleDateString('pt-BR', {
+                      day: '2-digit', month: '2-digit', year: 'numeric',
+                      hour: '2-digit', minute: '2-digit'
+                    }) : '-' }}</p>
                 </template>
 
                 <template #created_at="{ item }">
-                  {{ new Date(item.created_at).toLocaleDateString('pt-BR') }}
+                  <p class="font-inter text-[14px] font-normal leading-[18px] text-white">{{ item.created_at ? new
+                    Date(item.created_at).toLocaleDateString('pt-BR', {
+                      day: '2-digit', month: '2-digit', year: 'numeric',
+                      hour: '2-digit', minute: '2-digit'
+                    }) : '-' }}</p>
                 </template>
 
                 <template #updated_at="{ item }">
-                  {{ new Date(item.updated_at).toLocaleString('pt-BR', {
-                    day: '2-digit', month: '2-digit', year: 'numeric',
-                    hour: '2-digit', minute: '2-digit'
-                  }) }}
+                  <p class="font-inter text-[14px] font-normal leading-[18px] text-white">{{ item.updated_at ? new
+                    Date(item.updated_at).toLocaleDateString('pt-BR', {
+                      day: '2-digit', month: '2-digit', year: 'numeric',
+                      hour: '2-digit', minute: '2-digit'
+                    }) : '-' }}</p>
                 </template>
 
                 <template #status="{ item }">
-                  <span :class="getStatusClass(item.is_active ? 'Ativo' : 'Inativo')">
+                  <span :class="getStatusClass(item.is_active ? 'Ativo' : 'Inativo')"> 
                     {{ item.is_active ? 'Ativo' : 'Inativo' }}
                   </span>
                 </template>
@@ -397,19 +422,9 @@
         <BasePagination :meta="pagination" @page-change="handlePageChange" />
 
         <!-- Modal de criação de afiliado -->
-        <CreateAffiliateModal 
-          v-if="showCreateModal" 
-          @close="closeCreateModal" 
-          @submit="handleCreate"
-          @refresh="handleSearch('', 1)"
-          :rules="affiliateRules" 
-        />
-        <EditAffiliateModal 
-          v-if="showEditModal && selectedAffiliate?.id" 
-          :show="showEditModal" 
-          :affiliate-id="selectedAffiliate.id"
-          @close="showEditModal = false" 
-          @submit="handleEditAffiliate" 
-        />
+        <CreateAffiliateModal v-if="showCreateModal" @close="closeCreateModal" @submit="handleCreate"
+          @refresh="handleSearch('', 1)" :rules="affiliateRules" />
+        <EditAffiliateModal v-if="showEditModal && selectedAffiliate?.id" :show="showEditModal"
+          :affiliate-id="selectedAffiliate.id" @close="showEditModal = false" @submit="handleEditAffiliate" />
       </AuthenticatedLayout>
     </template>
