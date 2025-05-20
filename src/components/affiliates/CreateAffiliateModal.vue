@@ -234,14 +234,14 @@ const form = ref<Form>({
   ]
 })
 
-const validateCommission = (value: number, index: number) => {
+const validateCommission = (value: number, _: number) => {
   if (!props.rules) return true;
   const commissionDecimal = value / 100;
   return commissionDecimal >= props.rules.commission_percentage.min &&
     commissionDecimal <= props.rules.commission_percentage.max;
 }
 
-const validateReleaseDays = (value: number, index: number) => {
+const validateReleaseDays = (value: number, _: number) => {
   if (!props.rules) return true;
   return value >= props.rules.commission_release_days.min &&
     value <= props.rules.commission_release_days.max;
