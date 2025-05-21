@@ -1,7 +1,8 @@
 <template>
   <button @click="handleCopy"
     class="p-0 transition-colors bg-transparent border-none outline-none focus:outline-none focus:ring-0 ring-0 w-[25px] h-[25px] flex items-center justify-center"
-    title="Copiar ID da Transação">
+    :title="alt ? `Copiar ${alt}` : 'Copiar'"
+  >
     <CopyIcon v-if="!copied" class="w-[25px] h-[25px]" />
     <svg v-else xmlns="http://www.w3.org/2000/svg" class="w-[25px] h-[25px] text-green-500" viewBox="0 0 20 20"
       fill="currentColor">
@@ -23,7 +24,7 @@ const handleCopy = async () => {
   try {
     await navigator.clipboard.writeText(props.stringToCopy)
     copied.value = true
-    notificationService.success('ID copiado com sucesso!')
+    notificationService.success(`${props.alt ? props.alt : 'ID'} copiado com sucesso!`)
 
     // Resetar o estado após 2 segundos
     setTimeout(() => {
@@ -37,5 +38,6 @@ const handleCopy = async () => {
 
 const props = defineProps<{
   stringToCopy: string
+  alt?: string  
 }>()
 </script>
