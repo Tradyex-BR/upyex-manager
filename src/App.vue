@@ -43,10 +43,17 @@ function onSearch(term: string) {
 }
 
 watch(fullPath, (newPath) => {
+  const currentContext = localStorage.getItem(CONTEXT_ROLE_KEY);
+  
+  // Se não houver contexto definido, define como affiliate por padrão
+  if (!currentContext) {
+    localStorage.setItem(CONTEXT_ROLE_KEY, 'affiliate');
+    return;
+  }
+
+  // Só muda para manager se a rota explicitamente indicar
   if (newPath.includes('manager')) {
     localStorage.setItem(CONTEXT_ROLE_KEY, 'manager');
-  } else if (affiliatesPages.some(page => newPath.includes(page))) {
-    localStorage.setItem(CONTEXT_ROLE_KEY, 'affiliate');
   }
 });
 
