@@ -1,6 +1,7 @@
 import axios from 'axios'
 import { API_BASE_URL, API_TIMEOUT, TOKEN_KEY, CONTEXT_ROLE_KEY, ERROR_MESSAGES } from '@/config/constants'
 import { useAuthStore } from '@/stores/auth'
+import { useRouter } from 'vue-router'
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -30,7 +31,11 @@ api.interceptors.response.use(
       switch (error.response.status) {
         case 401:
           const authStore = useAuthStore()
-          authStore.handleUnauthorized()
+          const router = useRouter()
+          // Só redireciona se não estiver na página de login
+          if (!router.currentRoute.value.path.includes('/login')) {
+            authStore.handleUnauthorized()
+          }
           break
         case 403:
           throw new Error(ERROR_MESSAGES.FORBIDDEN)
