@@ -19,13 +19,6 @@ const pagesThatDontHaveSidebar = [
   '/password-changed'
 ];
 
-const affiliatesPages = [
-  '/login/affiliate',
-  '/forgot-password/affiliate',
-  '/email-sent/affiliate',
-  '/reset-password/affiliate',
-]
-
 const route = useRoute();
 const authStore = useAuthStore();
 const isLoading = ref(true);
