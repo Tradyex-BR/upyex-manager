@@ -19,7 +19,7 @@
           <BaseTable :headers="isManager ? [
             { key: 'name', label: 'Nome', align: 'left' },
             { key: 'status', label: 'Status', align: 'center' },
-            { key: 'base_affiliate_link', label: 'Link direto', align: 'center' },
+            { key: 'base_affiliate_link', label: 'URL Base', align: 'center' },
             { key: 'actions', label: 'Ações', align: 'center' }
           ] : [
             { key: 'name', label: 'Nome', align: 'left' },
@@ -49,7 +49,7 @@
                 <span class="font-inter text-[14px] font-normal leading-[18px] text-white truncate max-w-[200px]">
                   {{ item.base_affiliate_link }}
                 </span>
-                <CopyButton :stringToCopy="item.base_affiliate_link" />
+                <CopyButton v-if="item.base_affiliate_link" :stringToCopy="item.base_affiliate_link" :alt="isManager ? 'URL Base' : 'Link direto'" />
               </div>
               <div v-else class="flex items-center justify-center gap-2">
                 <span class="font-inter text-[14px] font-normal leading-[18px] text-white truncate max-w-[200px]">
@@ -63,7 +63,7 @@
                 <span class="font-inter text-[14px] font-normal leading-[18px] text-white truncate max-w-[200px]">
                   {{ formatLink(item.affiliate_link) }}
                 </span>
-                <CopyButton :stringToCopy="item.affiliate_link" />
+                <CopyButton v-if="item.affiliate_link" :stringToCopy="item.affiliate_link" :alt="isManager ? 'Link direto' : 'URL Base'" />
               </div>
             </template>
 
