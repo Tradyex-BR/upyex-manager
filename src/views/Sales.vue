@@ -15,19 +15,20 @@
         <BaseTable v-else :headers="isManager ? [
           { key: 'date', label: 'Data', align: 'left' },
           { key: 'customer', label: 'Cliente', align: 'center' },
-          { key: 'token', label: 'Token', align: 'center' },
+          { key: 'products', label: 'Produtos', align: 'center' },
           { key: 'status', label: 'Status', align: 'center' },
-          { key: 'payment_method', label: 'Método de Pagamentos', align: 'center' },
-          { key: 'volume', label: 'Volume', align: 'center' },
-          { key: 'value', label: 'Valor BRL', align: 'center' }
+          { key: 'payment_method', label: 'Método de pagamento', align: 'center' },
+          { key: 'affiliate_commission', label: 'Comissão do afiliado', align: 'center' },
+          { key: 'platform_fee', label: 'Comissão da plataforma', align: 'center' },
+          { key: 'total_amount', label: 'Total', align: 'center' }
         ] : [
-          { key: 'date', label: 'Data', align: 'left' },
-          { key: 'token', label: 'Token', align: 'center' },
-          { key: 'updated_at', label: 'Última Atualização', align: 'center' },
-          { key: 'value', label: 'Valor BRL', align: 'center' },
+        { key: 'date', label: 'Data', align: 'left' },
+          { key: 'customer', label: 'Cliente', align: 'center' },
+          { key: 'products', label: 'Produtos', align: 'center' },
           { key: 'status', label: 'Status', align: 'center' },
-          { key: 'wallet_id', label: 'Carteira', align: 'center' },
-          { key: 'transaction_id', label: 'ID Transação', align: 'center' }
+          { key: 'payment_method', label: 'Método de pagamento', align: 'center' },
+          { key: 'affiliate_commission', label: 'Comissão do afiliado', align: 'center' },
+          { key: 'total_amount', label: 'Total', align: 'center' }
         ]" :items="sales" class="overflow-y-visible">
           <template #date="{ item }">
             {{ new Date(item.created_at).toLocaleDateString('pt-BR') }}
@@ -37,7 +38,7 @@
             {{ item.customer?.name || '-'	 }}
           </template>
 
-          <template #token="{ item }">
+          <template #products="{ item }">
             <div class="flex items-center justify-center gap-3">
                 <BaseAvatarGroup :data="item.products" />
             </div>
@@ -51,12 +52,16 @@
             {{ mapPaymentMethod(item.payment_method) }}
           </template>
 
-          <template #volume="{ item }">
-            {{ item.products && item.products.length ? item.products[0].amount : '-' }}
+          <template #affiliate_commission="{ item }">
+            {{ item.affiliate_commission ? `R$ ${item.affiliate_commission.toFixed(2)}` : '-' }}
           </template>
 
-          <template #value="{ item }">
-            {{ item.products && item.products.length ? `R$ ${item.products[0].price.toFixed(2)}` : '-' }}
+          <template #platform_fee="{ item }">
+            {{ item.platform_fee ? `R$ ${item.platform_fee.toFixed(2)}` : '-' }}
+          </template>
+
+          <template #total_amount="{ item }">
+            {{ item.total_amount ? `R$ ${item.total_amount.toFixed(2)}` : '-' }}
           </template>
 
           <template #updated_at="{ item }">
