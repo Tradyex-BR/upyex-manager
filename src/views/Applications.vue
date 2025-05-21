@@ -18,6 +18,7 @@
         <div v-else class="overflow-visible w-full">
           <BaseTable :headers="isManager ? [
             { key: 'name', label: 'Nome', align: 'left' },
+            { key: 'affiliate_count', label: 'Afiliados', align: 'center' },
             { key: 'status', label: 'Status', align: 'center' },
             { key: 'base_affiliate_link', label: 'URL Base', align: 'center' },
             { key: 'actions', label: 'Ações', align: 'center' }
@@ -36,6 +37,10 @@
                   }}</span>
                 </div>
               </div>
+            </template>
+
+            <template #affiliate_count="{ item }">
+              <span class="font-inter text-[14px] font-normal leading-[18px] text-white">{{ item.affiliate_count || 0 }}</span>
             </template>
 
             <template #status="{ item }">
