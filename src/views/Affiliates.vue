@@ -263,7 +263,7 @@
 
         const getStatusClass = (status: string) => {
           const baseClass = 'font-inter text-[14px] font-medium leading-[18px] inline-flex h-6 px-2 justify-center items-center gap-1 rounded-[6px] w-fit mx-auto'
-          return status === 'Ativo'
+          return status === 'Ativo' || status === 'Sim'
             ? `${baseClass} bg-green-500/20 text-green-500`
             : `${baseClass} bg-red-500/20 text-red-500`
         }
