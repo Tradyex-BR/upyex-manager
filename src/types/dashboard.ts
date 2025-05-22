@@ -26,6 +26,7 @@ export interface DashboardResponse {
         payment_link: number
         pix: number
       }
+      total_sales?: number
     }
     graph: Array<{
       date: string

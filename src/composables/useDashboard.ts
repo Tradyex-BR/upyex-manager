@@ -25,7 +25,8 @@
             debit_card: 0,
             payment_link: 0,
             pix: 0
-          }
+          },
+          total_sales: 0
         },
         graph: []
       },
@@ -132,7 +133,8 @@
             debit_card: 0,
             payment_link: 0,
             pix: 0
-          }
+          },
+          total_sales: 100
         },
         graph: [
           {

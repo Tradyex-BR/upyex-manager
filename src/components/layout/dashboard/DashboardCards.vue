@@ -65,8 +65,8 @@ const managerListCards = [
 
 const affiliateCards = [
   {
-    value: props.data.balance?.current_balance?.toString() || '0',
-    label: 'Vendas totais',
+    value: props.data.sales.cards.total_sales?.toString() || '0',
+    label: 'Saldo atual',
     border: false
   },
   {
@@ -77,6 +77,11 @@ const affiliateCards = [
   {
     value: props.data.balance?.future_balance?.toString() || '0',
     label: 'Saldo a liberar',
+    border: false
+  },
+  {
+    value: props.data.balance?.current_balance?.toString() || '0',
+    label: 'Total de vendas',
     border: false
   },
 ]
@@ -99,6 +104,7 @@ defineOptions({
     opacity: 0;
     transform: translateY(20px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
