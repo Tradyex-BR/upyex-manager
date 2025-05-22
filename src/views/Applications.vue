@@ -3,7 +3,7 @@
     <section class="w-full overflow-hidden">
       <div class="flex justify-between items-center mb-6">
         <p class="text-white text-2xl font-semibold">Aplicações</p>
-        <BaseButton variant="primary" @click="showCreateModal = true">
+        <BaseButton v-if="isManager" variant="primary" @click="showCreateModal = true">
           Nova Aplicação
         </BaseButton>
       </div>
