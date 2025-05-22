@@ -1,5 +1,5 @@
 <script lang="ts">
-import { defineAsyncComponent, defineComponent, ref, watch } from 'vue'
+import { defineComponent, ref, watch } from 'vue'
 import { managerService } from '@/services/managerService'
 import Sidebar from '@/components/layout/dashboard/Sidebar.vue'
 import TopBar from '@/components/layout/dashboard/TopBar.vue'
@@ -18,9 +18,6 @@ import { useAuthStore } from '@/stores/auth'
 import { useToast } from 'vue-toastification'
 import BaseAvatarGroup from '@/components/common/BaseAvatarGroup.vue'
 
-const PenIcon = defineAsyncComponent(() => import('@/components/icons/PenIcon.vue'))
-const TrashIcon = defineAsyncComponent(() => import('@/components/icons/TrashIcon.vue'))
-
 interface Usuario {
   id: string;
   nome: string;
@@ -33,16 +30,6 @@ interface Usuario {
   linkApi: string;
   phone?: string;
   document_number?: string;
-}
-
-interface PaginationMeta {
-  current_page: number;
-  from: number;
-  last_page: number;
-  per_page: number;
-  to: number;
-  total: number;
-  links?: any;
 }
 
 export default defineComponent({
