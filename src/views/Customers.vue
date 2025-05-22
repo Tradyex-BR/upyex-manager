@@ -16,6 +16,7 @@ import { usePaginationStore } from '@/stores/pagination'
 import { useDashboardStore } from '@/stores/dashboard'
 import { useAuthStore } from '@/stores/auth'
 import { useToast } from 'vue-toastification'
+import BaseAvatarGroup from '@/components/common/BaseAvatarGroup.vue'
 
 const PenIcon = defineAsyncComponent(() => import('@/components/icons/PenIcon.vue'))
 const TrashIcon = defineAsyncComponent(() => import('@/components/icons/TrashIcon.vue'))
@@ -61,7 +62,8 @@ export default defineComponent({
     MenuIcon,
     BaseDropdown,
     BaseTable,
-    BasePagination
+    BasePagination,
+    BaseAvatarGroup
   },
   setup() {
     const store = useDashboardStore()
@@ -226,11 +228,10 @@ export default defineComponent({
           id: item.id,
           nome: item.name || '',
           email: item.email || '',
-          aplicacao: item.application?.name || '',
+          application: item.application || null,
           afiliado: item.affiliate?.name || '',
           status: item.application?.is_active ? 'Ativo' : 'Inativo',
           dataCadastro: item.created_at ? new Date(item.created_at).toLocaleDateString('pt-BR') : '-',
-          ultimoAcesso: item.updated_at ? new Date(item.updated_at).toLocaleDateString('pt-BR') : '-',
           linkApi: item.links?.api || '',
           phone: item.phone || '',
           document_number: item.document_number || ''
@@ -249,6 +250,23 @@ export default defineComponent({
       } finally {
         this.loading = false;
       }
+    },
+    formatApplicationAsProduct(application: any) {
+      if (!application) return []
+      
+      const product = {
+        id: application.id,
+        name: application.name,
+        description: application.description,
+        logo_url: application.logo_url,
+        base_affiliate_link: application.base_affiliate_link,
+        is_active: application.is_active,
+        affiliate_count: application.affiliate_count,
+        created_at: application.created_at,
+        updated_at: application.updated_at,
+        links: application.links
+      }
+      return [product]
     }
   }
 })
@@ -271,13 +289,17 @@ export default defineComponent({
         <div v-else class="overflow-visible w-full">
           <BaseTable :headers="[
             { key: 'name', label: 'Nome', align: 'left' },
+            { key: 'application_name', label: 'Aplicação', align: 'center' },
             { key: 'email', label: 'Email', align: 'center' },
             { key: 'status', label: 'Status', align: 'center' },
             { key: 'created_at', label: 'Data de cadastro', align: 'center' },
-            { key: 'last_access', label: 'Último acesso', align: 'center' }
           ]" :items="customers">
             <template #name="{ item }">
               {{ item.nome || "-" }}
+            </template>
+
+            <template #application_name="{ item }">
+              <BaseAvatarGroup :data="formatApplicationAsProduct(item.application)" />
             </template>
 
             <template #email="{ item }">

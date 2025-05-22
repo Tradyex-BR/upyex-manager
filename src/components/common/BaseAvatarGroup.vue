@@ -1,5 +1,5 @@
 <template>
-  <div class="flex -space-x-4 overflow-visible" style="overflow: visible !important;">
+  <div class="flex -space-x-4 overflow-visible justify-center" style="overflow: visible !important;">
     <template v-for="(product, idx) in displayedProducts" :key="product.id">
       <div class="relative group" :style="hoveredIdx === idx ? 'z-index: 999;' : 'z-index: 10;'"
         @mouseenter="showTooltip(idx)" @mouseleave="hideTooltip" :ref="el => setAvatarRef(el, idx)">
@@ -9,7 +9,7 @@
       </div>
     </template>
     <div v-if="data.length > maxAvatars"
-      class="w-10 h-10 rounded-full bg-gray-500 flex items-center justify-center text-white text-xs font-semibold shadow">
+      class="w-8 h-8 rounded-full bg-gray-500 flex items-center justify-center text-white text-xs font-semibold shadow">
       +{{ data.length - maxAvatars }}
     </div>
     <teleport to="body">
@@ -22,8 +22,13 @@
         pointerEvents: 'none',
       }" class="px-3 py-2 rounded bg-gray-900 text-white text-xs whitespace-nowrap shadow-lg transition opacity-100">
         <div><span class="font-semibold">{{ tooltip.product?.name }}</span></div>
-        <div>Preço: R$ {{ tooltip.product?.price.toFixed(2) }}</div>
-        <div>Qtd: {{ tooltip.product?.amount }}</div>
+        <div v-if="tooltip.product?.price">Preço: R$ {{ tooltip.product?.price?.toFixed(2) }}</div>
+        <div v-if="tooltip.product?.amount">Qtd: {{ tooltip.product?.amount }}</div>
+        <div v-if="tooltip.product?.description">{{ tooltip.product?.description }}</div>
+        <div v-if="tooltip.product?.affiliate_count">Afiliados: {{ tooltip.product?.affiliate_count }}</div>
+        <div v-if="tooltip.product?.is_active !== undefined">
+          Status: {{ tooltip.product?.is_active ? 'Ativo' : 'Inativo' }}
+        </div>
       </div>
     </teleport>
   </div>
@@ -37,8 +42,20 @@ import type { ComponentPublicInstance } from 'vue'
 interface Product {
   id: string
   name: string
-  price: number
-  amount: number
+  price?: number
+  amount?: number
+  description?: string
+  logo_url?: string | null
+  base_affiliate_link?: string
+  api_secret?: string
+  is_active?: boolean
+  affiliate_count?: number
+  created_at?: string
+  updated_at?: string
+  links?: {
+    api: string
+    frontend: string
+  }
 }
 
 export default defineComponent({
