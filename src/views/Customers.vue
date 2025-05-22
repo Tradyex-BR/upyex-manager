@@ -74,67 +74,12 @@ export default defineComponent({
     const customers = ref<any[]>([])
     const searchQuery = ref('')
     const paginationStore = usePaginationStore()
-    const pagination = ref<PaginationMeta>({
-      current_page: 1,
-      from: 1,
-      last_page: 1,
-      per_page: paginationStore.perPage,
-      to: 1,
-      total: 0
-    })
 
     watch(() => authStore.isAuthenticated, (isAuthenticated: boolean) => {
       if (!isAuthenticated) {
         router.push('/login')
       }
     })
-
-    watch(() => paginationStore.perPage, (newValue: number) => {
-      pagination.value.per_page = newValue
-      handleSearch(searchQuery.value, pagination.value.current_page)
-    })
-
-    const handleSearch = async (term: string, page: number = 1) => {
-      loading.value = true
-      try {
-        const response = await managerService.customers.list({
-          search: term,
-          page: page,
-          per_page: paginationStore.perPage,
-          sort_by: 'created_at',
-          sort_order: 'desc'
-        })
-        customers.value = response.data || []
-        if (response.meta) {
-          pagination.value = response.meta
-        }
-      } catch (e) {
-        logger.error('Erro ao buscar clientes:', e)
-      } finally {
-        loading.value = false
-      }
-    }
-
-    const handlePageChange = async (newPage: number) => {
-      await handleSearch(searchQuery.value, newPage)
-    }
-
-    const navigateToEdit = (customer: any) => {
-      router.push(`/customers/${customer.id}/edit`)
-    }
-
-    const dropdownOptions = [
-      {
-        text: 'Editar',
-        action: 'edit',
-        icon: PenIcon
-      },
-      {
-        text: 'Excluir',
-        action: 'delete',
-        icon: TrashIcon
-      }
-    ]
 
     return {
       store,
@@ -144,15 +89,20 @@ export default defineComponent({
       loading,
       customers,
       searchQuery,
-      pagination,
-      handleSearch,
-      handlePageChange,
-      navigateToEdit,
-      dropdownOptions
+      paginationStore
     }
   },
   data() {
     return {
+      pagination: {
+        current_page: 1,
+        from: 1,
+        last_page: 1,
+        per_page: 10,
+        to: 1,
+        total: 0,
+        links: [] as Array<{ url: string | null; label: string; active: boolean }>
+      },
       dropdownOpen: null as string | null,
       showDetailModal: false,
       showCreateModal: false,
@@ -162,8 +112,15 @@ export default defineComponent({
     }
   },
   watch: {
+    'paginationStore.perPage': {
+      handler(newValue: number) {
+        this.pagination.per_page = newValue
+        this.handleSearch(this.searchTerm)
+      },
+      immediate: true
+    },
     searchTerm(newTerm) {
-      this.handleSearch(newTerm);
+      this.handleSearch(newTerm)
     }
   },
   async mounted() {
@@ -267,6 +224,80 @@ export default defineComponent({
         links: application.links
       }
       return [product]
+    },
+    async handleSearch(term: string) {
+      this.loading = true
+      try {
+        const response = await managerService.customers.list({
+          search: term,
+          page: 1,
+          per_page: this.paginationStore.perPage,
+          sort_by: 'created_at',
+          sort_order: 'desc'
+        })
+        this.customers = (response.data || []).map((item: any) => ({
+          id: item.id,
+          nome: item.name || '',
+          email: item.email || '',
+          application: item.application || null,
+          afiliado: item.affiliate?.name || '',
+          status: item.application?.is_active ? 'Ativo' : 'Inativo',
+          dataCadastro: item.created_at ? new Date(item.created_at).toLocaleDateString('pt-BR') : '-',
+          linkApi: item.links?.api || '',
+          phone: item.phone || '',
+          document_number: item.document_number || ''
+        }))
+        this.pagination = {
+          current_page: response.meta.current_page,
+          from: response.meta.from,
+          last_page: response.meta.last_page,
+          per_page: response.meta.per_page,
+          to: response.meta.to,
+          total: response.meta.total,
+          links: response.meta.links
+        }
+      } catch (e) {
+        logger.error('Erro ao buscar clientes:', e)
+      } finally {
+        this.loading = false
+      }
+    },
+    async handlePageChange(page: number) {
+      this.loading = true
+      try {
+        const response = await managerService.customers.list({
+          search: this.searchTerm,
+          page: page,
+          per_page: this.paginationStore.perPage,
+          sort_by: 'created_at',
+          sort_order: 'desc'
+        })
+        this.customers = (response.data || []).map((item: any) => ({
+          id: item.id,
+          nome: item.name || '',
+          email: item.email || '',
+          application: item.application || null,
+          afiliado: item.affiliate?.name || '',
+          status: item.application?.is_active ? 'Ativo' : 'Inativo',
+          dataCadastro: item.created_at ? new Date(item.created_at).toLocaleDateString('pt-BR') : '-',
+          linkApi: item.links?.api || '',
+          phone: item.phone || '',
+          document_number: item.document_number || ''
+        }))
+        this.pagination = {
+          current_page: response.meta.current_page,
+          from: response.meta.from,
+          last_page: response.meta.last_page,
+          per_page: response.meta.per_page,
+          to: response.meta.to,
+          total: response.meta.total,
+          links: response.meta.links
+        }
+      } catch (e) {
+        logger.error('Erro ao buscar clientes:', e)
+      } finally {
+        this.loading = false
+      }
     }
   }
 })
