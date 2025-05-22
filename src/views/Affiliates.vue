@@ -425,6 +425,6 @@
         <CreateAffiliateModal v-if="showCreateModal" @close="closeCreateModal" @submit="handleCreate"
           @refresh="handleSearch('', 1)" :rules="affiliateRules" />
         <EditAffiliateModal v-if="showEditModal && selectedAffiliate?.id" :show="showEditModal"
-          :affiliate-id="selectedAffiliate.id" @close="showEditModal = false" @submit="handleEditAffiliate" />
+          :affiliate-id="selectedAffiliate.id" @close="showEditModal = false" @submit="handleEditAffiliate" :rules="affiliateRules" />
       </AuthenticatedLayout>
     </template>
