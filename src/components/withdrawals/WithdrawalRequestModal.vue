@@ -9,7 +9,7 @@
       <div class="flex items-center justify-center text-[56px] font-semibold leading-[64px] text-white">
         <input v-model="amount" type="text"
           class="text-center w-[200px] bg-transparent border-none outline-none p-0 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-          placeholder="$ 0.00" @keydown="handleKeydown" @input="handleInput" />
+          placeholder="R$ 0.00" @keydown="handleKeydown" @input="handleInput" />
       </div>
       <p class="text-[#B8B8B8] text-center font-inter font-light leading-5">
         Saldo disponível: R$ {{ withdrawalInfo.current_balance.toLocaleString('pt-BR', { minimumFractionDigits: 2 }) }}
