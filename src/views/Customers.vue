@@ -111,7 +111,7 @@ export default defineComponent({
     }
   },
   async mounted() {
-    await this.loadCustomers();
+    // Removido loadCustomers() pois já é chamado pelo watcher
   },
   methods: {
     getStatusClass(status: string): string {

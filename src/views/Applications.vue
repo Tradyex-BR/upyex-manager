@@ -190,7 +190,6 @@ export default defineComponent({
   },
   mounted() {
     this.isManager = localStorage.getItem(CONTEXT_ROLE_KEY) === 'manager'
-    this.handleSearch('')
   },
   watch: {
     'paginationStore.perPage': {
