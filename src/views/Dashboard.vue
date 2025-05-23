@@ -11,7 +11,7 @@
                   <flat-pickr
                     v-model="dateRange"
                     :config="flatpickrOptions"
-                    class="bg-[#222a3f] border border-[#222a3f] cursor-pointer rounded-lg px-4 py-2 text-white w-[255px] focus:outline-none focus:ring-0 pr-10"
+                    class="bg-[#222a3f] border border-[#222a3f] cursor-pointer rounded-lg px-4 py-2 text-white w-[260px] focus:outline-none focus:ring-0 pr-10"
                     placeholder="Selecione o período (DD/MM/AAAA)"
                   />
                   <svg class="absolute right-3 w-5 h-5 text-[#CF631C] pointer-events-none" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
