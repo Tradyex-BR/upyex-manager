@@ -309,7 +309,6 @@ export default defineComponent({
             { key: 'name', label: 'Nome', align: 'left' },
             { key: 'application_name', label: 'Aplicação', align: 'center' },
             { key: 'email', label: 'Email', align: 'center' },
-            { key: 'status', label: 'Status', align: 'center' },
             { key: 'created_at', label: 'Data de cadastro', align: 'center' },
           ]" :items="customers">
             <template #name="{ item }">
@@ -322,10 +321,6 @@ export default defineComponent({
 
             <template #email="{ item }">
               {{ item.email }}
-            </template>
-
-            <template #status="{ item }">
-              <span :class="getStatusClass(item.status)">{{ item.status }}</span>
             </template>
 
             <template #created_at="{ item }">
