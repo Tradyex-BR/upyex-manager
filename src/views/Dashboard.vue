@@ -21,7 +21,7 @@
               </div>
             </div>
             <div>
-              <DashboardCards :data="data" :gap="24" :role="role" :isValueCurrency="true" />
+              <DashboardCards :data="data" :gap="24" :role="role" />
             </div>
             <DashboardNavigation v-model="currentView" />
 

@@ -3,14 +3,14 @@
     <template v-if="vertical">
       <div class="flex flex-col gap-2">
         <StatCard v-for="(card, index) in managerListCards" :key="index" :value="card.value" :label="card.label"
-          :border="card.border" :class="$attrs.class" :index="index" :animate="true" :isValueCurrency="isValueCurrency" />
+          :border="card.border" :class="$attrs.class" :index="index" :animate="true" :isValueCurrency="card.isValueCurrency" />
       </div>
     </template>
     <template v-else>
       <div class="w-full flex flex-row gap-6">
         <StatCard v-for="(card, index) in (role === 'manager' ? managerCards : affiliateCards)" :key="index"
           :value="card.value" :label="card.label" :border="card.border" :class="$attrs.class" :index="index"
-          :isValueCurrency="isValueCurrency" />
+          :isValueCurrency="card.isValueCurrency" />
       </div>
     </template>
   </div>
@@ -38,17 +38,20 @@ const managerCards = [
   {
     value: props.data.sales?.cards?.by_status?.paid?.toString() || '0',
     label: 'Vendas Pagas',
-    border: false
+    border: false,
+    isValueCurrency: false
   },
   {
     value: props.data.customers?.total?.toString() || '0',
     label: 'Total de Clientes',
-    border: false
+    border: false,
+    isValueCurrency: false
   },
   {
     value: props.data.withdrawals?.by_status?.requested?.toString() || '0',
     label: 'Saques Solicitados',
-    border: false
+    border: false,
+    isValueCurrency: false
   },
 ]
 
@@ -56,12 +59,14 @@ const managerListCards = [
   {
     value: props.data.customers?.total?.toString() || '0',
     label: 'Total de Clientes',
-    border: true
+    border: true,
+    isValueCurrency: false
   },
   {
     value: props.data.customers?.new?.toString() || '0',
     label: 'Novos Clientes',
-    border: true
+    border: true,
+    isValueCurrency: false
   },
 ]
 
@@ -69,22 +74,26 @@ const affiliateCards = [
   {
     value: props.data.sales.cards.total_sales?.toString() || '0',
     label: 'Saldo atual',
-    border: false
+    border: false,
+    isValueCurrency: true
   },
   {
     value: props.data.balance?.next_7_days?.toString() || '0',
     label: 'Saldo a liberar (Proximos 7 dias)',
-    border: false
+    border: false,
+    isValueCurrency: true
   },
   {
     value: props.data.balance?.future_balance?.toString() || '0',
     label: 'Saldo a liberar',
-    border: false
+    border: false,
+    isValueCurrency: true
   },
   {
     value: props.data.balance?.current_balance?.toString() || '0',
     label: 'Total de vendas',
-    border: false
+    border: false,
+    isValueCurrency: true
   },
 ]
 

@@ -12,7 +12,7 @@
           {{ label }}
         </div>
         <div class="text-white text-[24px] font-semibold leading-8">
-          {{ isValueCurrency ? "R$ " + value : value }}
+          {{ isValueCurrency ? "R$ " + Number(value).toFixed(2) : value }}
         </div>
       </div>
     </div>
