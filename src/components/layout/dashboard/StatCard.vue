@@ -1,11 +1,9 @@
 <template>
-  <div
-    class="justify-between items-center bg-[#222A3F] flex min-w-60 flex-1 shrink basis-[0%] p-8 rounded-lg h-full"
+  <div class="justify-between items-center bg-[#222A3F] flex min-w-60 flex-1 shrink basis-[0%] p-8 rounded-lg h-full"
     :class="[
       { 'border border-[#2C3652]': border },
       { 'stat-card': animate }
-    ]"
-    :style="{
+    ]" :style="{
       animationDelay: animate ? `${index * 100}ms` : '0ms'
     }">
     <div class="self-stretch min-w-60 w-full flex-1 shrink basis-[0%] my-auto">
@@ -14,7 +12,7 @@
           {{ label }}
         </div>
         <div class="text-white text-[24px] font-semibold leading-8">
-          {{ value }}
+          {{ isValueCurrency ? "R$ " + value : value }}
         </div>
       </div>
     </div>
@@ -28,12 +26,14 @@ interface Props {
   border?: boolean;
   index?: number;
   animate?: boolean;
+  isValueCurrency?: boolean;
 }
 
 withDefaults(defineProps<Props>(), {
   border: false,
   index: 0,
-  animate: false
+  animate: false,
+  isValueCurrency: false
 });
 </script>
 
@@ -49,6 +49,7 @@ withDefaults(defineProps<Props>(), {
     opacity: 0;
     transform: translateY(20px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);

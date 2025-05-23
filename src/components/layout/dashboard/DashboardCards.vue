@@ -3,13 +3,14 @@
     <template v-if="vertical">
       <div class="flex flex-col gap-2">
         <StatCard v-for="(card, index) in managerListCards" :key="index" :value="card.value" :label="card.label"
-          :border="card.border" :class="$attrs.class" :index="index" :animate="true" />
+          :border="card.border" :class="$attrs.class" :index="index" :animate="true" :isValueCurrency="isValueCurrency" />
       </div>
     </template>
     <template v-else>
       <div class="w-full flex flex-row gap-6">
         <StatCard v-for="(card, index) in (role === 'manager' ? managerCards : affiliateCards)" :key="index"
-          :value="card.value" :label="card.label" :border="card.border" :class="$attrs.class" :index="index" />
+          :value="card.value" :label="card.label" :border="card.border" :class="$attrs.class" :index="index"
+          :isValueCurrency="isValueCurrency" />
       </div>
     </template>
   </div>
@@ -29,7 +30,8 @@ const props = defineProps<{
   vertical?: boolean,
   border?: boolean,
   gap?: number,
-  role?: string
+  role?: string,
+  isValueCurrency?: boolean
 }>();
 
 const managerCards = [
