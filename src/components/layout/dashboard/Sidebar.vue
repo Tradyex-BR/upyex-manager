@@ -111,7 +111,7 @@ export default defineComponent({
           text: 'Clientes',
           route: '/customers',
           icon: 'svg-vendas',
-          visible: role === 'manager'
+          visible: true
         },
         {
           text: 'Usuários',
